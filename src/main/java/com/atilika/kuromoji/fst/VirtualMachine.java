@@ -1,6 +1,7 @@
 package com.atilika.kuromoji.fst;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class VirtualMachine {
@@ -16,9 +17,11 @@ public class VirtualMachine {
         }
 
         void addInstruction(Instruction instruction) {
-
             instructions.add(instruction);
+        }
 
+        void addInstructions(Instruction[] instructions) {
+            this.instructions = Arrays.asList(instructions);
         }
     }
 
@@ -28,6 +31,8 @@ public class VirtualMachine {
         public static final int NOP = 2;
         public static final int FAIL = 3;
         public static final int HELLO = 4;
+        public static final int ACCEPT = 5;
+        public static final int ACCUMULATE = 6;
 
         int opcode;
 
@@ -63,9 +68,13 @@ public class VirtualMachine {
                     char arg1 = i.arg1;
 
                     if (arg1 == input.charAt(position)) {
-                        pc = i.arg2;
+                        pc = i.arg2 - 1; // pc is always incremented!
                     }
 
+                    break;
+
+                case Instruction.ACCUMULATE:
+                    accumulator += i.arg2;
                     break;
 
 
@@ -76,6 +85,9 @@ public class VirtualMachine {
                 case Instruction.NOP:
                     break;
 
+                case Instruction.ACCEPT:
+                    done = true;
+                    break;
 
                 case Instruction.FAIL:
                     done = true;
