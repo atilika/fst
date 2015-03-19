@@ -23,6 +23,10 @@ public class VirtualMachine {
         void addInstructions(Instruction[] instructions) {
             this.instructions = Arrays.asList(instructions);
         }
+
+        void addInstructions(List<Instruction> instructions) {
+            this.instructions =instructions;
+        }
     }
 
     public static class Instruction {
@@ -39,6 +43,8 @@ public class VirtualMachine {
         char arg1;
 
         int arg2;
+
+        int arg3; // used as a output for a FST arc
     }
 
     public VirtualMachine() {
@@ -47,6 +53,7 @@ public class VirtualMachine {
 
     public int run(Program program, String input) {
 
+        pc = 0;
 
         int accumulator = 0; // CPU register
 
@@ -67,15 +74,18 @@ public class VirtualMachine {
 
                     char arg1 = i.arg1;
 
-                    if (arg1 == input.charAt(position)) {
-                        pc = i.arg2 - 1; // pc is always incremented!
+                    if (position < input.length() && arg1 == input.charAt(position)) {
+//                        pc += i.arg2 - 1; // pc is always incremented!
+                        pc = i.arg2 - 1; // JUMP to Address i.arg2
+                        accumulator += i.arg3;
+                        position += 1; // move the input char pointer
                     }
 
                     break;
 
-                case Instruction.ACCUMULATE:
-                    accumulator += i.arg2;
-                    break;
+//                case Instruction.ACCUMULATE:
+//                    accumulator += i.arg2;
+//                    break;
 
 
                 case Instruction.HELLO:
@@ -104,4 +114,5 @@ public class VirtualMachine {
         return accumulator;
 
     }
+
 }

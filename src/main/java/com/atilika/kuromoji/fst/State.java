@@ -114,4 +114,24 @@ public class State {
 
         return null;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        State state = (State) o;
+
+        if (isFinal != state.isFinal) return false;
+        if (arcs != null ? !arcs.equals(state.arcs) : state.arcs != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = arcs != null ? arcs.hashCode() : 0;
+        result = 31 * result + (isFinal ? 1 : 0);
+        return result;
+    }
 }
