@@ -15,9 +15,9 @@ public class FSTCompilerTest {
 
         // currently, supported by storing where the destination address is.
         HashMap<String, Integer> stateAddressHashMap = new HashMap<>();
-        stateAddressHashMap.put("ACCEPT", 3); // looping to itself
-        stateAddressHashMap.put("a", 3); // stores the address of a next state
-        stateAddressHashMap.put("b", 3); // next state is 3
+        stateAddressHashMap.put("[]", 0); // ACCEPT
+        stateAddressHashMap.put("[a]", 2);
+        stateAddressHashMap.put("[b]", 3);
 
         State acceptState = new State();
         acceptState.isFinal = true;
@@ -28,12 +28,14 @@ public class FSTCompilerTest {
 
         FSTCompiler fstCompiler = new FSTCompiler();
         List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
-        instructionList.addAll(0, fstCompiler.freezeState(acceptState, stateAddressHashMap));
-        instructionList.addAll(0, fstCompiler.freezeState(startState, stateAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(acceptState, stateAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(startState, stateAddressHashMap));
+
 
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(instructionList);
+
 
         assertEquals(1, vm.run(program, "a"));
         assertEquals(2, vm.run(program, "b"));
@@ -44,10 +46,10 @@ public class FSTCompilerTest {
     public void testFreezeStateThreeStates() throws Exception {
 
         HashMap<String, Integer> stateAddressHashMap = new HashMap<>();
-        stateAddressHashMap.put("ACCEPT", 5); // looping to itself
-        stateAddressHashMap.put("c", 5);
-        stateAddressHashMap.put("a", 5); // stores the address of a next state
-        stateAddressHashMap.put("b", 3); // next state is 3
+        stateAddressHashMap.put("[]", 0); // accepting state, stores the address of instruction
+        stateAddressHashMap.put("[c]", 2);
+        stateAddressHashMap.put("[a]", 4);
+        stateAddressHashMap.put("[b]", 5);
 
         // this map will be unsupervised in the higher level method.
 
@@ -64,9 +66,9 @@ public class FSTCompilerTest {
 
         FSTCompiler fstCompiler = new FSTCompiler();
         List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
-        instructionList.addAll(0, fstCompiler.freezeState(acceptState, stateAddressHashMap));
-        instructionList.addAll(0, fstCompiler.freezeState(destStateB, stateAddressHashMap));
-        instructionList.addAll(0, fstCompiler.freezeState(startState, stateAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(acceptState, stateAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(destStateB, stateAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(startState, stateAddressHashMap));
         // note that startState is always freezed in the last.
 
         VirtualMachine vm = new VirtualMachine();

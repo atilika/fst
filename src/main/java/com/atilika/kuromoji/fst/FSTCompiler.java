@@ -7,6 +7,8 @@ import java.util.List;
 public class FSTCompiler {
 
     private HashMap<String, ArrayList<State>> statesDictionaryHashList;
+//    private HashMap<String, Integer> stateAddressHashMap = new HashMap<>();
+
 
     public List<VirtualMachine.Instruction> freezeState(State state,
                                                         HashMap<String, Integer> stateAddressHashMap) {
@@ -32,10 +34,12 @@ public class FSTCompiler {
             instructionMatch.opcode = instructionMatch.MATCH;
             instructionMatch.arg1 = transitionString; // TODO: debug it!
             instructionMatch.arg3 = state.getTransitionArc(transitionString).getOutput(); // set output
+//            instructionMatch.arg2 = stateAddressHashMap.get(transitionString.toString());
+            String temp = state.getNextState(transitionString).getAllTransitionStrings().toString();
+            instructionMatch.arg2 =
+                    stateAddressHashMap.get(temp);
 
-            instructionMatch.arg2 = stateAddressHashMap.get(transitionString.toString());
-
-            instructionList.add(0, instructionMatch); // what will happen if one state accepts it?
+            instructionList.add(instructionMatch); // what will happen if one state accepts it?
         }
 
         return instructionList;
@@ -51,6 +55,14 @@ public class FSTCompiler {
         VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
         return instructionAccept;
+    }
+
+    public void
+    addToStateAddressHashMap(String transition, State state) {
+        ArrayList<State> states = statesDictionaryHashList.get(transition);
+        states.add(state);
+        statesDictionaryHashList.put(transition, states); // putting back the updated lists
+
     }
 
 }
