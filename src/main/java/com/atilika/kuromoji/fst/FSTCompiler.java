@@ -6,10 +6,6 @@ import java.util.List;
 
 public class FSTCompiler {
 
-    private HashMap<String, ArrayList<State>> statesDictionaryHashList;
-//    private HashMap<String, Integer> stateAddressHashMap = new HashMap<>();
-
-
     public List<VirtualMachine.Instruction> freezeState(State state,
                                                         HashMap<String, Integer> stateAddressHashMap) {
         // returns a list of instructions
@@ -39,10 +35,58 @@ public class FSTCompiler {
             instructionMatch.arg2 =
                     stateAddressHashMap.get(temp);
 
+            state.getNextArc(transitionString).setTargetJumpAddress(stateAddressHashMap.get(temp));
+
             instructionList.add(instructionMatch); // what will happen if one state accepts it?
         }
 
         return instructionList;
+    }
+
+
+    // To be unit tested in the following methods....
+
+    public boolean isJumpToSameAddress(int jumpAddress, Arc arc) {
+        if (arc.getTargetJumpAddress() == jumpAddress) {
+            return true;
+        }
+        return false;
+    }
+
+    public int referToFrozenArc(Arc b, String key, HashMap<String, List<Integer>> arcAddressHashMap,
+                                 HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap) {
+        if (!arcAddressHashMap.containsKey(key)) {
+            return -1;
+        }
+
+        List<Integer> arcAddresses = arcAddressHashMap.get(key);
+
+        for (Integer arcAddress : arcAddresses) {
+            int arcCtargetAddress = addressInstructionHashMap.get(arcAddress).arg2;
+            if (isJumpToSameAddress(arcCtargetAddress, b)) {
+                return arcCtargetAddress; // transiting to the same state.
+            }
+        }
+
+        return -1;
+    }
+
+    public void assignTargetAddressToArcB(Arc b, String key, HashMap<String, List<Integer>> arcAddressHashMap,
+                                    HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap) {
+        int targetAddress = referToFrozenArc(b, key, arcAddressHashMap, addressInstructionHashMap);
+        if (targetAddress != -1) {
+            b.setTargetJumpAddress(targetAddress); // equivalent state found
+        }
+        else {
+            // No frozen arcs transiting to the same state. Freeze a new arc.
+            List<Integer> arcAddresses = arcAddressHashMap.get(key);
+            int newAddress = 0; // TODO: this should allocate to new address
+            VirtualMachine.Instruction newInstruction = new VirtualMachine.Instruction(); // TODO: Assign new instruction
+            arcAddresses.add(newAddress);
+            arcAddressHashMap.put(key, arcAddresses);
+            addressInstructionHashMap.put(newAddress, newInstruction);
+            b.setTargetJumpAddress(newAddress);
+        }
     }
 
     public VirtualMachine.Instruction createInstructionFail() {
@@ -55,14 +99,6 @@ public class FSTCompiler {
         VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
         return instructionAccept;
-    }
-
-    public void
-    addToStateAddressHashMap(String transition, State state) {
-        ArrayList<State> states = statesDictionaryHashList.get(transition);
-        states.add(state);
-        statesDictionaryHashList.put(transition, states); // putting back the updated lists
-
     }
 
 }

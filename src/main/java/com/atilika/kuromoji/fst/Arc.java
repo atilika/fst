@@ -4,6 +4,8 @@ public class Arc {
     char label; // for dead end state
     int output = 0;
     State destination;
+    int targetJumpAddress;
+
 
     public Arc(int output, State destination, char label) {
         this.output = output;
@@ -27,9 +29,15 @@ public class Arc {
         return this.label;
     }
 
+    public int getTargetJumpAddress() { return this.targetJumpAddress; }
+
     public void setOutput(Integer output) {this.output = output;}
 
     public void setLabel(char label) {
         this.label = label;
+    }
+
+    public void setTargetJumpAddress(int address) {
+        this.targetJumpAddress = address;
     }
 }

@@ -2,9 +2,7 @@ package com.atilika.kuromoji.fst;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -14,10 +12,10 @@ public class FSTCompilerTest {
     public void testFreezeStateTwoStates() throws Exception {
 
         // currently, supported by storing where the destination address is.
-        HashMap<String, Integer> stateAddressHashMap = new HashMap<>();
-        stateAddressHashMap.put("[]", 0); // ACCEPT
-        stateAddressHashMap.put("[a]", 2);
-        stateAddressHashMap.put("[b]", 3);
+        HashMap<String, Integer> arcAddressHashMap = new HashMap<>();
+        arcAddressHashMap.put("[]", 0); // ACCEPT
+        arcAddressHashMap.put("[a]", 2);
+        arcAddressHashMap.put("[b]", 3);
 
         State acceptState = new State();
         acceptState.isFinal = true;
@@ -28,9 +26,8 @@ public class FSTCompilerTest {
 
         FSTCompiler fstCompiler = new FSTCompiler();
         List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
-        instructionList.addAll(fstCompiler.freezeState(acceptState, stateAddressHashMap));
-        instructionList.addAll(fstCompiler.freezeState(startState, stateAddressHashMap));
-
+        instructionList.addAll(fstCompiler.freezeState(acceptState, arcAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(startState, arcAddressHashMap));
 
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
@@ -45,11 +42,11 @@ public class FSTCompilerTest {
     @Test
     public void testFreezeStateThreeStates() throws Exception {
 
-        HashMap<String, Integer> stateAddressHashMap = new HashMap<>();
-        stateAddressHashMap.put("[]", 0); // accepting state, stores the address of instruction
-        stateAddressHashMap.put("[c]", 2);
-        stateAddressHashMap.put("[a]", 4);
-        stateAddressHashMap.put("[b]", 5);
+        HashMap<String, Integer> arcAddressHashMap = new HashMap<>(); // corresponds to each arc
+        arcAddressHashMap.put("[]", 0); // accepting state, stores the address of instruction
+        arcAddressHashMap.put("[c]", 2);
+        arcAddressHashMap.put("[a]", 4);
+        arcAddressHashMap.put("[b]", 5);
 
         // this map will be unsupervised in the higher level method.
 
@@ -66,10 +63,11 @@ public class FSTCompilerTest {
 
         FSTCompiler fstCompiler = new FSTCompiler();
         List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
-        instructionList.addAll(fstCompiler.freezeState(acceptState, stateAddressHashMap));
-        instructionList.addAll(fstCompiler.freezeState(destStateB, stateAddressHashMap));
-        instructionList.addAll(fstCompiler.freezeState(startState, stateAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(acceptState, arcAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(destStateB, arcAddressHashMap));
+        instructionList.addAll(fstCompiler.freezeState(startState, arcAddressHashMap));
         // note that startState is always freezed in the last.
+
 
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
@@ -79,4 +77,75 @@ public class FSTCompilerTest {
         assertEquals(-1, vm.run(program, "b"));
         assertEquals(3, vm.run(program, "bc"));
     }
+
+    @Test
+    public void testReferToFrozenArc() throws Exception {
+        // testing for {2: match 'a', 1: FAIL, 0: ACCEPT}
+
+        State acceptState = new State();
+        acceptState.isFinal = true;
+
+        Arc b = new Arc(1, acceptState, 'a');
+        String key = "a";
+        HashMap<String, List<Integer>> arcAddressHashMap = new HashMap<>();
+        List<Integer> addresses = new ArrayList<>();
+        addresses.add(2);
+        arcAddressHashMap.put(key, addresses);
+
+        HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
+        VirtualMachine.Instruction instruction = new VirtualMachine.Instruction();
+        instruction.opcode = instruction.MATCH;
+        instruction.arg1 = 'a';
+        instruction.arg2 = 0;
+        instruction.arg3 = 1;
+
+        addressInstructionHashMap.put(2, instruction);
+
+        FSTCompiler fstCompiler = new FSTCompiler();
+        assertEquals(0, fstCompiler.referToFrozenArc(b, key, arcAddressHashMap, addressInstructionHashMap));
+
+        Arc c = new Arc(1, acceptState, 'b');
+        key = "b";
+        assertEquals(-1, fstCompiler.referToFrozenArc(c, key, arcAddressHashMap, addressInstructionHashMap));
+    }
+
+    //    @Test
+//    public void testCollidedCase() throws Exception {
+//        HashMap<String, List<Integer>> stateAddressHashMap = new HashMap<>();
+//        List<Integer> listAccept = new ArrayList<>();
+//        listAccept.add(0);
+//        stateAddressHashMap.put("[]", listAccept); // accepting state, stores the address of instruction
+//
+//        List<Integer> listA = new ArrayList<>();
+//        listAccept.add(2);
+//        listAccept.add(4);
+//        listAccept.add(6);
+//
+//        stateAddressHashMap.put("[a]", listA); // shall I change it to list of integers?
+//
+//        State acceptState = new State();
+//        acceptState.isFinal = true;
+//
+//        State stateA = new State();
+//
+//        State stateAA = new State();
+//        stateA.setArc('a', 1, stateAA);
+//        stateAA.setArc('a', 1, acceptState);
+//
+//        State startState = new State();
+//        startState.setArc('a', 1, stateA);
+//
+//        FSTCompiler fstCompiler = new FSTCompiler();
+//        List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
+//        instructionList.addAll(fstCompiler.freezeState(acceptState, stateAddressHashMap));
+//
+//
+//
+//        VirtualMachine vm = new VirtualMachine();
+//        VirtualMachine.Program program = new VirtualMachine.Program();
+//        program.addInstructions(instructionList);
+//
+//        assertEquals(1, vm.run(program, "a"));
+//
+//    }
 }
