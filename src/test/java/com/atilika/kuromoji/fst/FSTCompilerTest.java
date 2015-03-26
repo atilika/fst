@@ -102,11 +102,59 @@ public class FSTCompilerTest {
         addressInstructionHashMap.put(2, instruction);
 
         FSTCompiler fstCompiler = new FSTCompiler();
-        assertEquals(0, fstCompiler.referToFrozenArc(b, key, arcAddressHashMap, addressInstructionHashMap));
+        assertEquals(0, fstCompiler.referToFrozenArc(b, key, arcAddressHashMap, addressInstructionHashMap)); // returns the address of already frozen instruction
 
         Arc c = new Arc(1, acceptState, 'b');
         key = "b";
         assertEquals(-1, fstCompiler.referToFrozenArc(c, key, arcAddressHashMap, addressInstructionHashMap));
+    }
+
+    @Test
+    public void testAssignTargetAddressToArcB() throws Exception {
+        // Testing the equivalence freezing
+
+        // set up testing environment
+        HashMap<String, List<Integer>> arcAddressHashMap = new HashMap<>();
+        HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
+
+        State acceptState = new State();
+        acceptState.isFinal = true;
+
+        int INSTRUCTION_ACCEPT_ADDRESS = 0;
+        VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
+        instructionAccept.opcode = instructionAccept.ACCEPT;
+//        instructionAccept.arg1 = ' ';
+        instructionAccept.arg2 = 0; // target address, self loop: VERY IMPORTANT for equivalent state detection.
+//        instructionAccept.arg3 = 1;
+        addressInstructionHashMap.put(INSTRUCTION_ACCEPT_ADDRESS, instructionAccept);
+
+
+        // making an arc itself
+        Arc b = new Arc(1, acceptState, 'a');
+        String key = "a";
+        List<Integer> addresses = new ArrayList<>();
+
+        int INSTRUCTION_ADDRESS = 2;
+
+        addresses.add(INSTRUCTION_ADDRESS); // Instruction of an address
+        arcAddressHashMap.put(key, addresses);
+
+        // making an instruction that corresponds to an arc
+        VirtualMachine.Instruction instruction = new VirtualMachine.Instruction();
+        instruction.opcode = instruction.MATCH;
+        instruction.arg1 = 'a';
+        instruction.arg2 = 0; // target address, towards Accepting state
+        instruction.arg3 = 1;
+        addressInstructionHashMap.put(INSTRUCTION_ADDRESS, instruction);
+
+        int CURRENT_INSTRUCTION_SIZE = 0;
+
+        FSTCompiler fstCompiler = new FSTCompiler();
+        fstCompiler.assignTargetAddressToArcB(b, key, arcAddressHashMap, addressInstructionHashMap); // set the address of already frozen instruction
+
+        // freeze a new arc
+
+        assertEquals(0, b.getTargetJumpAddress());
     }
 
     //    @Test

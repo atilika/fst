@@ -48,6 +48,7 @@ public class FSTCompiler {
 
     public boolean isJumpToSameAddress(int jumpAddress, Arc arc) {
         if (arc.getTargetJumpAddress() == jumpAddress) {
+            // getTargetJumpAddress is Arc d
             return true;
         }
         return false;
@@ -80,7 +81,9 @@ public class FSTCompiler {
         else {
             // No frozen arcs transiting to the same state. Freeze a new arc.
             List<Integer> arcAddresses = arcAddressHashMap.get(key);
-            int newAddress = 0; // TODO: this should allocate to new address
+            int newAddress = 3; // TODO: this should allocate to new address
+            // How do you assign a new address?
+
             VirtualMachine.Instruction newInstruction = new VirtualMachine.Instruction(); // TODO: Assign new instruction
             arcAddresses.add(newAddress);
             arcAddressHashMap.put(key, arcAddresses);
