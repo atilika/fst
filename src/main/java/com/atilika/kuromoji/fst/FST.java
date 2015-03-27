@@ -10,6 +10,7 @@ public class FST {
     // Note that FST only allows the presorted dictionaries as input.
 
     private HashMap<String, ArrayList<State>> statesDictionaryHashList;
+    private FSTCompiler fstCompiler = new FSTCompiler();
 
     // TODO: Rewrite this...
     public int MAX_WORD_LENGTH = 100;
@@ -193,6 +194,28 @@ public class FST {
             setTransition(tempStates[i - 1], findEquivalentCollisionHandled(tempStates[i]), output, lastWord.charAt(i - 1));
         }
         findEquivalentCollisionHandled(tempStates[0]);
+
+        // For FST compiler
+        State dummyState = new State();
+        dummyState.setArc(' ', 0, tempStates[0]);
+        List<Character> transitionStrings = dummyState.getAllTransitionStrings();
+        if (transitionStrings.size() != 0) {
+            for (int i = 0; i < transitionStrings.size(); i++) {
+                char transitionChar = transitionStrings.get(i);
+                String keyArc = "Dummy" + transitionChar;
+                Arc b = dummyState.getNextArc(transitionChar);
+                fstCompiler.assignTargetAddressToArcB(b, keyArc);
+            }
+        }
+        else {
+            char transitionChar = ' ';
+//            Arc b = new Arc(0, state, transitionChar); // self loop
+            dummyState.setArc(' ', 0, dummyState);
+            String keyArc = "Dummy" + transitionChar;
+            Arc b = dummyState.getNextArc(transitionChar);
+            fstCompiler.assignTargetAddressToArcB(b, keyArc);
+        }
+
     }
 
 
@@ -241,11 +264,38 @@ public class FST {
         from.setArc(transitionStr, to);
     }
 
-
+    /**
+     * Find the equivalent state
+     *
+     * @param state
+     * @return
+     */
     private State findEquivalentCollisionHandled(State state) {
         // returns a equivalent state which is already in the stateDicitonary. nextState will be used when there is a collision
         List<Character> transitionStrings = state.getAllTransitionStrings();
         List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
+
+
+
+        if (transitionStrings.size() != 0) {
+            for (int i = 0; i < transitionStrings.size(); i++) {
+                char transitionChar = transitionStrings.get(i);
+                String keyArc = "" + transitionChar;
+                Arc b = state.getNextArc(transitionChar);
+                fstCompiler.assignTargetAddressToArcB(b, keyArc);
+            }
+        }
+        else {
+            char transitionChar = ' ';
+//            Arc b = new Arc(0, state, transitionChar); // self loop
+            state.setArc(' ', 0, state);
+            String keyArc = "" + transitionChar;
+            Arc b = state.getNextArc(transitionChar);
+            fstCompiler.assignTargetAddressToArcB(b, keyArc);
+        }
+
+
+
 
         String key = transitionStrings.toString() + outputStrings.toString();
 
@@ -254,7 +304,8 @@ public class FST {
         if (statesDictionaryHashList.containsKey(key)) {
             ArrayList<State> collidedStates = statesDictionaryHashList.get(key);
 
-            if (state.getAllTransitionStrings().size() == 0) {
+//            if (state.getAllTransitionStrings().size() == 0) {
+            if (state.getAllTransitionStrings().get(0) == ' ') {
                 // the dead end state (which is unique!)
                 return collidedStates.get(0);
             }
@@ -284,6 +335,11 @@ public class FST {
         return newStateToDic;
     }
 
+    /**
+     * Initialize the temp states
+     *
+     * @param state
+     */
     private void clearState(State state) {
         // clear all transitions and set it to non-final state
         state.arcs = new ArrayList<Arc>();

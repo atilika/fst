@@ -53,7 +53,8 @@ public class VirtualMachine {
 
     public int run(Program program, String input) {
 
-        pc = 0;
+//        pc = 0;
+        pc = program.instructions.size() - 1; // Compiled in a reverse order
 
         int accumulator = 0; // CPU register
 
@@ -76,7 +77,8 @@ public class VirtualMachine {
 
                     if (position < input.length() && arg1 == input.charAt(position)) {
 //                        pc += i.arg2 - 1; // pc is always incremented!
-                        pc = i.arg2 - 1; // JUMP to Address i.arg2
+//                        pc = i.arg2 - 1; // JUMP to Address i.arg2
+                        pc = i.arg2 + 1; // JUMP to Address i.arg2
                         accumulator += i.arg3;
                         position += 1; // move the input char pointer
                     }
@@ -108,7 +110,8 @@ public class VirtualMachine {
                     throw new RuntimeException("You have screwed up badly, please go away!");
             }
 
-            pc++;
+//            pc++;
+            pc--;
         }
 
         return accumulator;
