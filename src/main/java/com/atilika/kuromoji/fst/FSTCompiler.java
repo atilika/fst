@@ -77,6 +77,9 @@ public class FSTCompiler {
 
     public void assignTargetAddressToArcB(Arc b, String key) {
         int targetAddress = referToFrozenArc(b, key);
+        if (b.getLabel() == 'i') {
+            System.out.println();
+        }
         if (targetAddress != -1) {
             b.setTargetJumpAddress(targetAddress); // equivalent state found
         }
@@ -99,8 +102,11 @@ public class FSTCompiler {
             // TODO: Assumed only single arc
             VirtualMachine.Instruction newInstructionForArcD = new VirtualMachine.Instruction();
             if (d.getLabel() == ' ') {
-                // TODO: Accepting state sometimes jumps to next state. Self loop is not always true. Handle e.g. "dog" vs. "dogs"
                 newInstructionForArcD = createInstructionAccept(newAddress); // self loop
+            }
+            else if (d.getDestination().isFinal) {
+                // Accepting state sometimes jumps to next state. Self loop is not always true. Handle e.g. "dog" vs. "dogs"
+                newInstructionForArcD = createInstructionMatchOrAccept(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
             }
             else {
                 newInstructionForArcD =
@@ -109,7 +115,8 @@ public class FSTCompiler {
             instructionList.add(newInstructionForArcD);
 
             addressInstructionHashMap.put(newAddress, newInstructionForArcD);
-            b.setTargetJumpAddress(newAddress);
+
+//            b.setTargetJumpAddress(newAddress);
 
             // rest of the arcs
             for (int i = 1; i < b.getDestination().arcs.size(); i++) {
@@ -121,6 +128,7 @@ public class FSTCompiler {
 
                 addressInstructionHashMap.put(newAddress, newInstructionForArcD);
             }
+            b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
         }
     }
 
@@ -140,6 +148,15 @@ public class FSTCompiler {
     private VirtualMachine.Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
         VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
         instructionMatch.opcode = instructionMatch.MATCH;
+        instructionMatch.arg1 = arg1;
+        instructionMatch.arg2 = jumpAddress;
+        instructionMatch.arg3 = output;
+        return instructionMatch;
+    }
+
+    private VirtualMachine.Instruction createInstructionMatchOrAccept(char arg1, int jumpAddress, int output) {
+        VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
+        instructionMatch.opcode = instructionMatch.ACCEPT_OR_MATCH;
         instructionMatch.arg1 = arg1;
         instructionMatch.arg2 = jumpAddress;
         instructionMatch.arg3 = output;

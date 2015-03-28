@@ -10,7 +10,7 @@ public class FST {
     // Note that FST only allows the presorted dictionaries as input.
 
     private HashMap<String, ArrayList<State>> statesDictionaryHashList;
-    private FSTCompiler fstCompiler = new FSTCompiler();
+    public FSTCompiler fstCompiler = new FSTCompiler();
 
     // TODO: Rewrite this...
     public int MAX_WORD_LENGTH = 100;
@@ -208,8 +208,9 @@ public class FST {
             }
         }
         else {
+            // This is the case when start state is an accepting state. It will not be used when empty string does not appear in the dictionary
+
             char transitionChar = ' ';
-//            Arc b = new Arc(0, state, transitionChar); // self loop
             dummyState.setArc(' ', 0, dummyState);
             String keyArc = "Dummy" + transitionChar;
             Arc b = dummyState.getNextArc(transitionChar);

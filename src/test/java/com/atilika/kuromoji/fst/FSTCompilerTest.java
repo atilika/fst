@@ -161,43 +161,26 @@ public class FSTCompilerTest {
         return instructionMatch;
     }
 
-    //    @Test
-//    public void testCollidedCase() throws Exception {
-//        HashMap<String, List<Integer>> stateAddressHashMap = new HashMap<>();
-//        List<Integer> listAccept = new ArrayList<>();
-//        listAccept.add(0);
-//        stateAddressHashMap.put("[]", listAccept); // accepting state, stores the address of instruction
-//
-//        List<Integer> listA = new ArrayList<>();
-//        listAccept.add(2);
-//        listAccept.add(4);
-//        listAccept.add(6);
-//
-//        stateAddressHashMap.put("[a]", listA); // shall I change it to list of integers?
-//
-//        State acceptState = new State();
-//        acceptState.isFinal = true;
-//
-//        State stateA = new State();
-//
-//        State stateAA = new State();
-//        stateA.setArc('a', 1, stateAA);
-//        stateAA.setArc('a', 1, acceptState);
-//
-//        State startState = new State();
-//        startState.setArc('a', 1, stateA);
-//
-//        FSTCompiler fstCompiler = new FSTCompiler();
-//        List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
-//        instructionList.addAll(fstCompiler.freezeState(acceptState, stateAddressHashMap));
-//
-//
-//
-//        VirtualMachine vm = new VirtualMachine();
-//        VirtualMachine.Program program = new VirtualMachine.Program();
-//        program.addInstructions(instructionList);
-//
-//        assertEquals(1, vm.run(program, "a"));
-//
-//    }
+    @Test
+    public void testCreateDictionaryWithFSTCompiler() throws Exception {
+        // referring to https://lucene.apache.org/core/4_3_0/core/org/apache/lucene/util/fst/package-summary.html to make a simple test
+        String inputValues[] = {"cat", "cats", "dog", "dogs", "friday", "friend", "pydata"};
+        int outputValues[] = {1, 2, 3, 4, 20, 42, 43};
+
+
+        FST fst = new FST();
+        fst.createDictionary(inputValues, outputValues);
+
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+        }
+
+        // Test whether the program is correctly made.
+        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine.Program program = new VirtualMachine.Program();
+        program.addInstructions(fst.fstCompiler.instructionList);
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], vm.run(program, inputValues[i]));
+        }
+    }
 }

@@ -36,7 +36,7 @@ public class VirtualMachine {
         public static final int FAIL = 3;
         public static final int HELLO = 4;
         public static final int ACCEPT = 5;
-        public static final int ACCUMULATE = 6;
+        public static final int ACCEPT_OR_MATCH = 6;
 
         int opcode;
 
@@ -99,6 +99,25 @@ public class VirtualMachine {
 
                 case Instruction.ACCEPT:
                     done = true;
+                    break;
+
+                case Instruction.ACCEPT_OR_MATCH:
+                    if (input.length() == position + 1) {
+                        // last character
+                        accumulator += i.arg3;
+                        done = true;
+                    }
+                    else {
+                        arg1 = i.arg1;
+
+                        if (position < input.length() && arg1 == input.charAt(position)) {
+//                        pc += i.arg2 - 1; // pc is always incremented!
+//                        pc = i.arg2 - 1; // JUMP to Address i.arg2
+                            pc = i.arg2 + 1; // JUMP to Address i.arg2
+                            accumulator += i.arg3;
+                            position += 1; // move the input char pointer
+                        }
+                    }
                     break;
 
                 case Instruction.FAIL:
