@@ -182,5 +182,62 @@ public class FSTCompilerTest {
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }
+
+        System.out.println(vm.run(program, "cat"));
+        System.out.println(vm.run(program, "friday"));
+        System.out.println(vm.run(program, "thursday"));
+    }
+
+    @Test
+    public void testJapaneseBasics() throws Exception {
+        String inputValues[] = {"すし", "すめし", "さしみ", "寿司", "寿", "さんま", "さかな"};
+//        String inputValues[] = {"すし", "すめし", "さしみ", "寿司", "寿退社", "さんま", "さかな"};
+        int outputValues[] = {1, 2, 3, 4, 20, 42, 43};
+
+        List<String> inputs = Arrays.asList(inputValues);
+        Collections.sort(inputs);
+
+        String sortedInput[] = new String[inputs.size()];
+        for (int i = 0; i < inputs.size(); i++) {
+            sortedInput[i] = inputs.get(i);
+        }
+
+        FST fst = new FST();
+
+        fst.createDictionary(sortedInput, outputValues);
+
+        for (int i = 0; i < sortedInput.length; i++) {
+            assertEquals(outputValues[i], fst.transduce(sortedInput[i]));
+        }
+
+        System.out.println(inputs.toString());
+        // Test whether the program is correctly made.
+        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine.Program program = new VirtualMachine.Program();
+        program.addInstructions(fst.fstCompiler.instructionList);
+        for (int i = 0; i < sortedInput.length; i++) {
+            assertEquals(outputValues[i], vm.run(program, sortedInput[i]));
+        }
+    }
+
+    @Test
+    public void testKotobuki() throws Exception {
+        String inputValues[] = {"さかな", "寿", "寿司"};
+        int outputValues[] = {0, 1, 2};
+
+        FST fst = new FST();
+        fst.createDictionary(inputValues, outputValues);
+
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+        }
+
+        // Test whether the program is correctly made.
+        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine.Program program = new VirtualMachine.Program();
+        program.addInstructions(fst.fstCompiler.instructionList);
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], vm.run(program, inputValues[i]));
+        }
     }
 }

@@ -16,8 +16,8 @@ public class FSTTest {
     @Test
     public void testCreateDictionary() throws Exception {
         // referring to https://lucene.apache.org/core/4_3_0/core/org/apache/lucene/util/fst/package-summary.html to make a simple test
-        String inputValues[] = {"cat", "cats", "dog", "dogs", "friday", "friend"};
-        int outputValues[] = {1, 2, 3, 4, 20, 42};
+        String inputValues[] = {"cat", "cats", "dog", "dogs", "friday", "friend", "pydata"};
+        int outputValues[] = {1, 2, 3, 4, 20, 42, 43};
 
 
         FST fst = new FST();

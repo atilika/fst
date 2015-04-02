@@ -277,7 +277,7 @@ public class FST {
         List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
 
 
-
+         // For FST Compiler
         if (transitionStrings.size() != 0) {
             for (int i = 0; i < transitionStrings.size(); i++) {
                 char transitionChar = transitionStrings.get(i);
@@ -295,9 +295,6 @@ public class FST {
             fstCompiler.assignTargetAddressToArcB(b, keyArc);
         }
 
-
-
-
         String key = transitionStrings.toString() + outputStrings.toString();
 
         State newStateToDic = null;
@@ -306,7 +303,7 @@ public class FST {
             ArrayList<State> collidedStates = statesDictionaryHashList.get(key);
 
 //            if (state.getAllTransitionStrings().size() == 0) {
-            if (state.getAllTransitionStrings().get(0) == ' ') {
+            if (state.getAllTransitionStrings().get(0) == ' ') { // for FST compiler
                 // the dead end state (which is unique!)
                 return collidedStates.get(0);
             }
@@ -320,19 +317,14 @@ public class FST {
                     return collidedState;
                 }
             }
-            // At this point, we know that there is no equivalent compiled (finalized) node
-            newStateToDic = new State(state); // deep copy
-            ArrayList<State> stateList = new ArrayList<State>();
-            stateList.add(newStateToDic);
-            statesDictionaryHashList.put(key, stateList);
-        } else {
-            // At this point, we know that there is no equivalent compiled (finalized) node
-            newStateToDic = new State(state); // deep copy
-            ArrayList<State> stateList = new ArrayList<State>();
-            stateList.add(newStateToDic);
-            statesDictionaryHashList.put(key, stateList);
-
         }
+        // At this point, we know that there is no equivalent compiled (finalized) node
+        newStateToDic = new State(state); // deep copy
+        ArrayList<State> stateList = new ArrayList<State>();
+        stateList.add(newStateToDic);
+        statesDictionaryHashList.put(key, stateList);
+
+
         return newStateToDic;
     }
 

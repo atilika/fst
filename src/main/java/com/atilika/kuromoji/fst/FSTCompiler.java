@@ -50,6 +50,13 @@ public class FSTCompiler {
 
     // To be unit tested in the following methods....
 
+    /**
+     * Checks whether a given arc's jump address is same as the input jumpAddress
+     *
+     * @param jumpAddress
+     * @param arc
+     * @return
+     */
     public boolean isJumpToSameAddress(int jumpAddress, Arc arc) {
         if (arc.getTargetJumpAddress() == jumpAddress) {
             // getTargetJumpAddress is Arc d
@@ -58,6 +65,13 @@ public class FSTCompiler {
         return false;
     }
 
+    /**
+     * Checks whether
+     *
+     * @param b
+     * @param key
+     * @return -1 if there is no Arc which input/output corresponds to key. Else return the address that corresponds to that arc.
+     */
     public int referToFrozenArc(Arc b, String key) {
         if (!arcAddressHashMap.containsKey(key)) {
             return -1;
@@ -75,6 +89,12 @@ public class FSTCompiler {
         return -1;
     }
 
+    /**
+     * Assigning an target jump address to Arc b.
+     *
+     * @param b
+     * @param key
+     */
     public void assignTargetAddressToArcB(Arc b, String key) {
         int targetAddress = referToFrozenArc(b, key);
         if (b.getLabel() == 'i') {
@@ -99,7 +119,6 @@ public class FSTCompiler {
 
             Arc d = b.getDestination().arcs.get(0);
             // First arc is regarded as a state
-            // TODO: Assumed only single arc
             VirtualMachine.Instruction newInstructionForArcD = new VirtualMachine.Instruction();
             if (d.getLabel() == ' ') {
                 newInstructionForArcD = createInstructionAccept(newAddress); // self loop
@@ -122,10 +141,16 @@ public class FSTCompiler {
             for (int i = 1; i < b.getDestination().arcs.size(); i++) {
                 newAddress = instructionList.size();
                 d = b.getDestination().arcs.get(i);
-                newInstructionForArcD =
-                        createInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
-                instructionList.add(newInstructionForArcD);
+                if (d.getDestination().isFinal) {
+                    newInstructionForArcD =
+                            createInstructionMatchOrAccept(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
+                }
+                else {
+                    newInstructionForArcD =
+                            createInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
+                }
 
+                instructionList.add(newInstructionForArcD);
                 addressInstructionHashMap.put(newAddress, newInstructionForArcD);
             }
             b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
