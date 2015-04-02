@@ -149,7 +149,8 @@ public class FSTCompilerTest {
 
         fstCompiler.instructionList = instructionList;
         fstCompiler.assignTargetAddressToArcB(newArc, key);
-        assertEquals(2, newArc.getTargetJumpAddress()); // because the instructionList size is 2
+        // TargetJumpAddress = 3, because the instructionList size is 2 + 1 selfloop = 3
+        assertEquals(3, newArc.getTargetJumpAddress());
     }
 
     private VirtualMachine.Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
@@ -183,15 +184,12 @@ public class FSTCompilerTest {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }
 
-        System.out.println(vm.run(program, "cat"));
-        System.out.println(vm.run(program, "friday"));
-        System.out.println(vm.run(program, "thursday"));
+        assertEquals(-1, vm.run(program, "thursday"));
     }
 
     @Test
     public void testJapaneseBasics() throws Exception {
         String inputValues[] = {"すし", "すめし", "さしみ", "寿司", "寿", "さんま", "さかな"};
-//        String inputValues[] = {"すし", "すめし", "さしみ", "寿司", "寿退社", "さんま", "さかな"};
         int outputValues[] = {1, 2, 3, 4, 20, 42, 43};
 
         List<String> inputs = Arrays.asList(inputValues);
@@ -210,7 +208,6 @@ public class FSTCompilerTest {
             assertEquals(outputValues[i], fst.transduce(sortedInput[i]));
         }
 
-        System.out.println(inputs.toString());
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
@@ -218,6 +215,7 @@ public class FSTCompilerTest {
         for (int i = 0; i < sortedInput.length; i++) {
             assertEquals(outputValues[i], vm.run(program, sortedInput[i]));
         }
+        assertEquals(-1, vm.run(program, "まぐろ"));
     }
 
     @Test
@@ -239,5 +237,6 @@ public class FSTCompilerTest {
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }
+        assertEquals(-1, vm.run(program, "まぐろ"));
     }
 }

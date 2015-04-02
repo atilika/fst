@@ -195,28 +195,7 @@ public class FST {
         }
         findEquivalentCollisionHandled(tempStates[0]);
 
-        // For FST compiler
-        State dummyState = new State();
-        dummyState.setArc(' ', 0, tempStates[0]);
-        List<Character> transitionStrings = dummyState.getAllTransitionStrings();
-        if (transitionStrings.size() != 0) {
-            for (int i = 0; i < transitionStrings.size(); i++) {
-                char transitionChar = transitionStrings.get(i);
-                String keyArc = "Dummy" + transitionChar;
-                Arc b = dummyState.getNextArc(transitionChar);
-                fstCompiler.assignTargetAddressToArcB(b, keyArc);
-            }
-        }
-        else {
-            // This is the case when start state is an accepting state. It will not be used when empty string does not appear in the dictionary
-
-            char transitionChar = ' ';
-            dummyState.setArc(' ', 0, dummyState);
-            String keyArc = "Dummy" + transitionChar;
-            Arc b = dummyState.getNextArc(transitionChar);
-            fstCompiler.assignTargetAddressToArcB(b, keyArc);
-        }
-
+        compileFinalWord(tempStates); // For FST compiler
     }
 
 
@@ -276,27 +255,9 @@ public class FST {
         List<Character> transitionStrings = state.getAllTransitionStrings();
         List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
 
-
-         // For FST Compiler
-        if (transitionStrings.size() != 0) {
-            for (int i = 0; i < transitionStrings.size(); i++) {
-                char transitionChar = transitionStrings.get(i);
-                String keyArc = "" + transitionChar;
-                Arc b = state.getNextArc(transitionChar);
-                fstCompiler.assignTargetAddressToArcB(b, keyArc);
-            }
-        }
-        else {
-            char transitionChar = ' ';
-//            Arc b = new Arc(0, state, transitionChar); // self loop
-            state.setArc(' ', 0, state);
-            String keyArc = "" + transitionChar;
-            Arc b = state.getNextArc(transitionChar);
-            fstCompiler.assignTargetAddressToArcB(b, keyArc);
-        }
+        compileState(transitionStrings, state); // For FST Compiler
 
         String key = transitionStrings.toString() + outputStrings.toString();
-
         State newStateToDic = null;
 
         if (statesDictionaryHashList.containsKey(key)) {
@@ -324,7 +285,6 @@ public class FST {
         stateList.add(newStateToDic);
         statesDictionaryHashList.put(key, stateList);
 
-
         return newStateToDic;
     }
 
@@ -337,5 +297,45 @@ public class FST {
         // clear all transitions and set it to non-final state
         state.arcs = new ArrayList<Arc>();
         state.isFinal = false;
+    }
+
+    private void compileFinalWord(State[] tempStates) {
+        State dummyState = new State();
+        dummyState.setArc(' ', 0, tempStates[0]);
+        List<Character> transitionStrings = dummyState.getAllTransitionStrings();
+        if (transitionStrings.size() != 0) {
+            for (int i = 0; i < transitionStrings.size(); i++) {
+                char transitionChar = transitionStrings.get(i);
+                String keyArc = "Dummy" + transitionChar;
+                Arc b = dummyState.getNextArc(transitionChar);
+                fstCompiler.assignTargetAddressToArcB(b, keyArc);
+            }
+        }
+        else {
+            // This is the case when start state is an accepting state. It will not be used when empty string does not appear in the dictionary
+            char transitionChar = ' ';
+            dummyState.setArc(' ', 0, dummyState);
+            String keyArc = "Dummy" + transitionChar;
+            Arc b = dummyState.getNextArc(transitionChar);
+            fstCompiler.assignTargetAddressToArcB(b, keyArc);
+        }
+    }
+
+    private void compileState(List<Character> transitionStrings, State state) {
+        if (transitionStrings.size() != 0) {
+            for (int i = 0; i < transitionStrings.size(); i++) {
+                char transitionChar = transitionStrings.get(i);
+                String keyArc = "" + transitionChar;
+                Arc b = state.getNextArc(transitionChar);
+                fstCompiler.assignTargetAddressToArcB(b, keyArc);
+            }
+        }
+        else {
+            char transitionChar = ' ';
+            state.setArc(' ', 0, state);
+            String keyArc = "" + transitionChar;
+            Arc b = state.getNextArc(transitionChar);
+            fstCompiler.assignTargetAddressToArcB(b, keyArc);
+        }
     }
 }

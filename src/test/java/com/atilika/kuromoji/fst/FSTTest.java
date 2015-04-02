@@ -28,13 +28,13 @@ public class FSTTest {
         }
     }
 
-//    @Ignore
+    @Ignore("Enable when you want to try out with the whole JA wikipedia titles by incremental approach.")
     @Test
     public void testJAWikipediaIncremental() throws Exception {
         readIncremental(getResource("jawikititles.txt"));
     }
 
-    @Ignore
+    @Ignore("Enable when you want to try out with the whole JA wikipedia titles.")
     @Test
     public void testJAWikipedia() throws Exception {
         read(getResource("jawikititles.txt"));

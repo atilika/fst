@@ -66,7 +66,7 @@ public class FSTCompiler {
     }
 
     /**
-     * Checks whether
+     * Checks whether Arc b is already frozen
      *
      * @param b
      * @param key
@@ -97,9 +97,6 @@ public class FSTCompiler {
      */
     public void assignTargetAddressToArcB(Arc b, String key) {
         int targetAddress = referToFrozenArc(b, key);
-        if (b.getLabel() == 'i') {
-            System.out.println();
-        }
         if (targetAddress != -1) {
             b.setTargetJumpAddress(targetAddress); // equivalent state found
         }
@@ -132,10 +129,7 @@ public class FSTCompiler {
                         createInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
             }
             instructionList.add(newInstructionForArcD);
-
             addressInstructionHashMap.put(newAddress, newInstructionForArcD);
-
-//            b.setTargetJumpAddress(newAddress);
 
             // rest of the arcs
             for (int i = 1; i < b.getDestination().arcs.size(); i++) {
@@ -157,13 +151,13 @@ public class FSTCompiler {
         }
     }
 
-    public VirtualMachine.Instruction createInstructionFail() {
+    private VirtualMachine.Instruction createInstructionFail() {
         VirtualMachine.Instruction instructionFail = new VirtualMachine.Instruction();
         instructionFail.opcode = instructionFail.FAIL;
         return instructionFail;
     }
 
-    public VirtualMachine.Instruction createInstructionAccept(int jumpAddress) {
+    private VirtualMachine.Instruction createInstructionAccept(int jumpAddress) {
         VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
         instructionAccept.arg2 = jumpAddress;

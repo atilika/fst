@@ -39,8 +39,10 @@ public class VirtualMachineTest {
         VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
 
+//        VirtualMachine.Instruction[] instructions =
+//                new VirtualMachine.Instruction[] {instructionMatch, instructionAccept};
         VirtualMachine.Instruction[] instructions =
-                new VirtualMachine.Instruction[] {instructionMatch, instructionAccept};
+                new VirtualMachine.Instruction[] {instructionAccept, instructionMatch};
         program.addInstructions(instructions);
 
         assertEquals(1, vm.run(program, "a"));
