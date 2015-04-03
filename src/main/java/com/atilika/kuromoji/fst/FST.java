@@ -264,7 +264,7 @@ public class FST {
             ArrayList<State> collidedStates = statesDictionaryHashList.get(key);
 
 //            if (state.getAllTransitionStrings().size() == 0) {
-            if (state.getAllTransitionStrings().get(0) == ' ') { // for FST compiler
+            if (state.getAllTransitionStrings().get(0) == fstCompiler.KEY_FOR_DEADEND_ARC) { // for FST compiler
                 // the dead end state (which is unique!)
                 return collidedStates.get(0);
             }
@@ -301,7 +301,7 @@ public class FST {
 
     private void compileFinalWord(State[] tempStates) {
         State dummyState = new State();
-        dummyState.setArc(' ', 0, tempStates[0]);
+        dummyState.setArc(fstCompiler.KEY_FOR_DEADEND_ARC, 0, tempStates[0]);
         List<Character> transitionStrings = dummyState.getAllTransitionStrings();
         if (transitionStrings.size() != 0) {
             for (int i = 0; i < transitionStrings.size(); i++) {
@@ -313,8 +313,8 @@ public class FST {
         }
         else {
             // This is the case when start state is an accepting state. It will not be used when empty string does not appear in the dictionary
-            char transitionChar = ' ';
-            dummyState.setArc(' ', 0, dummyState);
+            char transitionChar = fstCompiler.KEY_FOR_DEADEND_ARC;
+            dummyState.setArc(fstCompiler.KEY_FOR_DEADEND_ARC, 0, dummyState);
             String keyArc = "Dummy" + transitionChar;
             Arc b = dummyState.getNextArc(transitionChar);
             fstCompiler.assignTargetAddressToArcB(b, keyArc);
@@ -331,8 +331,8 @@ public class FST {
             }
         }
         else {
-            char transitionChar = ' ';
-            state.setArc(' ', 0, state);
+            char transitionChar = fstCompiler.KEY_FOR_DEADEND_ARC;
+            state.setArc(fstCompiler.KEY_FOR_DEADEND_ARC, 0, state);
             String keyArc = "" + transitionChar;
             Arc b = state.getNextArc(transitionChar);
             fstCompiler.assignTargetAddressToArcB(b, keyArc);

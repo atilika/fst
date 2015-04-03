@@ -40,7 +40,7 @@ public class FSTTest {
         read(getResource("jawikititles.txt"));
     }
 
-    public void readIncremental(InputStream is) throws IOException {
+    private void readIncremental(InputStream is) throws IOException {
         FST fst = new FST();
         fst.MAX_WORD_LENGTH = getMaxWordLength(getResource("jawikititles.txt"));
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));

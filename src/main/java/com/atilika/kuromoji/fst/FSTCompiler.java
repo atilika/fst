@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class FSTCompiler {
+
+    public char KEY_FOR_DEADEND_ARC = '*';
+
     HashMap<String, List<Integer>> arcAddressHashMap = new HashMap<>();
     HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
     public List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
@@ -117,7 +120,7 @@ public class FSTCompiler {
             Arc d = b.getDestination().arcs.get(0);
             // First arc is regarded as a state
             VirtualMachine.Instruction newInstructionForArcD = new VirtualMachine.Instruction();
-            if (d.getLabel() == ' ') {
+            if (d.getLabel() == KEY_FOR_DEADEND_ARC) {
                 newInstructionForArcD = createInstructionAccept(newAddress); // self loop
             }
             else if (d.getDestination().isFinal) {
