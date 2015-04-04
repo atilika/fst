@@ -1,10 +1,16 @@
 package com.atilika.kuromoji.fst;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class FSTCompilerTest {
 
@@ -234,9 +240,133 @@ public class FSTCompilerTest {
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(fst.fstCompiler.instructionList);
+
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }
         assertEquals(-1, vm.run(program, "まぐろ"));
+    }
+
+    @Test
+    public void testWordsWithWhiteSpace() throws Exception {
+        String inputValues[] = {"!", "! -attention-"};
+        int outputValues[] = {0, 1};
+
+        FST fst = new FST();
+        fst.createDictionary(inputValues, outputValues);
+
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+        }
+
+        // Test whether the program is correctly made.
+        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine.Program program = new VirtualMachine.Program();
+        program.addInstructions(fst.fstCompiler.instructionList);
+
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], vm.run(program, inputValues[i]));
+        }
+        assertEquals(-1, vm.run(program, "まぐろ"));
+
+    }
+
+    @Test
+    public void testRepeatedCharacter() throws Exception {
+        String inputValues[] = {"!", "! -attention-", "!!!", "!!!F You!!!", "!［ai-ou］"};
+        int outputValues[] = {0, 1, 2, 3, 4};
+
+        FST fst = new FST();
+        fst.createDictionary(inputValues, outputValues);
+
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+        }
+
+        // Test whether the program is correctly made.
+        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine.Program program = new VirtualMachine.Program();
+        program.addInstructions(fst.fstCompiler.instructionList);
+
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], vm.run(program, inputValues[i]));
+        }
+        assertEquals(-1, vm.run(program, "まぐろ"));
+
+    }
+
+    //    @Ignore("Enable for testing simple VM-based FST")
+    @Test
+    public void testJAWikipediaIncremental10Words() throws Exception {
+        String resource = "jawikititlesHead10.txt";
+        testJAWikipediaIncremental(resource);
+    }
+
+    //    @Ignore("Enable for testing simple VM-based FST")
+    @Test
+    public void testJAWikipediaIncremental100Words() throws Exception {
+        String resource = "jawikititlesHead100.txt";
+        testJAWikipediaIncremental(resource);
+    }
+
+    private void testJAWikipediaIncremental(String resource) throws Exception {
+
+        FST fst = readIncremental(getResource(resource));
+
+        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine.Program program = new VirtualMachine.Program();
+        program.addInstructions(fst.fstCompiler.instructionList);
+
+        int wordID = 1;
+
+        // Read all words
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(getResource(resource), "UTF-8"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Remove comments
+            line = line.replaceAll("#.*$", "");
+
+            // Skip empty lines or comment lines
+            if (line.trim().length() == 0) {
+                continue;
+            }
+            int wordIDExpected = vm.run(program, line);
+            assertEquals(wordID, wordIDExpected);
+            wordID++;
+        }
+        reader.close();
+    }
+
+    private FST readIncremental(InputStream is) throws IOException {
+        FST fst = new FST();
+        fst.MAX_WORD_LENGTH = getMaxWordLength(getResource("jawikititles.txt"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        fst.createDictionaryIncremental(reader);
+
+        return fst;
+    }
+
+    // The following methods should ideally be included in FST or FSTCompiler class
+    private int getMaxWordLength (InputStream is) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        int maxWordLength = 0;
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Remove comments
+            line = line.replaceAll("#.*$", "");
+
+            // Skip empty lines or comment lines
+            if (line.trim().length() == 0) {
+                continue;
+            }
+            maxWordLength = Math.max(maxWordLength, line.trim().length());
+        }
+        reader.close();
+        return maxWordLength;
+    }
+
+    private InputStream getResource(String s) {
+        return this.getClass().getClassLoader().getResourceAsStream(s);
     }
 }

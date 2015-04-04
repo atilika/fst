@@ -102,14 +102,14 @@ public class VirtualMachine {
                     break;
 
                 case Instruction.ACCEPT_OR_MATCH:
-                    if (input.length() == position + 1) {
+                    arg1 = i.arg1;
+
+                    if (input.length() == position + 1 && arg1 == input.charAt(position)) {
                         // last character
                         accumulator += i.arg3;
                         done = true;
                     }
                     else {
-                        arg1 = i.arg1;
-
                         if (position < input.length() && arg1 == input.charAt(position)) {
 //                        pc += i.arg2 - 1; // pc is always incremented!
 //                        pc = i.arg2 - 1; // JUMP to Address i.arg2
