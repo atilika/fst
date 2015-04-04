@@ -302,8 +302,6 @@ public class FSTCompilerTest {
 
         FST fst = readIncremental(getResource(resource));
 
-        // TODO: Check if each word is mapped correctly
-
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(fst.fstCompiler.instructionList);
@@ -324,6 +322,7 @@ public class FSTCompilerTest {
             }
             int wordIDExpected = vm.run(program, line);
             assertEquals(wordID, wordIDExpected);
+            wordID++;
         }
         reader.close();
     }
