@@ -299,6 +299,17 @@ public class FSTCompilerTest {
     @Test
     public void testJAWikipediaIncremental10Words() throws Exception {
         String resource = "jawikititlesHead10.txt";
+        testJAWikipediaIncremental(resource);
+    }
+
+    //    @Ignore("Enable for testing simple VM-based FST")
+    @Test
+    public void testJAWikipediaIncremental100Words() throws Exception {
+        String resource = "jawikititlesHead100.txt";
+        testJAWikipediaIncremental(resource);
+    }
+
+    private void testJAWikipediaIncremental(String resource) throws Exception {
 
         FST fst = readIncremental(getResource(resource));
 
