@@ -75,7 +75,11 @@ public class VirtualMachine {
 
                     char arg1 = i.arg1;
 
-                    if (position < input.length() && arg1 == input.charAt(position)) {
+                    if (position >= input.length()) {
+                        break;
+                    }
+
+                    if (arg1 == input.charAt(position)) {
 //                        pc += i.arg2 - 1; // pc is always incremented!
 //                        pc = i.arg2 - 1; // JUMP to Address i.arg2
                         pc = i.arg2 + 1; // JUMP to Address i.arg2
@@ -98,7 +102,9 @@ public class VirtualMachine {
                     break;
 
                 case Instruction.ACCEPT:
-                    done = true;
+                    if (input.length() == position) {
+                        done = true;
+                    }
                     break;
 
                 case Instruction.ACCEPT_OR_MATCH:

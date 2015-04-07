@@ -245,6 +245,8 @@ public class FSTCompilerTest {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }
         assertEquals(-1, vm.run(program, "まぐろ"));
+        assertEquals(-1, vm.run(program, "寿司が食べたい"));
+        assertEquals(-1, vm.run(program, "寿司が"));
     }
 
     @Test
@@ -317,7 +319,7 @@ public class FSTCompilerTest {
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
-        int wordID = 1;
+        int wordIDExpected = 1;
 
         // Read all words
         BufferedReader reader = new BufferedReader(
@@ -331,9 +333,9 @@ public class FSTCompilerTest {
             if (line.trim().length() == 0) {
                 continue;
             }
-            int wordIDExpected = vm.run(program, line);
-            assertEquals(wordID, wordIDExpected);
-            wordID++;
+            int wordID = vm.run(program, line);
+            assertEquals(wordIDExpected, wordID);
+            wordIDExpected++;
         }
         reader.close();
     }
