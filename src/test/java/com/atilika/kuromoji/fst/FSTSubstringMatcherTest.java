@@ -2,6 +2,8 @@ package com.atilika.kuromoji.fst;
 
 import org.junit.Test;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,5 +55,87 @@ public class FSTSubstringMatcherTest {
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(vm, program);
         String[] expectedTokens = {"寿司", "寿司", "寿司", "寿司", "寿司"};
         assertEquals(Arrays.asList(expectedTokens), extractedTokens);
+    }
+
+    @Test
+    public void testExtractFromWikipediaArticle() throws Exception {
+        // Read the dictionary from a file
+        // Extract words from dictionaries
+
+        String resource = "jawikititlesHead1000.txt";
+        testJAWikipediaIncremental(resource);
+    }
+
+    private void testJAWikipediaIncremental(String resource) throws Exception {
+        FSTTestHelper fstTestHelper = new FSTTestHelper();
+        FST fst = fstTestHelper.readIncremental(resource);
+
+        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine.Program program = new VirtualMachine.Program();
+        program.addInstructions(fst.fstCompiler.instructionList);
+
+        int wordIDExpected = 1;
+
+        // Read all words
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(getResource(resource), "UTF-8"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Remove comments
+            line = line.replaceAll("#.*$", "");
+
+            // Skip empty lines or comment lines
+            if (line.trim().length() == 0) {
+                continue;
+            }
+            int wordID = vm.run(program, line);
+            assertEquals(wordIDExpected, wordID);
+            wordIDExpected++;
+        }
+        reader.close();
+        List<String> sentences = readInFile();
+
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < 1; i++) {
+            lookupSentences(vm, program, sentences);
+        }
+
+        long end = System.currentTimeMillis();
+        System.out.println("Running time:" + (end - start));
+    }
+
+    private InputStream getResource(String s) {
+        return this.getClass().getClassLoader().getResourceAsStream(s);
+    }
+
+    private void lookupSentences(VirtualMachine vm, VirtualMachine.Program program, List<String> sentences) {
+        FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
+        List<String> tokens = new ArrayList<>();
+        for (String sentence : sentences) {
+            List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sentence, vm, program);
+            tokens.addAll(extractedTokens);
+        }
+
+    }
+    private List<String> readInFile() throws IOException {
+
+        List<String> sentences = new ArrayList<>();
+
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(getResource("jaWikiSampleArticle.txt"), "UTF-8"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Remove comments
+            line = line.replaceAll("#.*$", "");
+
+            // Skip empty lines or comment lines
+            if (line.trim().length() == 0) {
+                continue;
+            }
+
+            sentences.add(line);
+        }
+        return sentences;
     }
 }

@@ -312,8 +312,8 @@ public class FSTCompilerTest {
     }
 
     private void testJAWikipediaIncremental(String resource) throws Exception {
-
-        FST fst = readIncremental(getResource(resource));
+        FSTTestHelper fstTestHelper = new FSTTestHelper();
+        FST fst = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
@@ -338,34 +338,6 @@ public class FSTCompilerTest {
             wordIDExpected++;
         }
         reader.close();
-    }
-
-    private FST readIncremental(InputStream is) throws IOException {
-        FST fst = new FST();
-        fst.MAX_WORD_LENGTH = getMaxWordLength(getResource("jawikititles.txt"));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        fst.createDictionaryIncremental(reader);
-
-        return fst;
-    }
-
-    // The following methods should ideally be included in FST or FSTCompiler class
-    private int getMaxWordLength (InputStream is) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        int maxWordLength = 0;
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // Remove comments
-            line = line.replaceAll("#.*$", "");
-
-            // Skip empty lines or comment lines
-            if (line.trim().length() == 0) {
-                continue;
-            }
-            maxWordLength = Math.max(maxWordLength, line.trim().length());
-        }
-        reader.close();
-        return maxWordLength;
     }
 
     private InputStream getResource(String s) {
