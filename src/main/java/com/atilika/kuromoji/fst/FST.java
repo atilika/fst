@@ -86,6 +86,7 @@ public class FST {
                 int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
                 Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
                 tempStates[i - 1].arcs.remove(removingArc);
+                compileState(tempStates[i]); // For FST Compiler
 
                 State temp = findEquivalentCollisionHandled(tempStates[i]);
                 setTransition(tempStates[i - 1], temp, output, previousWord.charAt(i - 1));
@@ -124,8 +125,11 @@ public class FST {
             int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
             Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
             tempStates[i - 1].arcs.remove(removingArc);
+            compileState(tempStates[i]); // For FST Compiler
+
             setTransition(tempStates[i - 1], findEquivalentCollisionHandled(tempStates[i]), output, lastWord.charAt(i - 1));
         }
+        compileState(tempStates[0]); // For FST Compiler
         findEquivalentCollisionHandled(tempStates[0]);
 
         compileFinalWord(tempStates); // For FST compiler
@@ -156,6 +160,8 @@ public class FST {
             for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
                 int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
                 Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
+                compileState(tempStates[i]); // For FST Compiler
+
                 State temp = findEquivalentCollisionHandled(tempStates[i]);
                 setTransition(tempStates[i - 1], temp, output, previousWord.charAt(i - 1));
                 tempStates[i - 1].arcs.remove(removingArc);
@@ -193,8 +199,11 @@ public class FST {
             int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
             Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
             tempStates[i - 1].arcs.remove(removingArc);
+            compileState(tempStates[i]); // For FST Compiler
             setTransition(tempStates[i - 1], findEquivalentCollisionHandled(tempStates[i]), output, lastWord.charAt(i - 1));
+
         }
+        compileState(tempStates[0]); // For FST Compiler
         findEquivalentCollisionHandled(tempStates[0]);
 
         compileFinalWord(tempStates); // For FST compiler
@@ -257,7 +266,6 @@ public class FST {
         List<Character> transitionStrings = state.getAllTransitionStrings();
         List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
 
-        compileState(state); // For FST Compiler
 
         String key = transitionStrings.toString() + outputStrings.toString();
         State newStateToDic = null;
