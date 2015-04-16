@@ -245,6 +245,8 @@ public class FSTCompilerTest {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }
         assertEquals(-1, vm.run(program, "まぐろ"));
+        assertEquals(-1, vm.run(program, "寿司が食べたい"));
+        assertEquals(-1, vm.run(program, "寿司が"));
     }
 
     @Test
@@ -310,14 +312,14 @@ public class FSTCompilerTest {
     }
 
     private void testJAWikipediaIncremental(String resource) throws Exception {
-
-        FST fst = readIncremental(getResource(resource));
+        FSTTestHelper fstTestHelper = new FSTTestHelper();
+        FST fst = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
-        int wordID = 1;
+        int wordIDExpected = 1;
 
         // Read all words
         BufferedReader reader = new BufferedReader(
@@ -331,39 +333,11 @@ public class FSTCompilerTest {
             if (line.trim().length() == 0) {
                 continue;
             }
-            int wordIDExpected = vm.run(program, line);
-            assertEquals(wordID, wordIDExpected);
-            wordID++;
+            int wordID = vm.run(program, line);
+            assertEquals(wordIDExpected, wordID);
+            wordIDExpected++;
         }
         reader.close();
-    }
-
-    private FST readIncremental(InputStream is) throws IOException {
-        FST fst = new FST();
-        fst.MAX_WORD_LENGTH = getMaxWordLength(getResource("jawikititles.txt"));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        fst.createDictionaryIncremental(reader);
-
-        return fst;
-    }
-
-    // The following methods should ideally be included in FST or FSTCompiler class
-    private int getMaxWordLength (InputStream is) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        int maxWordLength = 0;
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // Remove comments
-            line = line.replaceAll("#.*$", "");
-
-            // Skip empty lines or comment lines
-            if (line.trim().length() == 0) {
-                continue;
-            }
-            maxWordLength = Math.max(maxWordLength, line.trim().length());
-        }
-        reader.close();
-        return maxWordLength;
     }
 
     private InputStream getResource(String s) {

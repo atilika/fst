@@ -6,7 +6,7 @@ import java.util.List;
 
 public class FSTCompiler {
 
-    public char KEY_FOR_DEADEND_ARC = '*';
+    public char KEY_FOR_DEADEND_ARC = '|';
 
     HashMap<String, List<Integer>> arcAddressHashMap = new HashMap<>();
     HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();

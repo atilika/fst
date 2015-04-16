@@ -28,10 +28,11 @@ public class FSTTest {
         }
     }
 
-    @Ignore("Enable when you want to try out with the whole JA wikipedia titles by incremental approach.")
+//    @Ignore("Enable when you want to try out with the whole JA wikipedia titles by incremental approach.")
     @Test
     public void testJAWikipediaIncremental() throws Exception {
-        readIncremental(getResource("jawikititles.txt"));
+        FSTTestHelper fstTestHelper = new FSTTestHelper();
+        fstTestHelper.readIncremental("jawikititles.txt");
     }
 
     @Ignore("Enable when you want to try out with the whole JA wikipedia titles.")
@@ -40,30 +41,6 @@ public class FSTTest {
         read(getResource("jawikititles.txt"));
     }
 
-    private void readIncremental(InputStream is) throws IOException {
-        FST fst = new FST();
-        fst.MAX_WORD_LENGTH = getMaxWordLength(getResource("jawikititles.txt"));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        fst.createDictionaryIncremental(reader);
-    }
-
-    private int getMaxWordLength (InputStream is) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        int maxWordLength = 0;
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // Remove comments
-            line = line.replaceAll("#.*$", "");
-
-            // Skip empty lines or comment lines
-            if (line.trim().length() == 0) {
-                continue;
-            }
-            maxWordLength = Math.max(maxWordLength, line.trim().length());
-        }
-        reader.close();
-        return maxWordLength;
-    }
 
     public static FST read(InputStream is) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
