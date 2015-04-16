@@ -4,14 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FSTSubstringMatcher {
-    private String sentence;
-    private String fileName;
+    private int numLookups;
 
     FSTSubstringMatcher() {
-    }
-
-    FSTSubstringMatcher(String sentence) {
-        this.sentence = sentence;
+        this.numLookups = 0;
     }
 
     /**
@@ -21,21 +17,6 @@ public class FSTSubstringMatcher {
      * @param program
      * @return List of extracted tokens that are in a dictionary
      */
-    public List matchAllSubstrings(VirtualMachine vm, VirtualMachine.Program program) {
-        List extractedTokens = new ArrayList();
-
-        for (int i = 0; i < sentence.length(); i++) {
-            for (int j = i + 1; j < sentence.length(); j++) {
-                if (vm.run(program, sentence.substring(i, j)) != -1) {
-//                    System.out.println(sentence.substring(i, j));
-                    extractedTokens.add(sentence.substring(i, j));
-                }
-            }
-        }
-
-        return extractedTokens;
-    }
-
     public List matchAllSubstrings(String sentence, VirtualMachine vm, VirtualMachine.Program program) {
         List extractedTokens = new ArrayList();
 
@@ -57,8 +38,22 @@ public class FSTSubstringMatcher {
         if (hits > 0 || misses > 0) {
             System.out.println("Hits: " + hits + ", misses: " + misses + ", ratio: " + (hits / (1.0 * hits + misses)));
         }
+        this.numLookups += hits + misses;
+
         return extractedTokens;
     }
 
+
+    public void lookupSentences(VirtualMachine vm, VirtualMachine.Program program, List<String> sentences) {
+        List<String> tokens = new ArrayList<>();
+        for (String sentence : sentences) {
+            List extractedTokens = matchAllSubstrings(sentence, vm, program);
+            tokens.addAll(extractedTokens);
+        }
+    }
+
+    public int getNumLookups() {
+        return this.numLookups;
+    }
 
 }

@@ -28,8 +28,8 @@ public class FSTSubstringMatcherTest {
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
-        FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher(sampleSentence);
-        List extractedTokens = fstSubstringMatcher.matchAllSubstrings(vm, program);
+        FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
+        List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
 
         assertEquals(Arrays.asList(tokens), extractedTokens);
     }
@@ -51,8 +51,8 @@ public class FSTSubstringMatcherTest {
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
-        FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher(sampleSentence);
-        List extractedTokens = fstSubstringMatcher.matchAllSubstrings(vm, program);
+        FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
+        List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
         String[] expectedTokens = {"寿司", "寿司", "寿司", "寿司", "寿司"};
         assertEquals(Arrays.asList(expectedTokens), extractedTokens);
     }
@@ -67,6 +67,7 @@ public class FSTSubstringMatcherTest {
     }
 
     private void testJAWikipediaIncremental(String resource) throws Exception {
+        FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         FSTTestHelper fstTestHelper = new FSTTestHelper();
         FST fst = fstTestHelper.readIncremental(resource);
 
@@ -98,26 +99,19 @@ public class FSTSubstringMatcherTest {
         long start = System.currentTimeMillis();
 
         for (int i = 0; i < 1; i++) {
-            lookupSentences(vm, program, sentences);
+            fstSubstringMatcher.lookupSentences(vm, program, sentences);
         }
 
         long end = System.currentTimeMillis();
-        System.out.println("Running time:" + (end - start));
+        System.out.println("Running time:" + (end - start) + " milliseconds");
+        System.out.println("Number of lookups:" + fstSubstringMatcher.getNumLookups());
+        System.out.println("Sec. per lookup:" + (1.0 * (end - start)) / fstSubstringMatcher.getNumLookups());
     }
 
     private InputStream getResource(String s) {
         return this.getClass().getClassLoader().getResourceAsStream(s);
     }
 
-    private void lookupSentences(VirtualMachine vm, VirtualMachine.Program program, List<String> sentences) {
-        FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
-        List<String> tokens = new ArrayList<>();
-        for (String sentence : sentences) {
-            List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sentence, vm, program);
-            tokens.addAll(extractedTokens);
-        }
-
-    }
     private List<String> readInFile() throws IOException {
 
         List<String> sentences = new ArrayList<>();
