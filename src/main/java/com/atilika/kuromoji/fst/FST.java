@@ -257,7 +257,7 @@ public class FST {
         List<Character> transitionStrings = state.getAllTransitionStrings();
         List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
 
-        compileState(transitionStrings, state); // For FST Compiler
+        compileState(state); // For FST Compiler
 
         String key = transitionStrings.toString() + outputStrings.toString();
         State newStateToDic = null;
@@ -319,7 +319,8 @@ public class FST {
         }
     }
 
-    private void compileState(List<Character> transitionStrings, State state) {
+    private void compileState(State state) {
+        List<Character> transitionStrings = state.getAllTransitionStrings();
         if (transitionStrings.size() != 0) {
             for (int i = 0; i < transitionStrings.size(); i++) {
                 char transitionChar = transitionStrings.get(i);
