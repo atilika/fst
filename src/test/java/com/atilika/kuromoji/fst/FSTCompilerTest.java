@@ -30,7 +30,7 @@ public class FSTCompilerTest {
         addresses.add(2);
         fstCompiler.arcAddressHashMap.put(key, addresses);
 
-        VirtualMachine.Instruction instruction = createInstructionMatch('a', 0, 1);
+        VirtualMachine.Instruction instruction = fstCompiler.createInstructionMatch('a', 0, 1);
         fstCompiler.addressInstructionHashMap.put(2, instruction);
         assertEquals(0, fstCompiler.referToFrozenArc(b, key)); // returns the address of already frozen instruction
 
@@ -41,7 +41,8 @@ public class FSTCompilerTest {
 
     @Test
     public void testAssignTargetAddressToArcB() throws Exception {
-        // Testing the equivalence freezing
+        // Testing assigning jump address to an arc works
+        // {{3: match 'b', 2: match 'a', 1: FAIL, 0: ACCEPT}}
         FSTCompiler fstCompiler = new FSTCompiler();
 
         // set up testing environment
@@ -65,7 +66,7 @@ public class FSTCompilerTest {
         fstCompiler.arcAddressHashMap.put(keyA, addresses); // only stores corresponding arcs
         // making an instruction that corresponds to an arc
         VirtualMachine.Instruction instructionMatchA =
-                createInstructionMatch('a', 0, 1); // trans. char='a', target address: 0, output: 1
+                fstCompiler.createInstructionMatch('a', 0, 1); // trans. char='a', target address: 0, output: 1
         fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_A_ADDRESS, instructionMatchA);
 
         // freeze a new arc
@@ -93,7 +94,7 @@ public class FSTCompilerTest {
         List<Integer> addressesForKeyB = new ArrayList<>();
         addressesForKeyB.add(INSTRUCTION_MATCH_B_ADDRESS);
         VirtualMachine.Instruction instructionMatchB =
-                createInstructionMatch('b', 0, 2); // trans. char='b', target address: 0, output: 2
+                fstCompiler.createInstructionMatch('b', 0, 2); // trans. char='b', target address: 0, output: 2
         fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_B_ADDRESS, instructionMatchB);
         fstCompiler.arcAddressHashMap.put(keyB, addressesForKeyB);
 
@@ -103,13 +104,10 @@ public class FSTCompilerTest {
         assertNotEquals(-1, fstCompiler.referToFrozenArc(arcB, keyB));
     }
 
-    private VirtualMachine.Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
-        VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
-        instructionMatch.opcode = instructionMatch.MATCH;
-        instructionMatch.arg1 = arg1;
-        instructionMatch.arg2 = jumpAddress;
-        instructionMatch.arg3 = output;
-        return instructionMatch;
+    @Test
+    public void testAssignTargetAddressToArcBFour() throws Exception {
+
+
     }
 
     @Test
