@@ -47,46 +47,60 @@ public class FSTCompilerTest {
         // set up testing environment
         State acceptState = new State();
         acceptState.isFinal = true;
-        acceptState.setArc(' ', 0, acceptState); // self loop
+//        acceptState.setArc(' ', 0, acceptState); // self loop
 
         int INSTRUCTION_ACCEPT_ADDRESS = 0;
         VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
-        instructionAccept.arg2 = 0; // target address, self loop: VERY IMPORTANT for equivalent state detection.
+//        instructionAccept.arg2 = 0; // target address, self loop: VERY IMPORTANT for equivalent state detection.
+        instructionAccept.arg2 = -1; // target address not set.
         fstCompiler.addressInstructionHashMap.put(INSTRUCTION_ACCEPT_ADDRESS, instructionAccept);
 
-//        Arc b = new Arc(1, acceptState, 'a');
-        String key = "a";
+        VirtualMachine.Instruction instructionFail = fstCompiler.createInstructionFail();
+
+        int INSTRUCTION_MATCH_A_ADDRESS = 2;
+        String keyA = "a";
         List<Integer> addresses = new ArrayList<>();
-        int INSTRUCTION_ADDRESS = 2;
-        addresses.add(INSTRUCTION_ADDRESS); // Instruction of an address
-        fstCompiler.arcAddressHashMap.put(key, addresses);
-
+        addresses.add(INSTRUCTION_MATCH_A_ADDRESS); // Instruction of an address
+        fstCompiler.arcAddressHashMap.put(keyA, addresses); // only stores corresponding arcs
         // making an instruction that corresponds to an arc
-        VirtualMachine.Instruction instructionMatch = createInstructionMatch('a', 0, 1);
-        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_ADDRESS, instructionMatch);
-
-//        fstCompiler.assignTargetAddressToArcB(b, key); // set the address of already frozen instruction
-//        assertEquals(0, b.getTargetJumpAddress());
+        VirtualMachine.Instruction instructionMatchA =
+                createInstructionMatch('a', 0, 1); // trans. char='a', target address: 0, output: 1
+        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_A_ADDRESS, instructionMatchA);
 
         // freeze a new arc
-        Arc newArc = new Arc(2, acceptState, 'b');
-        addresses = new ArrayList<>();
-        INSTRUCTION_ADDRESS = 3;
-        addresses.add(INSTRUCTION_ADDRESS);
+        int INSTRUCTION_MATCH_B_ADDRESS = 3;
+        String keyB = "b";
+        Arc arcB = new Arc(2, acceptState, 'b'); // output=2, dest. to Accepting state, transition char='b'
+//        addresses = new ArrayList<>();
+//        addresses.add(INSTRUCTION_MATCH_B_ADDRESS);
+//        VirtualMachine.Instruction instructionMatchB =
+//                createInstructionMatch('b', 0, 2); // trans. char='b', target address: 0, output: 2
+//        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_B_ADDRESS, instructionMatchB);
 
         // create an instruction
         List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
         instructionList.add(instructionAccept);
-        instructionList.add(instructionMatch);
-
+        instructionList.add(instructionFail);
+        instructionList.add(instructionMatchA);
+//        instructionList.add(instructionMatchB); //
         fstCompiler.instructionList = instructionList;
-        key = "b";
-        fstCompiler.assignTargetAddressToArcB(newArc, key);
-        // TargetJumpAddress = 3, because the instructionList size is 2 + 1 selfloop = 3
-        assertEquals(3, newArc.getTargetJumpAddress());
 
-        fstCompiler.assignTargetAddressToArcB(newArc, key);
+        fstCompiler.assignTargetAddressToArcB(arcB, keyB);
+        // TargetJumpAddress = 0, to the dead-end accepting state
+        assertEquals(0, arcB.getTargetJumpAddress());
+
+        List<Integer> addressesForKeyB = new ArrayList<>();
+        addressesForKeyB.add(INSTRUCTION_MATCH_B_ADDRESS);
+        VirtualMachine.Instruction instructionMatchB =
+                createInstructionMatch('b', 0, 2); // trans. char='b', target address: 0, output: 2
+        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_B_ADDRESS, instructionMatchB);
+        fstCompiler.arcAddressHashMap.put(keyB, addressesForKeyB);
+
+        instructionList.add(instructionMatchB); // add to Program for VM
+
+        // There should exist an instruction MATCH 'b'
+        assertNotEquals(-1, fstCompiler.referToFrozenArc(arcB, keyB));
     }
 
     private VirtualMachine.Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {

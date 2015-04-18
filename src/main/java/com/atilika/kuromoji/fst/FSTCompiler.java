@@ -32,11 +32,11 @@ public class FSTCompiler {
     /**
      * Checks whether Arc b is already frozen
      *
-     * @param b
+     * @param d
      * @param key
      * @return -1 if there is no Arc which input/output corresponds to key. Else return the address that corresponds to that arc.
      */
-    public int referToFrozenArc(Arc b, String key) {
+    public int referToFrozenArc(Arc d, String key) {
         if (!arcAddressHashMap.containsKey(key)) {
             return -1;
         }
@@ -45,7 +45,7 @@ public class FSTCompiler {
 
         for (Integer arcAddress : arcAddresses) {
             int arcCtargetAddress = addressInstructionHashMap.get(arcAddress).arg2;
-            if (isJumpToSameAddress(arcCtargetAddress, b)) {
+            if (d.getTargetJumpAddress() == arcCtargetAddress) {
                 return arcCtargetAddress; // transiting to the same state.
             }
         }
@@ -78,7 +78,14 @@ public class FSTCompiler {
             arcAddresses.add(newAddress);
             arcAddressHashMap.put(key, arcAddresses);
 
+
+            if (b.getDestination().arcs.size() == 0) {
+                // an arc which points to dead end accepting state
+                b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
+                return;
+            }
             Arc d = b.getDestination().arcs.get(0);
+
             // First arc is regarded as a state
             VirtualMachine.Instruction newInstructionForArcD = new VirtualMachine.Instruction();
             if (d.getLabel() == KEY_FOR_DEADEND_ARC) {
@@ -115,7 +122,7 @@ public class FSTCompiler {
         }
     }
 
-    private VirtualMachine.Instruction createInstructionFail() {
+    public VirtualMachine.Instruction createInstructionFail() {
         VirtualMachine.Instruction instructionFail = new VirtualMachine.Instruction();
         instructionFail.opcode = instructionFail.FAIL;
         return instructionFail;
