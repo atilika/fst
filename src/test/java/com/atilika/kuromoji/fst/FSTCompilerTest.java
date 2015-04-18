@@ -14,76 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 public class FSTCompilerTest {
 
-//    @Test
-//    public void testFreezeStateTwoStates() throws Exception {
-//
-//        // currently, supported by storing where the destination address is.
-//        HashMap<String, Integer> arcAddressHashMap = new HashMap<>();
-//        arcAddressHashMap.put("[]", 0); // ACCEPT
-//        arcAddressHashMap.put("[a]", 2);
-//        arcAddressHashMap.put("[b]", 3);
-//
-//        State acceptState = new State();
-//        acceptState.isFinal = true;
-//
-//        State startState = new State();
-//        startState.setArc('a', 1, acceptState);
-//        startState.setArc('b', 2, acceptState);
-//
-//        FSTCompiler fstCompiler = new FSTCompiler();
-//        List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
-//        instructionList.addAll(fstCompiler.freezeState(acceptState, arcAddressHashMap));
-//        instructionList.addAll(fstCompiler.freezeState(startState, arcAddressHashMap));
-//
-//        VirtualMachine vm = new VirtualMachine();
-//        VirtualMachine.Program program = new VirtualMachine.Program();
-//        program.addInstructions(instructionList);
-//
-//
-//        assertEquals(1, vm.run(program, "a"));
-//        assertEquals(2, vm.run(program, "b"));
-//        assertEquals(-1, vm.run(program, "c"));
-//    }
-//
-//    @Test
-//    public void testFreezeStateThreeStates() throws Exception {
-//
-//        HashMap<String, Integer> arcAddressHashMap = new HashMap<>(); // corresponds to each arc
-//        arcAddressHashMap.put("[]", 0); // accepting state, stores the address of instruction
-//        arcAddressHashMap.put("[c]", 2);
-//        arcAddressHashMap.put("[a]", 4);
-//        arcAddressHashMap.put("[b]", 5);
-//
-//        // this map will be unsupervised in the higher level method.
-//
-//        State acceptState = new State();
-//        acceptState.isFinal = true;
-//
-//        State startState = new State();
-//        startState.setArc('a', 1, acceptState);
-//
-//        State destStateB = new State();
-//        startState.setArc('b', 2, destStateB);
-//
-//        destStateB.setArc('c', 1, acceptState);
-//
-//        FSTCompiler fstCompiler = new FSTCompiler();
-//        List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
-//        instructionList.addAll(fstCompiler.freezeState(acceptState, arcAddressHashMap));
-//        instructionList.addAll(fstCompiler.freezeState(destStateB, arcAddressHashMap));
-//        instructionList.addAll(fstCompiler.freezeState(startState, arcAddressHashMap));
-//        // note that startState is always freezed in the last.
-//
-//
-//        VirtualMachine vm = new VirtualMachine();
-//        VirtualMachine.Program program = new VirtualMachine.Program();
-//        program.addInstructions(instructionList);
-//
-//        assertEquals(1, vm.run(program, "a"));
-//        assertEquals(-1, vm.run(program, "b"));
-//        assertEquals(3, vm.run(program, "bc"));
-//    }
-
     @Test
     public void testReferToFrozenArc() throws Exception {
         // testing for {2: match 'a', 1: FAIL, 0: ACCEPT}
@@ -112,13 +42,12 @@ public class FSTCompilerTest {
     @Test
     public void testAssignTargetAddressToArcB() throws Exception {
         // Testing the equivalence freezing
-
         FSTCompiler fstCompiler = new FSTCompiler();
 
         // set up testing environment
         State acceptState = new State();
         acceptState.isFinal = true;
-        acceptState.setArc(' ', 0, acceptState);
+        acceptState.setArc(' ', 0, acceptState); // self loop
 
         int INSTRUCTION_ACCEPT_ADDRESS = 0;
         VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
@@ -126,8 +55,7 @@ public class FSTCompilerTest {
         instructionAccept.arg2 = 0; // target address, self loop: VERY IMPORTANT for equivalent state detection.
         fstCompiler.addressInstructionHashMap.put(INSTRUCTION_ACCEPT_ADDRESS, instructionAccept);
 
-        // making an arc itself
-        Arc b = new Arc(1, acceptState, 'a');
+//        Arc b = new Arc(1, acceptState, 'a');
         String key = "a";
         List<Integer> addresses = new ArrayList<>();
         int INSTRUCTION_ADDRESS = 2;
@@ -143,7 +71,6 @@ public class FSTCompilerTest {
 
         // freeze a new arc
         Arc newArc = new Arc(2, acceptState, 'b');
-        key = "b";
         addresses = new ArrayList<>();
         INSTRUCTION_ADDRESS = 3;
         addresses.add(INSTRUCTION_ADDRESS);
@@ -154,9 +81,12 @@ public class FSTCompilerTest {
         instructionList.add(instructionMatch);
 
         fstCompiler.instructionList = instructionList;
+        key = "b";
         fstCompiler.assignTargetAddressToArcB(newArc, key);
         // TargetJumpAddress = 3, because the instructionList size is 2 + 1 selfloop = 3
         assertEquals(3, newArc.getTargetJumpAddress());
+
+        fstCompiler.assignTargetAddressToArcB(newArc, key);
     }
 
     private VirtualMachine.Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {

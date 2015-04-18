@@ -62,7 +62,8 @@ public class FSTSubstringMatcherTest {
         // Read the dictionary from a file
         // Extract words from dictionaries
 
-        String resource = "jawikititlesHead1000.txt";
+//        String resource = "jawikititlesHead1000.txt";
+        String resource = "ipadic-allwords_uniqHead10000.csv";
         testJAWikipediaIncremental(resource);
     }
 

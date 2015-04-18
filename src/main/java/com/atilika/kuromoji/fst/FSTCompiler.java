@@ -12,45 +12,6 @@ public class FSTCompiler {
     HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
     public List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
 
-
-//    public List<VirtualMachine.Instruction> freezeState(State state,
-//                                                        HashMap<String, Integer> stateAddressHashMap) {
-//        // returns a list of instructions
-//        // instructions represent 1. state 2. state stransition (outgoing arcs from states)
-//        // Enough to assume that state itself already holds a transition string.
-//
-//        List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
-//
-//        List<Character> transitionStrings = state.getAllTransitionStrings(); // all transition strings
-//
-//        // since it is acyclic, always add to the front.
-//        if (state.isFinal) {
-//            instructionList.add(0, createInstructionAccept());
-//        }
-//        else {
-//            instructionList.add(0, createInstructionFail());
-//        }
-//
-//        for (Character transitionString : transitionStrings) {
-//
-//            VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
-//            instructionMatch.opcode = instructionMatch.MATCH;
-//            instructionMatch.arg1 = transitionString; // TODO: debug it!
-//            instructionMatch.arg3 = state.getTransitionArc(transitionString).getOutput(); // set output
-////            instructionMatch.arg2 = stateAddressHashMap.get(transitionString.toString());
-//            String temp = state.getNextState(transitionString).getAllTransitionStrings().toString();
-//            instructionMatch.arg2 =
-//                    stateAddressHashMap.get(temp);
-//
-//            state.getNextArc(transitionString).setTargetJumpAddress(stateAddressHashMap.get(temp));
-//
-//            instructionList.add(instructionMatch); // what will happen if one state accepts it?
-//        }
-//
-//        return instructionList;
-//    }
-
-
     // To be unit tested in the following methods....
 
     /**
