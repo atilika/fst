@@ -25,6 +25,7 @@ public class FSTCompilerTest {
 
         Arc b = new Arc(1, acceptState, 'a');
         String key = "a";
+        b.setTargetJumpAddress(0); // to accepting state
 
         List<Integer> addresses = new ArrayList<>();
         addresses.add(2);
