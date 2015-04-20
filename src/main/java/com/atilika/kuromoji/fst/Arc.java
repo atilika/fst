@@ -11,6 +11,7 @@ public class Arc {
         this.output = output;
         this.destination = destination;
         this.label = label;
+        this.targetJumpAddress = -1;
     }
 
     public Arc(State destination) {
