@@ -73,67 +73,15 @@ public class FST {
             if (line.trim().length() == 0) {
                 continue;
             }
-
             String inputWord = line;
-
-            int commonPrefixLengthPlusOne = commonPrefixIndice(previousWord, inputWord);
-
-            /*
-            we minimize the states from the suffix of the previous word
-             */
-
-            for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
-                int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
-                Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
-                tempStates[i - 1].arcs.remove(removingArc);
-
-                State temp = findEquivalentCollisionHandled(tempStates[i]);
-                setTransition(tempStates[i - 1], temp, output, previousWord.charAt(i - 1));
-
-                compileState(tempStates[i - 1]); // For FST Compiler
-            }
-            for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
-                clearState(tempStates[i]);
-                setTransition(tempStates[i - 1], tempStates[i], inputWord.charAt(i - 1));
-            }
-            tempStates[inputWord.length()].setFinal();
-
-
-            // dealing with common prefix between previous word and the current word
-            // (also note that its output must have common prefix too.)
-            State currentState = tempStates[0];
-            int currentOutput = outputValue;
-
-            for (int i = 0; i < commonPrefixLengthPlusOne - 1; i++) {
-                Arc nextArc = currentState.getNextArc(inputWord.charAt(i));
-                int commonStateOutput = nextArc.output;
-                currentOutput = excludePrefix(currentOutput, commonStateOutput);
-                currentState = nextArc.getDestination();
-            }
-
-            int outputDiff = currentOutput;
-            State suffixHeadState = tempStates[commonPrefixLengthPlusOne - 1];
-            suffixHeadState.linearSearchArc(inputWord.charAt(commonPrefixLengthPlusOne - 1)).setOutput(outputDiff);
-
+            createDictionaryCommon(inputWord, previousWord, tempStates, outputValue);
             previousWord = inputWord;
             outputValue++; // allocate the next wordID
         }
 
         // for last word
         String lastWord = previousWord;
-        for (int i = lastWord.length(); i > 0; i--) {
-            int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
-            Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
-            tempStates[i - 1].arcs.remove(removingArc);
-
-            setTransition(tempStates[i - 1], findEquivalentCollisionHandled(tempStates[i]), output, lastWord.charAt(i - 1));
-            compileState(tempStates[i - 1]); // For FST Compiler
-
-        }
-        compileState(tempStates[0]); // For FST Compiler
-        findEquivalentCollisionHandled(tempStates[0]);
-
-        compileFinalWord(tempStates); // For FST compiler
+        handleLastWord(previousWord, lastWord, tempStates);
     }
 
 
@@ -151,52 +99,60 @@ public class FST {
 
         for (int inputWordIdx = 0; inputWordIdx < inputWords.length; inputWordIdx++) {
             String inputWord = inputWords[inputWordIdx];
-
-            int commonPrefixLengthPlusOne = commonPrefixIndice(previousWord, inputWord);
-            
-            /*
-            we minimize the states from thee suffix of the previous word
-             */
-
-            for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
-                int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
-                Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
-
-                State temp = findEquivalentCollisionHandled(tempStates[i]);
-                setTransition(tempStates[i - 1], temp, output, previousWord.charAt(i - 1));
-                tempStates[i - 1].arcs.remove(removingArc);
-
-                compileState(tempStates[i - 1]); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
-
-            }
-            for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
-                clearState(tempStates[i]);
-                setTransition(tempStates[i - 1], tempStates[i], inputWord.charAt(i - 1));
-            }
-            tempStates[inputWord.length()].setFinal();
-
-
-            // dealing with common prefix between previous word and the current word
-            // (also note that its output must have common prefix too.)
-            State currentState = tempStates[0];
-            int currentOutput = outputValues[inputWordIdx];
-
-            for (int i = 0; i < commonPrefixLengthPlusOne - 1; i++) {
-                Arc nextArc = currentState.getNextArc(inputWord.charAt(i));
-                int commonStateOutput = nextArc.output;
-                currentOutput = excludePrefix(currentOutput, commonStateOutput);
-                currentState = nextArc.getDestination();
-            }
-
-            int outputDiff = currentOutput;
-            State suffixHeadState = tempStates[commonPrefixLengthPlusOne - 1];
-            suffixHeadState.linearSearchArc(inputWord.charAt(commonPrefixLengthPlusOne - 1)).setOutput(outputDiff);
-
+            createDictionaryCommon(inputWord, previousWord, tempStates, outputValues[inputWordIdx]);
             previousWord = inputWord;
         }
 
         // for last word
         String lastWord = previousWord;
+        handleLastWord(previousWord, lastWord, tempStates);
+    }
+
+    private void createDictionaryCommon(String inputWord, String previousWord, State[] tempStates, int currentOutput) {
+
+        int commonPrefixLengthPlusOne = commonPrefixIndice(previousWord, inputWord);
+
+            /*
+            we minimize the states from thee suffix of the previous word
+             */
+
+        for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
+            int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
+            Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
+
+            State temp = findEquivalentCollisionHandled(tempStates[i]);
+            setTransition(tempStates[i - 1], temp, output, previousWord.charAt(i - 1));
+            tempStates[i - 1].arcs.remove(removingArc);
+
+            compileState(tempStates[i - 1]); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
+
+        }
+        for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
+            clearState(tempStates[i]);
+            setTransition(tempStates[i - 1], tempStates[i], inputWord.charAt(i - 1));
+        }
+        tempStates[inputWord.length()].setFinal();
+
+
+        // dealing with common prefix between previous word and the current word
+        // (also note that its output must have common prefix too.)
+        State currentState = tempStates[0];
+
+        for (int i = 0; i < commonPrefixLengthPlusOne - 1; i++) {
+            Arc nextArc = currentState.getNextArc(inputWord.charAt(i));
+            int commonStateOutput = nextArc.output;
+            currentOutput = excludePrefix(currentOutput, commonStateOutput);
+            currentState = nextArc.getDestination();
+        }
+
+        int outputDiff = currentOutput;
+        State suffixHeadState = tempStates[commonPrefixLengthPlusOne - 1];
+        suffixHeadState.linearSearchArc(inputWord.charAt(commonPrefixLengthPlusOne - 1)).setOutput(outputDiff);
+
+        previousWord = inputWord;
+    }
+
+    private void handleLastWord(String previousWord, String lastWord, State[] tempStates) {
         for (int i = lastWord.length(); i > 0; i--) {
             int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
             Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
