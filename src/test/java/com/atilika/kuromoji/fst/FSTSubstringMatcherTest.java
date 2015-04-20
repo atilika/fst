@@ -63,7 +63,9 @@ public class FSTSubstringMatcherTest {
         // Extract words from dictionaries
 
 //        String resource = "jawikititlesHead1000.txt";
-        String resource = "ipadic-allwords_uniqHead10000.csv";
+//        String resource = "ipadic-allwords_uniqHead5000.csv";
+//        String resource = "ipadic-allwords_uniq_sorted_Head1070_tail65.csv";
+        String resource = "ipadic-allwords_uniq_sorted_Head5000.csv";
         testJAWikipediaIncremental(resource);
     }
 
@@ -75,6 +77,9 @@ public class FSTSubstringMatcherTest {
         VirtualMachine vm = new VirtualMachine();
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(fst.fstCompiler.instructionList);
+
+//        FSTFormatter fstFormatter = new FSTFormatter();
+//        fstFormatter.format(fst, "ipadic-allwords_uniq_sorted_Head1070_tail65.txt");
 
         int wordIDExpected = 1;
 
@@ -90,6 +95,8 @@ public class FSTSubstringMatcherTest {
             if (line.trim().length() == 0) {
                 continue;
             }
+            assertEquals(wordIDExpected, fst.transduce(line));
+
             int wordID = vm.run(program, line);
             assertEquals(wordIDExpected, wordID);
             wordIDExpected++;

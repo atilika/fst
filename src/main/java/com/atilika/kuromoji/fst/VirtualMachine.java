@@ -80,7 +80,6 @@ public class VirtualMachine {
                     }
 
                     if (arg1 == input.charAt(position)) {
-
 //                        pc += i.arg2 - 1; // pc is always incremented!
 //                        pc = i.arg2 - 1; // JUMP to Address i.arg2
                         pc = i.arg2 + 1; // JUMP to Address i.arg2
@@ -109,9 +108,6 @@ public class VirtualMachine {
                     break;
 
                 case Instruction.ACCEPT_OR_MATCH:
-//                    if (input.equals("あさましい")) {
-//                        System.out.println("");
-//                    }
                     arg1 = i.arg1;
 
                     if (input.length() == position + 1 && arg1 == input.charAt(position)) {
@@ -131,9 +127,6 @@ public class VirtualMachine {
                     break;
 
                 case Instruction.FAIL:
-//                    if (input.equals("あさましい")) {
-//                        System.out.println("");
-//                    }
                     done = true;
                     accumulator = -1;
                     break;

@@ -258,7 +258,7 @@ public class FST {
     }
 
     /**
-     * Find the equivalent state
+     * Find the equivalent state by checking its destination states to when collided.
      *
      * @param state
      * @return
@@ -268,32 +268,44 @@ public class FST {
         List<Character> transitionStrings = state.getAllTransitionStrings();
         List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
 
-
         String key = transitionStrings.toString() + outputStrings.toString();
-        State newStateToDic = null;
 
         if (statesDictionaryHashList.containsKey(key)) {
             ArrayList<State> collidedStates = statesDictionaryHashList.get(key);
 
             if (state.getAllTransitionStrings().size() == 0) {
-//            if (state.getAllTransitionStrings().get(0) == fstCompiler.KEY_FOR_DEADEND_ARC) { // for FST compiler
                 // the dead end state (which is unique!)
                 return collidedStates.get(0);
             }
-            char transitionStringFocused = state.getAllTransitionStrings().get(0); // state which is not compiled yet
-            State targetNextState = state.getNextState(transitionStringFocused);
 
+            // Here, there are multiple states that has the same transition arc
             // Linear Probing the collidedStates!
             for (State collidedState : collidedStates) {
-                if (collidedState.getNextState(transitionStringFocused).equals(targetNextState)) {
+                boolean destStateDiff = false;
+                List<Character> transitionStringsInCollidedState = collidedState.getAllTransitionStrings();
+
+                for (int i = 0; i < transitionStringsInCollidedState.size(); i++) {
+                    if (!state.getNextState(transitionStringsInCollidedState.get(i))
+                            .equals(collidedState.getNextState(transitionStringsInCollidedState.get(i)))) {
+                        // this state is not equivalent since there is a dest. state that is different.
+                        destStateDiff = true;
+                        break;
+                    }
+                }
+
+                if (!destStateDiff) {
                     // OK, these states point to the same state. Equivalent!
                     return collidedState;
                 }
             }
         }
         // At this point, we know that there is no equivalent compiled (finalized) node
-        newStateToDic = new State(state); // deep copy
+        State newStateToDic = new State(state); // deep copy
         ArrayList<State> stateList = new ArrayList<State>();
+        if (statesDictionaryHashList.containsKey(key)) {
+            stateList = statesDictionaryHashList.get(key);
+            // adding new state to a key
+        }
         stateList.add(newStateToDic);
         statesDictionaryHashList.put(key, stateList);
 

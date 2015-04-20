@@ -81,6 +81,7 @@ public class FSTCompiler {
         VirtualMachine.Instruction newInstructionForArcD = new VirtualMachine.Instruction();
 
         for (int i = 0; i < b.getDestination().arcs.size(); i++) {
+
             newAddress = instructionList.size();
             Arc d = b.getDestination().arcs.get(i);
             if (d.getDestination().isFinal) {
