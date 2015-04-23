@@ -66,7 +66,6 @@ public class FST {
 
         int outputValue = 1; // Initialize output value
 
-//        for (int inputWordIdx = 0; inputWordIdx < inputWords.length; inputWordIdx++) {
         String line;
         while ((line = reader.readLine()) != null) {
             line = line.replaceAll("#.*$", "");
@@ -148,8 +147,6 @@ public class FST {
         int outputDiff = currentOutput;
         State suffixHeadState = tempStates[commonPrefixLengthPlusOne - 1];
         suffixHeadState.linearSearchArc(inputWord.charAt(commonPrefixLengthPlusOne - 1)).setOutput(outputDiff);
-
-        previousWord = inputWord;
     }
 
     private void handleLastWord(String previousWord, String lastWord, State[] tempStates) {
@@ -225,6 +222,7 @@ public class FST {
         List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
 
         String key = transitionStrings.toString() + outputStrings.toString();
+
 
         if (statesDictionaryHashList.containsKey(key)) {
             ArrayList<State> collidedStates = statesDictionaryHashList.get(key);
