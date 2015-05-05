@@ -9,17 +9,20 @@ import java.util.List;
 public class FST {
     // Note that FST only allows the presorted dictionaries as input.
 
-    private HashMap<String, ArrayList<State>> statesDictionaryHashList;
+//    private HashMap<String, ArrayList<State>> statesDictionaryHashList;
+    private HashMap<Integer, ArrayList<State>> statesDictionaryHashList;
     public FSTCompiler fstCompiler = new FSTCompiler();
 
     // TODO: Rewrite this...
     public int MAX_WORD_LENGTH = 100;
 
     public FST() {
-        this.statesDictionaryHashList = new HashMap<String, ArrayList<State>>();
+//        this.statesDictionaryHashList = new HashMap<String, ArrayList<State>>();
+        this.statesDictionaryHashList = new HashMap<Integer, ArrayList<State>>();
         ArrayList<State> stateList = new ArrayList<State>();
         stateList.add(new State());
-        this.statesDictionaryHashList.put("start state", stateList); // setting the start state
+//        this.statesDictionaryHashList.put("start state", stateList); // setting the start state
+        this.statesDictionaryHashList.put(0, stateList); // temporary setting the start state
 
     }
 
@@ -49,7 +52,8 @@ public class FST {
 
 
     public State getStartState() {
-        return this.statesDictionaryHashList.get("start state").get(0);
+//        return this.statesDictionaryHashList.get("start state").get(0);
+        return this.statesDictionaryHashList.get(0).get(0);
     }
 
     /**
@@ -218,10 +222,11 @@ public class FST {
      */
     private State findEquivalentCollisionHandled(State state) {
         // returns a equivalent state which is already in the stateDicitonary. nextState will be used when there is a collision
-        List<Character> transitionStrings = state.getAllTransitionStrings();
-        List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
+//        List<Character> transitionStrings = state.getAllTransitionStrings();
+//        List<String> outputStrings = state.getAllOutputs(); // output of outgoing transition arcs
 
-        String key = transitionStrings.toString() + outputStrings.toString();
+//        String key = transitionStrings.toString() + outputStrings.toString();
+        Integer key = state.hashCode(); // this is going to be the hashCode.
 
 
         if (statesDictionaryHashList.containsKey(key)) {
