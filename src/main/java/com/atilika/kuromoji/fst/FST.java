@@ -283,20 +283,21 @@ public class FST {
     }
 
     private void compileFinalWord(State[] tempStates) {
+        char transitionDummyChar = 'D';
         State dummyState = new State();
-        dummyState.setArc(' ', 0, tempStates[0]); // trans. char.: ' ',  output: 0, dest. state: to starting state
+        dummyState.setArc(transitionDummyChar, 0, tempStates[0]); // trans. char.: ' ',  output: 0, dest. state: to starting state
         List<Character> transitionStrings = dummyState.getAllTransitionStrings();
         if (transitionStrings.size() != 0) {
             for (int i = 0; i < transitionStrings.size(); i++) {
                 char transitionChar = transitionStrings.get(i);
-                compileArc(transitionChar, dummyState, "Dummy");
+                compileArc(transitionChar, dummyState);
             }
         }
         else {
             // This is the case when start state is an accepting state. It will not be used when empty string does not appear in the dictionary
 //            char transitionChar = fstCompiler.KEY_FOR_DEADEND_ARC;
             dummyState.setArc(' ', 0, dummyState);
-            compileArc(' ', dummyState, "Dummy");
+            compileArc(' ', dummyState);
         }
     }
 
@@ -310,7 +311,7 @@ public class FST {
         if (transitionStrings.size() != 0) {
             for (int i = 0; i < transitionStrings.size(); i++) {
                 char transitionChar = transitionStrings.get(i);
-                compileArc(transitionChar, state, "");
+                compileArc(transitionChar, state);
             }
         }
         else {
@@ -319,9 +320,8 @@ public class FST {
         }
     }
 
-    private void compileArc(char transitionChar, State state, String DummyOrEmpty) {
-        String keyArc = DummyOrEmpty + transitionChar;
+    private void compileArc(char transitionChar, State state) {
         Arc b = state.getNextArc(transitionChar);
-        fstCompiler.assignTargetAddressToArcB(b, keyArc);
+        fstCompiler.assignTargetAddressToArcB(b, transitionChar);
     }
 }

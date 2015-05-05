@@ -6,7 +6,8 @@ import java.util.List;
 
 public class FSTCompiler {
 
-    HashMap<String, List<Integer>> arcAddressHashMap = new HashMap<>();
+//    HashMap<String, List<Integer>> arcAddressHashMap = new HashMap<>();
+    HashMap<Character, List<Integer>> arcAddressHashMap = new HashMap<>();
     HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
     public List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
 
@@ -17,7 +18,7 @@ public class FSTCompiler {
      * @param key
      * @return -1 if there is no Arc which input/output corresponds to key. Else return the address that corresponds to that arc.
      */
-    public int referToFrozenArc(Arc b, String key) {
+    public int referToFrozenArc(Arc b, Character key) {
         // remember that key only refers to where Arc b is in the Program.
         // so you have to check whether b's destination is compiled or not.
         if (!arcAddressHashMap.containsKey(key)) {
@@ -42,7 +43,7 @@ public class FSTCompiler {
      * @param b
      * @param key
      */
-    public void assignTargetAddressToArcB(Arc b, String key) {
+    public void assignTargetAddressToArcB(Arc b, Character key) {
         if (b.getDestination().arcs.size() == 0) {
             // an arc which points to dead end accepting state
             b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
@@ -62,7 +63,7 @@ public class FSTCompiler {
         }
     }
 
-    public int makeNewInstructionForArcD(Arc b, String key){
+    public int makeNewInstructionForArcD(Arc b, Character key){
         // No frozen arcs transiting to the same state. Freeze a new arc.
 
         instructionList.add(createInstructionFail());
@@ -100,15 +101,16 @@ public class FSTCompiler {
 
     public void makeInstructionForDeadEndState() {
         if (instructionList.size() == 0) {
+            char KEY_FOR_DEAD_END = ' ';
             VirtualMachine.Instruction instructionAccept = createInstructionAccept(-1);
             instructionList.add(instructionAccept); // TODO: refactor this
             List<Integer> arcAddresses = new ArrayList<>();
-            if (arcAddressHashMap.containsKey(" ")) {
-                arcAddresses = arcAddressHashMap.get(" ");
+            if (arcAddressHashMap.containsKey(KEY_FOR_DEAD_END)) {
+                arcAddresses = arcAddressHashMap.get(KEY_FOR_DEAD_END);
             }
             int newAddress = instructionList.size();
             arcAddresses.add(newAddress);
-            arcAddressHashMap.put(" ", arcAddresses);
+            arcAddressHashMap.put(KEY_FOR_DEAD_END, arcAddresses);
             addressInstructionHashMap.put(newAddress, instructionAccept);
         }
         else {

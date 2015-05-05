@@ -24,7 +24,8 @@ public class FSTCompilerTest {
         acceptState.isFinal = true;
 
         Arc b = new Arc(1, acceptState, 'a');
-        String key = "a";
+//        String key = "a";
+        char key = 'a';
         b.setTargetJumpAddress(0); // to accepting state
 
         List<Integer> addresses = new ArrayList<>();
@@ -36,7 +37,7 @@ public class FSTCompilerTest {
         assertEquals(0, fstCompiler.referToFrozenArc(b, key)); // returns the address of already frozen instruction
 
         Arc c = new Arc(1, acceptState, 'b');
-        key = "b";
+        key = 'b';
         assertEquals(-1, fstCompiler.referToFrozenArc(c, key));
     }
 
@@ -61,7 +62,7 @@ public class FSTCompilerTest {
         VirtualMachine.Instruction instructionFail = fstCompiler.createInstructionFail();
 
         int INSTRUCTION_MATCH_A_ADDRESS = 2;
-        String keyA = "a";
+        char keyA = 'a';
         List<Integer> addresses = new ArrayList<>();
         addresses.add(INSTRUCTION_MATCH_A_ADDRESS); // Instruction of an address
         fstCompiler.arcAddressHashMap.put(keyA, addresses); // only stores corresponding arcs
@@ -72,7 +73,7 @@ public class FSTCompilerTest {
 
         // freeze a new arc
         int INSTRUCTION_MATCH_B_ADDRESS = 3;
-        String keyB = "b";
+        char keyB ='b';
         Arc arcB = new Arc(2, acceptState, 'b'); // output=2, dest. to Accepting state, transition char='b'
 //        addresses = new ArrayList<>();
 //        addresses.add(INSTRUCTION_MATCH_B_ADDRESS);
