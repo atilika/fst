@@ -8,7 +8,7 @@ public class FSTCompiler {
 
 //    HashMap<String, List<Integer>> arcAddressHashMap = new HashMap<>();
     HashMap<Character, List<Integer>> arcAddressHashMap = new HashMap<>();
-    HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
+//    HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
     public List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
 
     /**
@@ -28,7 +28,8 @@ public class FSTCompiler {
         List<Integer> arcAddresses = arcAddressHashMap.get(key);
 
         for (Integer arcAddress : arcAddresses) {
-            int arcBtargetAddress = addressInstructionHashMap.get(arcAddress).arg2; //
+//            int arcBtargetAddress = addressInstructionHashMap.get(arcAddress).arg2; //
+            int arcBtargetAddress = instructionList.get(arcAddress).arg2; //
             if (b.getTargetJumpAddress() == arcBtargetAddress) {
                 return arcBtargetAddress; // transiting to the same state.
             }
@@ -94,7 +95,7 @@ public class FSTCompiler {
             }
 
             instructionList.add(newInstructionForArcD);
-            addressInstructionHashMap.put(newAddress, newInstructionForArcD);
+//            addressInstructionHashMap.put(newAddress, newInstructionForArcD);
         }
         return newAddress;
     }
@@ -111,7 +112,7 @@ public class FSTCompiler {
             int newAddress = instructionList.size();
             arcAddresses.add(newAddress);
             arcAddressHashMap.put(KEY_FOR_DEAD_END, arcAddresses);
-            addressInstructionHashMap.put(newAddress, instructionAccept);
+//            addressInstructionHashMap.put(newAddress, instructionAccept);
         }
         else {
             // already exists
@@ -125,7 +126,7 @@ public class FSTCompiler {
         return instructionFail;
     }
 
-    private VirtualMachine.Instruction createInstructionAccept(int jumpAddress) {
+    public VirtualMachine.Instruction createInstructionAccept(int jumpAddress) {
         VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
         instructionAccept.arg2 = jumpAddress;
