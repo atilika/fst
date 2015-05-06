@@ -322,6 +322,6 @@ public class FST {
 
     private void compileArc(char transitionChar, State state) {
         Arc b = state.getNextArc(transitionChar);
-        fstCompiler.assignTargetAddressToArcB(b, transitionChar);
+        fstCompiler.assignTargetAddressToArcB(b);
     }
 }
