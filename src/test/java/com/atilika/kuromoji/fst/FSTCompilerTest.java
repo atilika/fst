@@ -186,6 +186,8 @@ public class FSTCompilerTest {
         VirtualMachine.Program program = new VirtualMachine.Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
+        List<VirtualMachine.Instruction> instructionsDebug = program.debugInstructions();
+
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }

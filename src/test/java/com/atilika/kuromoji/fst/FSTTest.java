@@ -28,7 +28,7 @@ public class FSTTest {
         }
     }
 
-    @Ignore("Enable when you want to try out with the whole JA wikipedia titles by incremental approach.")
+//    @Ignore("Enable when you want to try out with the whole JA wikipedia titles by incremental approach.")
     @Test
     public void testJAWikipediaIncremental() throws Exception {
         FSTTestHelper fstTestHelper = new FSTTestHelper();

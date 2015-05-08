@@ -29,7 +29,8 @@ public class FSTCompiler {
 
         for (Integer arcAddress : arcAddresses) {
 //            int arcBtargetAddress = addressInstructionHashMap.get(arcAddress).arg2; //
-            int arcBtargetAddress = instructionList.get(arcAddress).arg2; //
+//            int arcBtargetAddress = instructionList.get(arcAddress).arg2; //
+            int arcBtargetAddress = arcAddress; //
             if (b.getTargetJumpAddress() == arcBtargetAddress) {
                 return arcBtargetAddress; // transiting to the same state.
             }

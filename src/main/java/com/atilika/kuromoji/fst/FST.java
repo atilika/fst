@@ -114,6 +114,7 @@ public class FST {
     private void createDictionaryCommon(String inputWord, String previousWord, State[] tempStates, int currentOutput) {
 
         int commonPrefixLengthPlusOne = commonPrefixIndice(previousWord, inputWord);
+//        System.out.println(currentOutput);
 
             /*
             we minimize the states from thee suffix of the previous word
@@ -239,11 +240,20 @@ public class FST {
 
             // Here, there are multiple states that has the same transition arc
             // Linear Probing the collidedStates!
+//            System.out.println(collidedStates.get(0).getAllTransitionStrings());
             for (State collidedState : collidedStates) {
                 boolean destStateDiff = false;
                 List<Character> transitionStringsInCollidedState = collidedState.getAllTransitionStrings();
 
                 for (int i = 0; i < transitionStringsInCollidedState.size(); i++) {
+                    // we cannot guarantee that the state has a given transition char since the hashCode() may collide in coincidence.
+                    if (!state.getAllTransitionStrings().contains(transitionStringsInCollidedState.get(i))) {
+                        // this state is not equivalent since a given state does not contain collided state's transition string.
+                        destStateDiff = true;
+                        break;
+
+                    }
+                    System.out.println(state.getNextState(transitionStringsInCollidedState.get(i)));
                     if (!state.getNextState(transitionStringsInCollidedState.get(i))
                             .equals(collidedState.getNextState(transitionStringsInCollidedState.get(i)))) {
                         // this state is not equivalent since there is a dest. state that is different.

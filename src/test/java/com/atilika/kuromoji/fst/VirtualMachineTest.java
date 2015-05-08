@@ -2,6 +2,8 @@ package com.atilika.kuromoji.fst;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 public class VirtualMachineTest {
@@ -41,16 +43,36 @@ public class VirtualMachineTest {
 
 //        VirtualMachine.Instruction[] instructions =
 //                new VirtualMachine.Instruction[] {instructionMatch, instructionAccept};
-        VirtualMachine.Instruction[] instructions =
-                new VirtualMachine.Instruction[] {instructionAccept, instructionMatch};
-        program.addInstructions(instructions);
+        program.addInstructions(
+                Arrays.asList(instructionAccept, instructionMatch)
+        );
 
         assertEquals(1, vm.run(program, "a"));
     }
 
     @Test
-    public void testMultipleMatches() throws Exception {
+    public void testAddInstructions() throws Exception {
+        FSTCompiler fstCompiler = new FSTCompiler();
+        VirtualMachine.Instruction instructionAccept = fstCompiler.createInstructionAccept(0);
+        VirtualMachine.Instruction instructionFail = fstCompiler.createInstructionFail();
+        VirtualMachine.Instruction instructionMatch = fstCompiler.createInstructionMatch('a', 1, 1);
 
+        VirtualMachine.Program program = new VirtualMachine.Program();
+        program.addInstructions(Arrays.asList(instructionAccept, instructionFail, instructionMatch));
+//        program.addInstruction(instructionAccept);
+//        program.addInstruction(instructionFail);
+//        program.addInstruction(instructionMatch);
 
+        VirtualMachine.Instruction storedMatchInstruction = program.getInstructionAt(2);
+
+        assertEquals(storedMatchInstruction.arg1, instructionMatch.arg1);
+        assertEquals(storedMatchInstruction.arg2, instructionMatch.arg2);
+        assertEquals(storedMatchInstruction.arg3, instructionMatch.arg3);
+
+        VirtualMachine.Instruction storedAcceptInstruction = program.getInstructionAt(0);
+        assertEquals(storedAcceptInstruction.toString(), instructionAccept.toString());
+
+        VirtualMachine.Instruction storedFailInstruction = program.getInstructionAt(1);
+        assertEquals(storedFailInstruction.toString(), instructionFail.toString());
     }
 }
