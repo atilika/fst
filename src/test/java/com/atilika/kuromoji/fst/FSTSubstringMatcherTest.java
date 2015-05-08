@@ -1,5 +1,7 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Program;
+import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
 
 import java.io.*;
@@ -25,7 +27,7 @@ public class FSTSubstringMatcherTest {
         fst.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
@@ -48,7 +50,7 @@ public class FSTSubstringMatcherTest {
         fst.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
@@ -75,7 +77,7 @@ public class FSTSubstringMatcherTest {
         FST fst = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
 //        FSTFormatter fstFormatter = new FSTFormatter();

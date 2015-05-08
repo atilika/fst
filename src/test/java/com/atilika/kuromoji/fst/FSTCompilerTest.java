@@ -1,5 +1,8 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Instruction;
+import com.atilika.kuromoji.fst.vm.Program;
+import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -32,7 +35,7 @@ public class FSTCompilerTest {
         addresses.add(2);
         fstCompiler.arcDestinationAddressHashMap.put(key, addresses);
 
-        VirtualMachine.Instruction instruction = fstCompiler.createInstructionMatch('a', 0, 1);
+        Instruction instruction = fstCompiler.createInstructionMatch('a', 0, 1);
 //        fstCompiler.addressInstructionHashMap.put(2, instruction);
         fstCompiler.instructionList.add(2, instruction);
         assertEquals(0, fstCompiler.referToFrozenArc(b)); // returns the address of already frozen instruction
@@ -54,13 +57,13 @@ public class FSTCompilerTest {
 //        acceptState.setArc(' ', 0, acceptState); // self loop
 
         int INSTRUCTION_ACCEPT_ADDRESS = 0;
-        VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
+        Instruction instructionAccept = new Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
 //        instructionAccept.arg2 = 0; // target address, self loop: VERY IMPORTANT for equivalent state detection.
         instructionAccept.arg2 = -1; // target address not set.
 //        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_ACCEPT_ADDRESS, instructionAccept);
 
-        VirtualMachine.Instruction instructionFail = fstCompiler.createInstructionFail();
+        Instruction instructionFail = fstCompiler.createInstructionFail();
 
         int INSTRUCTION_MATCH_A_ADDRESS = 2;
         char keyA = 'a';
@@ -68,7 +71,7 @@ public class FSTCompilerTest {
         addresses.add(INSTRUCTION_MATCH_A_ADDRESS); // Instruction of an address
         fstCompiler.arcDestinationAddressHashMap.put(keyA, addresses); // only stores corresponding arcs
         // making an instruction that corresponds to an arc
-        VirtualMachine.Instruction instructionMatchA =
+        Instruction instructionMatchA =
                 fstCompiler.createInstructionMatch('a', 0, 1); // trans. char='a', target address: 0, output: 1
 //        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_A_ADDRESS, instructionMatchA);
 
@@ -78,12 +81,12 @@ public class FSTCompilerTest {
         Arc arcB = new Arc(2, acceptState, 'b'); // output=2, dest. to Accepting state, transition char='b'
 //        addresses = new ArrayList<>();
 //        addresses.add(INSTRUCTION_MATCH_B_ADDRESS);
-//        VirtualMachine.Instruction instructionMatchB =
+//        Instruction instructionMatchB =
 //                createInstructionMatch('b', 0, 2); // trans. char='b', target address: 0, output: 2
 //        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_B_ADDRESS, instructionMatchB);
 
         // create an instruction
-        List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
+        List<Instruction> instructionList = new ArrayList<>();
         instructionList.add(instructionAccept);
         instructionList.add(instructionFail);
         instructionList.add(instructionMatchA);
@@ -96,7 +99,7 @@ public class FSTCompilerTest {
 
         List<Integer> addressesForKeyB = new ArrayList<>();
         addressesForKeyB.add(INSTRUCTION_MATCH_B_ADDRESS);
-        VirtualMachine.Instruction instructionMatchB =
+        Instruction instructionMatchB =
                 fstCompiler.createInstructionMatch('b', 0, 2); // trans. char='b', target address: 0, output: 2
 //        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_B_ADDRESS, instructionMatchB);
         fstCompiler.arcDestinationAddressHashMap.put(keyB, addressesForKeyB);
@@ -129,7 +132,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
@@ -161,7 +164,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
         for (int i = 0; i < sortedInput.length; i++) {
             assertEquals(outputValues[i], vm.run(program, sortedInput[i]));
@@ -183,10 +186,10 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
-        List<VirtualMachine.Instruction> instructionsDebug = program.debugInstructions();
+        List<Instruction> instructionsDebug = program.debugInstructions();
 
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
@@ -210,7 +213,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
         for (int i = 0; i < inputValues.length; i++) {
@@ -234,7 +237,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
         for (int i = 0; i < inputValues.length; i++) {
@@ -263,7 +266,7 @@ public class FSTCompilerTest {
         FST fst = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
         program.addInstructions(fst.fstCompiler.instructionList);
 
         int wordIDExpected = 1;

@@ -1,5 +1,7 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Instruction;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +11,7 @@ public class FSTCompiler {
 //    HashMap<String, List<Integer>> arcDestinationAddressHashMap = new HashMap<>();
     HashMap<Character, List<Integer>> arcDestinationAddressHashMap = new HashMap<>(); // points to the starting Arc address of a state
     //    HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
-    public List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
+    public List<Instruction> instructionList = new ArrayList<>();
 
     /**
      * Assuming Arc b already holds target jump address. Checks whether Arc b is already frozen.
@@ -79,7 +81,7 @@ public class FSTCompiler {
         arcDestinationAddressHashMap.put(key, arcAddresses);
 
         // rest of the arcs
-        VirtualMachine.Instruction newInstructionForArcD = new VirtualMachine.Instruction();
+        Instruction newInstructionForArcD = new Instruction();
 
         for (int i = 0; i < b.getDestination().arcs.size(); i++) {
 
@@ -102,7 +104,7 @@ public class FSTCompiler {
     public void makeInstructionForDeadEndState() {
         if (instructionList.size() == 0) {
             char KEY_FOR_DEAD_END = ' ';
-            VirtualMachine.Instruction instructionAccept = createInstructionAccept(-1);
+            Instruction instructionAccept = createInstructionAccept(-1);
             instructionList.add(instructionAccept); // TODO: refactor this
             List<Integer> arcAddresses = new ArrayList<>();
             if (arcDestinationAddressHashMap.containsKey(KEY_FOR_DEAD_END)) {
@@ -119,21 +121,21 @@ public class FSTCompiler {
         }
     }
 
-    public VirtualMachine.Instruction createInstructionFail() {
-        VirtualMachine.Instruction instructionFail = new VirtualMachine.Instruction();
+    public Instruction createInstructionFail() {
+        Instruction instructionFail = new Instruction();
         instructionFail.opcode = instructionFail.FAIL;
         return instructionFail;
     }
 
-    public VirtualMachine.Instruction createInstructionAccept(int jumpAddress) {
-        VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
+    public Instruction createInstructionAccept(int jumpAddress) {
+        Instruction instructionAccept = new Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
         instructionAccept.arg2 = jumpAddress;
         return instructionAccept;
     }
 
-    public VirtualMachine.Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
-        VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
+    public Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
+        Instruction instructionMatch = new Instruction();
         instructionMatch.opcode = instructionMatch.MATCH;
         instructionMatch.arg1 = arg1;
         instructionMatch.arg2 = jumpAddress;
@@ -141,8 +143,8 @@ public class FSTCompiler {
         return instructionMatch;
     }
 
-    private VirtualMachine.Instruction createInstructionMatchOrAccept(char arg1, int jumpAddress, int output) {
-        VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
+    private Instruction createInstructionMatchOrAccept(char arg1, int jumpAddress, int output) {
+        Instruction instructionMatch = new Instruction();
         instructionMatch.opcode = instructionMatch.ACCEPT_OR_MATCH;
         instructionMatch.arg1 = arg1;
         instructionMatch.arg2 = jumpAddress;
