@@ -1,6 +1,7 @@
 package com.atilika.kuromoji.fst;
 
 import com.atilika.kuromoji.fst.vm.Instruction;
+import com.atilika.kuromoji.fst.vm.Program;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +12,7 @@ public class FSTCompiler {
 //    HashMap<String, List<Integer>> arcDestinationAddressHashMap = new HashMap<>();
     HashMap<Character, List<Integer>> arcDestinationAddressHashMap = new HashMap<>(); // points to the starting Arc address of a state
     //    HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
-    public List<Instruction> instructionList = new ArrayList<>();
+    public Program program = new Program();
 
     /**
      * Assuming Arc b already holds target jump address. Checks whether Arc b is already frozen.
@@ -68,10 +69,10 @@ public class FSTCompiler {
         // No frozen arcs transiting to the same state. Freeze a new arc.
 
         char key = b.getLabel();
-        instructionList.add(createInstructionFail());
+        program.addInstruction(createInstructionFail());
 
         List<Integer> arcAddresses = new ArrayList<>();
-        int newAddress = instructionList.size();
+        int newAddress = program.numInstructions;
 
         // 1. Create a new List for a new key
         if (arcDestinationAddressHashMap.containsKey(key)) {
@@ -85,7 +86,7 @@ public class FSTCompiler {
 
         for (int i = 0; i < b.getDestination().arcs.size(); i++) {
 
-            newAddress = instructionList.size();
+            newAddress = program.numInstructions;
             Arc d = b.getDestination().arcs.get(i);
             if (d.getDestination().isFinal) {
                 newInstructionForArcD =
@@ -95,22 +96,24 @@ public class FSTCompiler {
                         createInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
             }
 
-            instructionList.add(newInstructionForArcD);
+//            instructionList.add(newInstructionForArcD);
+            program.addInstruction(newInstructionForArcD);
 //            addressInstructionHashMap.put(newAddress, newInstructionForArcD);
         }
         return newAddress;
     }
 
     public void makeInstructionForDeadEndState() {
-        if (instructionList.size() == 0) {
+        // TODO: this is currently not used. Delete it afterwards.
+        if (program.numInstructions == 0) {
             char KEY_FOR_DEAD_END = ' ';
             Instruction instructionAccept = createInstructionAccept(-1);
-            instructionList.add(instructionAccept); // TODO: refactor this
+            program.addInstruction(instructionAccept);
             List<Integer> arcAddresses = new ArrayList<>();
             if (arcDestinationAddressHashMap.containsKey(KEY_FOR_DEAD_END)) {
                 arcAddresses = arcDestinationAddressHashMap.get(KEY_FOR_DEAD_END);
             }
-            int newAddress = instructionList.size();
+            int newAddress = program.numInstructions;
             arcAddresses.add(newAddress);
             arcDestinationAddressHashMap.put(KEY_FOR_DEAD_END, arcAddresses);
 //            addressInstructionHashMap.put(newAddress, instructionAccept);
@@ -152,4 +155,7 @@ public class FSTCompiler {
         return instructionMatch;
     }
 
+    public Program getProgram() {
+        return this.program;
+    }
 }

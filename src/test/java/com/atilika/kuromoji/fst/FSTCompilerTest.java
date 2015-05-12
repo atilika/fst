@@ -23,8 +23,10 @@ public class FSTCompilerTest {
 
         State acceptState = new State();
         acceptState.isFinal = true;
-        fstCompiler.instructionList.add(0, fstCompiler.createInstructionAccept(0));
-        fstCompiler.instructionList.add(1, fstCompiler.createInstructionFail());
+//        fstCompiler.instructionList.add(0, fstCompiler.createInstructionAccept(0));
+        fstCompiler.program.addInstruction(fstCompiler.createInstructionAccept(0));
+//        fstCompiler.instructionList.add(1, fstCompiler.createInstructionFail());
+        fstCompiler.program.addInstruction(fstCompiler.createInstructionFail());
 
         Arc b = new Arc(1, acceptState, 'a');
 //        String key = "a";
@@ -32,12 +34,13 @@ public class FSTCompilerTest {
         b.setTargetJumpAddress(0); // to accepting state
 
         List<Integer> addresses = new ArrayList<>();
-        addresses.add(2);
+        addresses.add(0);
         fstCompiler.arcDestinationAddressHashMap.put(key, addresses);
 
         Instruction instruction = fstCompiler.createInstructionMatch('a', 0, 1);
 //        fstCompiler.addressInstructionHashMap.put(2, instruction);
-        fstCompiler.instructionList.add(2, instruction);
+//        fstCompiler.instructionList.add(2, instruction);
+        fstCompiler.program.addInstruction(instruction);
         assertEquals(0, fstCompiler.referToFrozenArc(b)); // returns the address of already frozen instruction
 
         Arc c = new Arc(1, acceptState, 'b');
@@ -65,7 +68,7 @@ public class FSTCompilerTest {
 
         Instruction instructionFail = fstCompiler.createInstructionFail();
 
-        int INSTRUCTION_MATCH_A_ADDRESS = 2;
+        int INSTRUCTION_MATCH_A_ADDRESS = 0;
         char keyA = 'a';
         List<Integer> addresses = new ArrayList<>();
         addresses.add(INSTRUCTION_MATCH_A_ADDRESS); // Instruction of an address
@@ -76,7 +79,7 @@ public class FSTCompilerTest {
 //        fstCompiler.addressInstructionHashMap.put(INSTRUCTION_MATCH_A_ADDRESS, instructionMatchA);
 
         // freeze a new arc
-        int INSTRUCTION_MATCH_B_ADDRESS = 3;
+        int INSTRUCTION_MATCH_B_ADDRESS = 0;
         char keyB ='b';
         Arc arcB = new Arc(2, acceptState, 'b'); // output=2, dest. to Accepting state, transition char='b'
 //        addresses = new ArrayList<>();
@@ -91,7 +94,8 @@ public class FSTCompilerTest {
         instructionList.add(instructionFail);
         instructionList.add(instructionMatchA);
 //        instructionList.add(instructionMatchB); //
-        fstCompiler.instructionList = instructionList;
+//        fstCompiler.instructionList = instructionList;
+        fstCompiler.program.addInstructions(instructionList);
 
         fstCompiler.assignTargetAddressToArcB(arcB);
         // TargetJumpAddress = 0, to the dead-end accepting state
@@ -132,8 +136,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }
@@ -164,8 +167,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
         for (int i = 0; i < sortedInput.length; i++) {
             assertEquals(outputValues[i], vm.run(program, sortedInput[i]));
         }
@@ -186,8 +188,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
         List<Instruction> instructionsDebug = program.debugInstructions();
 
@@ -213,8 +214,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
@@ -237,8 +237,7 @@ public class FSTCompilerTest {
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
@@ -266,8 +265,7 @@ public class FSTCompilerTest {
         FST fst = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
         int wordIDExpected = 1;
 

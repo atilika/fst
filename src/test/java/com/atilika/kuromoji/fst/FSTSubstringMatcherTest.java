@@ -27,8 +27,7 @@ public class FSTSubstringMatcherTest {
         fst.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
@@ -50,8 +49,7 @@ public class FSTSubstringMatcherTest {
         fst.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
@@ -77,8 +75,7 @@ public class FSTSubstringMatcherTest {
         FST fst = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = new Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
 //        FSTFormatter fstFormatter = new FSTFormatter();
 //        fstFormatter.format(fst, "ipadic-allwords_uniq_sorted_Head1070_tail65.txt");

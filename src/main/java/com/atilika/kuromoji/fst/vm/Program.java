@@ -7,6 +7,7 @@ import java.util.List;
 public class Program {
 
     int endOfTheProgram = 0; // end of the pc;
+    public int numInstructions = 0;
 
     public final static int BYTES_PER_INSTRUCTIONS = 12;
 
@@ -50,6 +51,7 @@ public class Program {
         instruction.putInt(i.arg3);
 
         endOfTheProgram += BYTES_PER_INSTRUCTIONS;
+        numInstructions += 1; // TODO: integrate this variable with the above.
     }
 
     public void addInstructions(List<Instruction> instructions) {
