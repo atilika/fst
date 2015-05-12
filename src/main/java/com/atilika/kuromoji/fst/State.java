@@ -11,6 +11,7 @@ public class State {
     ArrayList<Arc> arcs; // possible arcs given a transition string
     boolean isFinal = false;
     boolean visited; //for visualization purpose
+    int instructionAddress = -1;
 
     public State() {
         this.arcs = new ArrayList<Arc>();
@@ -104,6 +105,10 @@ public class State {
     public void setFinal() {
         this.isFinal = true;
     }
+
+    public void setInstructionAddress(int instructionAddress) { this.instructionAddress = instructionAddress;}
+
+    public int getInstructionAddress() { return this.instructionAddress;}
 
     public Arc linearSearchArc(char transition) {
         for (Arc arc : arcs) {

@@ -12,7 +12,7 @@ public class Program {
     public final static int BYTES_PER_INSTRUCTIONS = 12;
 
     //        int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
-    int instructionsSize = BYTES_PER_INSTRUCTIONS * 10000000;
+    int instructionsSize = BYTES_PER_INSTRUCTIONS * 5000000;
     ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
     int instructionIndex = 0;
 //        List<Instruction> instructions = new ArrayList<>();

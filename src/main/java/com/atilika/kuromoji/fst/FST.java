@@ -128,6 +128,7 @@ public class FST {
             setTransition(tempStates[i - 1], temp, output, previousWord.charAt(i - 1));
             tempStates[i - 1].arcs.remove(removingArc);
 
+//            compileState(tempStates[i - 1]); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
             compileState(tempStates[i - 1]); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
 
         }
@@ -332,6 +333,6 @@ public class FST {
 
     private void compileArc(char transitionChar, State state) {
         Arc b = state.getNextArc(transitionChar);
-        fstCompiler.assignTargetAddressToArcB(b);
+        fstCompiler.assignTargetAddressToArcB(b, statesDictionaryHashList);
     }
 }
