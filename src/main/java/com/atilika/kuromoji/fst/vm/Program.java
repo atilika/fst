@@ -2,6 +2,7 @@ package com.atilika.kuromoji.fst.vm;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Program {
@@ -9,13 +10,23 @@ public class Program {
     int endOfTheProgram = 0; // end of the pc;
     public int numInstructions = 0;
 
-    public final static int BYTES_PER_INSTRUCTIONS = 12;
+    public final static int BYTES_PER_INSTRUCTIONS = 11;
 
     //        int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
     int instructionsSize = BYTES_PER_INSTRUCTIONS * 5000000;
     ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
-    int instructionIndex = 0;
-//        List<Instruction> instructions = new ArrayList<>();
+
+    int CACHED_CHAR_RANGE = 1 << 16;
+    public int[] cacheFirstAddresses;
+    public int[] cacheFirstOutputs;
+    public boolean[] cacheFirstIsAccept;
+
+    public Program() {
+        this.cacheFirstAddresses = new int[CACHED_CHAR_RANGE];
+        Arrays.fill(this.cacheFirstAddresses, -1);
+        this.cacheFirstOutputs = new int[CACHED_CHAR_RANGE];
+        this.cacheFirstIsAccept = new boolean[CACHED_CHAR_RANGE];
+    }
 
     public Instruction getInstructionAt(int pc) {
         int internalIndex = pc * BYTES_PER_INSTRUCTIONS;
@@ -27,7 +38,8 @@ public class Program {
         instruction.position(internalIndex);
 
         Instruction i = new Instruction();
-        i.opcode = instruction.getShort();
+//        i.opcode = instruction.getShort();
+        i.opcode = instruction.get();
         i.arg1 = instruction.getChar();
         i.arg2 = instruction.getInt();
         i.arg3 = instruction.getInt();
@@ -45,7 +57,8 @@ public class Program {
 //            }
         // write instruction into bytearray as bytes..
 
-        instruction.putShort(i.opcode);
+//        instruction.putShort(i.opcode);
+        instruction.put(i.opcode);
         instruction.putChar(i.arg1);
         instruction.putInt(i.arg2);
         instruction.putInt(i.arg3);
@@ -71,4 +84,8 @@ public class Program {
         }
         return instructions;
     }
+
+    public int[] getCacheFirstAddresses() {return this.cacheFirstAddresses;}
+
+    public int[] getCacheFirstOutputs() {return this.cacheFirstOutputs;}
 }

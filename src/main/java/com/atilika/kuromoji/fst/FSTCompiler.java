@@ -9,10 +9,11 @@ import java.util.List;
 
 public class FSTCompiler {
 
-//    HashMap<String, List<Integer>> arcDestinationAddressHashMap = new HashMap<>();
-//    HashMap<Character, List<Integer>> arcDestinationAddressHashMap = new HashMap<>(); // points to the starting Arc address of a state
-    //    HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
-    public Program program = new Program();
+    public Program program;
+
+    public FSTCompiler() {
+        this.program = new Program();
+    }
 
     /**
      * Assuming Arc b already holds target jump address. Checks whether Arc b is already frozen.
@@ -29,44 +30,41 @@ public class FSTCompiler {
      *
      * @param b
      */
-    public void assignTargetAddressToArcB(Arc b, HashMap<Integer, ArrayList<State>> statesDictionaryHashList) {
+    public void assignTargetAddressToArcB(Arc b, HashMap<Integer, ArrayList<State>> statesDictionaryHashList, boolean isStartState) {
         if (b.getDestination().arcs.size() == 0) {
             // an arc which points to dead end accepting state
             b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
-            return;
-        }
-        // whether equivlent destination state is already frozen
-
-        int targetAddress = referToFrozenArc(b, statesDictionaryHashList);
-        if (targetAddress != -1) {
-            b.setTargetJumpAddress(targetAddress); // equivalent state found
-            b.getDestination().setInstructionAddress(targetAddress);
+//            return;
         }
         else {
-            // First arc is regarded as a state
-            int newAddress = makeNewInstructionsForFreezingState(b); // TODO: this method is not fully implemented yet
-            b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
-            b.getDestination().setInstructionAddress(newAddress); // the last arc since it is run in reverse order
+            // whether equivlent destination state is already frozen
+
+            int targetAddress = referToFrozenArc(b, statesDictionaryHashList);
+            if (targetAddress != -1) {
+                b.setTargetJumpAddress(targetAddress); // equivalent state found
+                b.getDestination().setInstructionAddress(targetAddress);
+
+            } else {
+                // First arc is regarded as a state
+                int newAddress = makeNewInstructionsForFreezingState(b, isStartState); // TODO: this method is not fully implemented yet
+                b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
+                b.getDestination().setInstructionAddress(newAddress); // the last arc since it is run in reverse order
+            }
+        }
+
+
+        if (isStartState && b.getLabel() < program.cacheFirstAddresses.length) {
+            program.cacheFirstAddresses[b.getLabel()] = b.getTargetJumpAddress();
+            program.cacheFirstOutputs[b.getLabel()] = b.getOutput();
+            program.cacheFirstIsAccept[b.getLabel()] = b.getDestination().isFinal;
         }
     }
 
-    public int makeNewInstructionsForFreezingState(Arc b){
+    public int makeNewInstructionsForFreezingState(Arc b, boolean isStartState){
         // No frozen arcs transiting to the same state. Freeze a new arc.
 
-        char key = b.getLabel();
         program.addInstruction(createInstructionFail());
-
-        List<Integer> arcAddresses = new ArrayList<>();
         int newAddress = program.numInstructions;
-
-//        // 1. Create a new List for a new key
-//        if (arcDestinationAddressHashMap.containsKey(key)) {
-//            arcAddresses = arcDestinationAddressHashMap.get(key);
-//        }
-//        arcAddresses.add(newAddress); // destination
-//        arcDestinationAddressHashMap.put(key, arcAddresses);
-
-        // rest of the arcs
         Instruction newInstructionForArcD = new Instruction();
 
         for (int i = 0; i < b.getDestination().arcs.size(); i++) {
@@ -80,6 +78,12 @@ public class FSTCompiler {
                 newInstructionForArcD =
                         createInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
             }
+//
+//            if (isStartState && d.getLabel() < program.cacheFirstAddresses.length) {
+//                program.cacheFirstAddresses[d.getLabel()] = d.getTargetJumpAddress();
+//                program.cacheFirstAddresses[d.getLabel()] = d.getOutput();
+//                program.cacheFirstIsAccept[d.getLabel()] = d.getDestination().isFinal;
+//            }
 
             program.addInstruction(newInstructionForArcD);
         }

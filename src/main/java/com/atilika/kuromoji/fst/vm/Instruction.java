@@ -2,14 +2,21 @@ package com.atilika.kuromoji.fst.vm;
 
 public class Instruction {
 
-    public static final short MATCH = 1;
-    public static final short NOP = 2;
-    public static final short FAIL = 3;
-    public static final short HELLO = 4;
-    public static final short ACCEPT = 5;
-    public static final short ACCEPT_OR_MATCH = 6;
+//    public static final short MATCH = 1;
+//    public static final short NOP = 2;
+//    public static final short FAIL = 3;
+//    public static final short HELLO = 4;
+//    public static final short ACCEPT = 5;
+//    public static final short ACCEPT_OR_MATCH = 6;
+    public static final byte MATCH = 1;
+    public static final byte NOP = 2;
+    public static final byte FAIL = 3;
+    public static final byte HELLO = 4;
+    public static final byte ACCEPT = 5;
+    public static final byte ACCEPT_OR_MATCH = 6;
 
-    public short opcode;
+//    public short opcode;
+    public byte opcode;
 
     public char arg1;
 

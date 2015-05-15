@@ -169,6 +169,7 @@ public class FSTCompilerTest {
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
         Program program = fst.fstCompiler.getProgram();
+        List<Instruction> instructionsDebug = program.debugInstructions();
         for (int i = 0; i < sortedInput.length; i++) {
             assertEquals(outputValues[i], vm.run(program, sortedInput[i]));
         }

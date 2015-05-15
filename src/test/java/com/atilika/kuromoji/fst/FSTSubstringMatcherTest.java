@@ -64,8 +64,9 @@ public class FSTSubstringMatcherTest {
 
 //        String resource = "jawikititlesHead1000.txt";
 //        String resource = "ipadic-allwords_uniqHead5000.csv";
-        String resource = "ipadic-allwords_uniqHead100000.csv";
-//        String resource = "ipadic-allwords_uniq_sorted.csv";
+//        String resource = "ipadic-allwords_uniqHead100000.csv";
+//        String resource = "ipadic-allwords_uniqHead200000.csv";
+        String resource = "ipadic-allwords_uniq_sorted.csv";
         testJAWikipediaIncremental(resource);
     }
 

@@ -13,6 +13,7 @@ public class VirtualMachine {
         pc = 0;
     }
 
+
     public int run(Program program, String input) {
 
 //        pc = 0;
@@ -24,8 +25,32 @@ public class VirtualMachine {
         int position = 0; // CPU register
 
         boolean done = false;
+        boolean isFirstArc = true;
 
         while (!done) {
+
+            // Referring to the cache
+            if (isFirstArc && input.charAt(position) < program.getCacheFirstAddresses().length) {
+
+                if (program.getCacheFirstAddresses()[input.charAt(position)] == -1) {
+                    accumulator = -1;
+                    break;
+                }
+
+                pc = program.getCacheFirstAddresses()[input.charAt(position)];
+                accumulator += program.getCacheFirstOutputs()[input.charAt(position)];
+
+                if (input.length() == position + 1 && program.cacheFirstIsAccept[input.charAt(position)]) {
+                    // last character
+                    done = true;
+                }
+
+                position++;
+
+                isFirstArc = false;
+                continue;
+            }
+            isFirstArc = false;
 
             Instruction i = program.getInstructionAt(pc);
 //            System.out.println(i);
