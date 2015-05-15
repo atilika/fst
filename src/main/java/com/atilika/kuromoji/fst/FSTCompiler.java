@@ -1,15 +1,18 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Instruction;
+import com.atilika.kuromoji.fst.vm.Program;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class FSTCompiler {
 
-//    HashMap<String, List<Integer>> arcDestinationAddressHashMap = new HashMap<>();
-    HashMap<Character, List<Integer>> arcDestinationAddressHashMap = new HashMap<>(); // points to the starting Arc address of a state
-    //    HashMap<Integer, VirtualMachine.Instruction> addressInstructionHashMap = new HashMap<>();
-    public List<VirtualMachine.Instruction> instructionList = new ArrayList<>();
+    public Program program;
+
+    public FSTCompiler() {
+        this.program = new Program();
+    }
 
     /**
      * Assuming Arc b already holds target jump address. Checks whether Arc b is already frozen.
@@ -17,25 +20,8 @@ public class FSTCompiler {
      * @param b
      * @return -1 if there is no Arc which input/output corresponds to key. Else return the address that corresponds to that arc.
      */
-    public int referToFrozenArc(Arc b) {
-        // remember that key only refers to where Arc b is in the Program.
-        // so you have to check whether b's destination is compiled or not.
-        char key = b.getLabel();
-        if (!arcDestinationAddressHashMap.containsKey(key)) {
-            return -1;
-        }
-
-        List<Integer> arcAddresses = arcDestinationAddressHashMap.get(key);
-
-        for (Integer arcAddress : arcAddresses) {
-//            int arcBtargetAddress = addressInstructionHashMap.get(arcAddress).arg2; //
-            int arcBtargetAddress = instructionList.get(arcAddress).arg2; //
-            if (b.getTargetJumpAddress() == arcBtargetAddress) {
-                return arcBtargetAddress; // transiting to the same state.
-            }
-        }
-
-        return -1;
+    public int referToFrozenArc(Arc b, HashMap<Integer, ArrayList<State>> statesDictionaryHashMap) {
+        return b.getDestination().getInstructionAddress();
     }
 
     /**
@@ -43,46 +29,44 @@ public class FSTCompiler {
      *
      * @param b
      */
-    public void assignTargetAddressToArcB(Arc b) {
+    public void assignTargetAddressToArcB(Arc b, HashMap<Integer, ArrayList<State>> statesDictionaryHashList, boolean isStartState) {
         if (b.getDestination().arcs.size() == 0) {
             // an arc which points to dead end accepting state
             b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
-            return;
-        }
-
-        int targetAddress = referToFrozenArc(b);
-        if (targetAddress != -1) {
-            b.setTargetJumpAddress(targetAddress); // equivalent state found
         }
         else {
-            // First arc is regarded as a state
-            int newAddress = makeNewInstructionsForFreezingState(b); // TODO: this method is not fully implemented yet
-            b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
+            // whether equivlent destination state is already frozen
+
+            int targetAddress = referToFrozenArc(b, statesDictionaryHashList);
+            if (targetAddress != -1) {
+                b.setTargetJumpAddress(targetAddress); // equivalent state found
+                b.getDestination().setInstructionAddress(targetAddress);
+
+            } else {
+                // First arc is regarded as a state
+                int newAddress = makeNewInstructionsForFreezingState(b, isStartState); // TODO: this method is not fully implemented yet
+                b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
+                b.getDestination().setInstructionAddress(newAddress); // the last arc since it is run in reverse order
+            }
+        }
+
+        if (isStartState && b.getLabel() < program.cacheFirstAddresses.length) {
+            program.cacheFirstAddresses[b.getLabel()] = b.getTargetJumpAddress();
+            program.cacheFirstOutputs[b.getLabel()] = b.getOutput();
+            program.cacheFirstIsAccept[b.getLabel()] = b.getDestination().isFinal;
         }
     }
 
-    public int makeNewInstructionsForFreezingState(Arc b){
+    public int makeNewInstructionsForFreezingState(Arc b, boolean isStartState){
         // No frozen arcs transiting to the same state. Freeze a new arc.
 
-        char key = b.getLabel();
-        instructionList.add(createInstructionFail());
-
-        List<Integer> arcAddresses = new ArrayList<>();
-        int newAddress = instructionList.size();
-
-        // 1. Create a new List for a new key
-        if (arcDestinationAddressHashMap.containsKey(key)) {
-            arcAddresses = arcDestinationAddressHashMap.get(key);
-        }
-        arcAddresses.add(newAddress); // destination
-        arcDestinationAddressHashMap.put(key, arcAddresses);
-
-        // rest of the arcs
-        VirtualMachine.Instruction newInstructionForArcD = new VirtualMachine.Instruction();
+        program.addInstruction(createInstructionFail());
+        int newAddress = program.numInstructions;
+        Instruction newInstructionForArcD = new Instruction();
 
         for (int i = 0; i < b.getDestination().arcs.size(); i++) {
 
-            newAddress = instructionList.size();
+            newAddress = program.numInstructions;
             Arc d = b.getDestination().arcs.get(i);
             if (d.getDestination().isFinal) {
                 newInstructionForArcD =
@@ -92,47 +76,26 @@ public class FSTCompiler {
                         createInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
             }
 
-            instructionList.add(newInstructionForArcD);
-//            addressInstructionHashMap.put(newAddress, newInstructionForArcD);
+            program.addInstruction(newInstructionForArcD);
         }
         return newAddress;
     }
 
-    public void makeInstructionForDeadEndState() {
-        if (instructionList.size() == 0) {
-            char KEY_FOR_DEAD_END = ' ';
-            VirtualMachine.Instruction instructionAccept = createInstructionAccept(-1);
-            instructionList.add(instructionAccept); // TODO: refactor this
-            List<Integer> arcAddresses = new ArrayList<>();
-            if (arcDestinationAddressHashMap.containsKey(KEY_FOR_DEAD_END)) {
-                arcAddresses = arcDestinationAddressHashMap.get(KEY_FOR_DEAD_END);
-            }
-            int newAddress = instructionList.size();
-            arcAddresses.add(newAddress);
-            arcDestinationAddressHashMap.put(KEY_FOR_DEAD_END, arcAddresses);
-//            addressInstructionHashMap.put(newAddress, instructionAccept);
-        }
-        else {
-            // already exists
-            return;
-        }
-    }
-
-    public VirtualMachine.Instruction createInstructionFail() {
-        VirtualMachine.Instruction instructionFail = new VirtualMachine.Instruction();
+    public Instruction createInstructionFail() {
+        Instruction instructionFail = new Instruction();
         instructionFail.opcode = instructionFail.FAIL;
         return instructionFail;
     }
 
-    public VirtualMachine.Instruction createInstructionAccept(int jumpAddress) {
-        VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
+    public Instruction createInstructionAccept(int jumpAddress) {
+        Instruction instructionAccept = new Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
         instructionAccept.arg2 = jumpAddress;
         return instructionAccept;
     }
 
-    public VirtualMachine.Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
-        VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
+    public Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
+        Instruction instructionMatch = new Instruction();
         instructionMatch.opcode = instructionMatch.MATCH;
         instructionMatch.arg1 = arg1;
         instructionMatch.arg2 = jumpAddress;
@@ -140,8 +103,8 @@ public class FSTCompiler {
         return instructionMatch;
     }
 
-    private VirtualMachine.Instruction createInstructionMatchOrAccept(char arg1, int jumpAddress, int output) {
-        VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
+    private Instruction createInstructionMatchOrAccept(char arg1, int jumpAddress, int output) {
+        Instruction instructionMatch = new Instruction();
         instructionMatch.opcode = instructionMatch.ACCEPT_OR_MATCH;
         instructionMatch.arg1 = arg1;
         instructionMatch.arg2 = jumpAddress;
@@ -149,4 +112,7 @@ public class FSTCompiler {
         return instructionMatch;
     }
 
+    public Program getProgram() {
+        return this.program;
+    }
 }

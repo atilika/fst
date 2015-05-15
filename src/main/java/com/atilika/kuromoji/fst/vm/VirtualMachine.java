@@ -1,72 +1,55 @@
-package com.atilika.kuromoji.fst;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+package com.atilika.kuromoji.fst.vm;
 
 public class VirtualMachine {
 
     private int pc;
 
-    public static class Program {
-
-        List<Instruction> instructions = new ArrayList<>();
-
-        Instruction getInstructionAt(int pc) {
-            return instructions.get(pc);
-        }
-
-        void addInstruction(Instruction instruction) {
-            instructions.add(instruction);
-        }
-
-        void addInstructions(Instruction[] instructions) {
-            this.instructions = Arrays.asList(instructions);
-        }
-
-        void addInstructions(List<Instruction> instructions) {
-            this.instructions =instructions;
-        }
-    }
-
-    public static class Instruction {
-
-        public static final int MATCH = 1;
-        public static final int NOP = 2;
-        public static final int FAIL = 3;
-        public static final int HELLO = 4;
-        public static final int ACCEPT = 5;
-        public static final int ACCEPT_OR_MATCH = 6;
-
-        int opcode;
-
-        char arg1;
-
-        int arg2;
-
-        int arg3; // used as a output for a FST arc
-    }
-
     public VirtualMachine() {
         pc = 0;
     }
 
+
     public int run(Program program, String input) {
 
 //        pc = 0;
-        pc = program.instructions.size() - 1; // Compiled in a reverse order
+//        pc = program.instruction.position() / Program.BYTES_PER_INSTRUCTIONS - 1; // Compiled in a reverse order
+        pc = program.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1; // Compiled in a reverse order
 
         int accumulator = 0; // CPU register
 
         int position = 0; // CPU register
 
         boolean done = false;
+        boolean isFirstArc = true;
 
         while (!done) {
 
-            Instruction i = program.getInstructionAt(pc);
+            // Referring to the cache
+            if (isFirstArc && input.charAt(position) < program.getCacheFirstAddresses().length) {
 
-            int opcode = i.opcode;
+                if (program.getCacheFirstAddresses()[input.charAt(position)] == -1) {
+                    accumulator = -1;
+                    break;
+                }
+
+                pc = program.getCacheFirstAddresses()[input.charAt(position)];
+                accumulator += program.getCacheFirstOutputs()[input.charAt(position)];
+
+                if (input.length() == position + 1 && program.cacheFirstIsAccept[input.charAt(position)]) {
+                    // last character
+                    done = true;
+                }
+
+                position++;
+
+                isFirstArc = false;
+                continue;
+            }
+
+            Instruction i = program.getInstructionAt(pc);
+//            System.out.println(i);
+
+            short opcode = i.opcode;
 
             switch (opcode) {
 

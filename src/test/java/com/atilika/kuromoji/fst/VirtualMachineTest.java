@@ -1,6 +1,11 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Instruction;
+import com.atilika.kuromoji.fst.vm.Program;
+import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -10,12 +15,12 @@ public class VirtualMachineTest {
     public void testHelloVM()
     {
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
+        Program program = new Program();
 
-        VirtualMachine.Instruction instruction = new VirtualMachine.Instruction();
+        Instruction instruction = new Instruction();
         instruction.opcode = instruction.HELLO;
 
-        VirtualMachine.Instruction instructionFail = new VirtualMachine.Instruction();
+        Instruction instructionFail = new Instruction();
         instructionFail.opcode = instructionFail.FAIL;
 
         program.addInstruction(instruction);
@@ -29,28 +34,48 @@ public class VirtualMachineTest {
     public void testMatch() throws Exception {
         // testing the input string "a" being accepted or not
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
-        VirtualMachine.Instruction instructionMatch = new VirtualMachine.Instruction();
+        Program program = new Program();
+        Instruction instructionMatch = new Instruction();
         instructionMatch.opcode = instructionMatch.MATCH;
         instructionMatch.arg1 = 'a'; // transition string
         instructionMatch.arg2 = 1;  // target address, delta coded
         instructionMatch.arg3 = 1; // output, value to be accumulated;
 
-        VirtualMachine.Instruction instructionAccept = new VirtualMachine.Instruction();
+        Instruction instructionAccept = new Instruction();
         instructionAccept.opcode = instructionAccept.ACCEPT;
 
-//        VirtualMachine.Instruction[] instructions =
-//                new VirtualMachine.Instruction[] {instructionMatch, instructionAccept};
-        VirtualMachine.Instruction[] instructions =
-                new VirtualMachine.Instruction[] {instructionAccept, instructionMatch};
-        program.addInstructions(instructions);
+//        Instruction[] instructions =
+//                new Instruction[] {instructionMatch, instructionAccept};
+        program.addInstructions(
+                Arrays.asList(instructionAccept, instructionMatch)
+        );
 
         assertEquals(1, vm.run(program, "a"));
     }
 
     @Test
-    public void testMultipleMatches() throws Exception {
+    public void testAddInstructions() throws Exception {
+        FSTCompiler fstCompiler = new FSTCompiler();
+        Instruction instructionAccept = fstCompiler.createInstructionAccept(0);
+        Instruction instructionFail = fstCompiler.createInstructionFail();
+        Instruction instructionMatch = fstCompiler.createInstructionMatch('a', 1, 1);
 
+        Program program = new Program();
+        program.addInstructions(Arrays.asList(instructionAccept, instructionFail, instructionMatch));
+//        program.addInstruction(instructionAccept);
+//        program.addInstruction(instructionFail);
+//        program.addInstruction(instructionMatch);
 
+        Instruction storedMatchInstruction = program.getInstructionAt(2);
+
+        assertEquals(storedMatchInstruction.arg1, instructionMatch.arg1);
+        assertEquals(storedMatchInstruction.arg2, instructionMatch.arg2);
+        assertEquals(storedMatchInstruction.arg3, instructionMatch.arg3);
+
+        Instruction storedAcceptInstruction = program.getInstructionAt(0);
+        assertEquals(storedAcceptInstruction.toString(), instructionAccept.toString());
+
+        Instruction storedFailInstruction = program.getInstructionAt(1);
+        assertEquals(storedFailInstruction.toString(), instructionFail.toString());
     }
 }

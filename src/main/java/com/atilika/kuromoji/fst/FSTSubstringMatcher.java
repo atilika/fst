@@ -1,5 +1,8 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Program;
+import com.atilika.kuromoji.fst.vm.VirtualMachine;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +20,7 @@ public class FSTSubstringMatcher {
      * @param program
      * @return List of extracted tokens that are in a dictionary
      */
-    public List matchAllSubstrings(String sentence, VirtualMachine vm, VirtualMachine.Program program) {
+    public List matchAllSubstrings(String sentence, VirtualMachine vm, Program program) {
         List extractedTokens = new ArrayList();
 
         int hits = 0;
@@ -44,7 +47,7 @@ public class FSTSubstringMatcher {
     }
 
 
-    public void lookupSentences(VirtualMachine vm, VirtualMachine.Program program, List<String> sentences) {
+    public void lookupSentences(VirtualMachine vm, Program program, List<String> sentences) {
         List<String> tokens = new ArrayList<>();
         for (String sentence : sentences) {
             List extractedTokens = matchAllSubstrings(sentence, vm, program);

@@ -1,5 +1,7 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Program;
+import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
 
 import java.io.*;
@@ -25,8 +27,7 @@ public class FSTSubstringMatcherTest {
         fst.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
@@ -48,8 +49,7 @@ public class FSTSubstringMatcherTest {
         fst.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
@@ -64,7 +64,9 @@ public class FSTSubstringMatcherTest {
 
 //        String resource = "jawikititlesHead1000.txt";
 //        String resource = "ipadic-allwords_uniqHead5000.csv";
-        String resource = "ipadic-allwords_uniqHead100000.csv";
+//        String resource = "ipadic-allwords_uniqHead100000.csv";
+        String resource = "ipadic-allwords_uniqHead200000.csv";
+//        String resource = "ipadic-allwords_uniq_sorted.csv";
         testJAWikipediaIncremental(resource);
     }
 
@@ -74,8 +76,7 @@ public class FSTSubstringMatcherTest {
         FST fst = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
-        VirtualMachine.Program program = new VirtualMachine.Program();
-        program.addInstructions(fst.fstCompiler.instructionList);
+        Program program = fst.fstCompiler.getProgram();
 
 //        FSTFormatter fstFormatter = new FSTFormatter();
 //        fstFormatter.format(fst, "ipadic-allwords_uniq_sorted_Head1070_tail65.txt");
@@ -101,6 +102,9 @@ public class FSTSubstringMatcherTest {
             wordIDExpected++;
         }
         reader.close();
+
+        program.outputProgramToFile(); // outputting bytebuffer to a file
+
         List<String> sentences = readInFile();
 
         long start = System.currentTimeMillis();
@@ -112,7 +116,7 @@ public class FSTSubstringMatcherTest {
         long end = System.currentTimeMillis();
         System.out.println("Running time:" + (end - start) + " milliseconds");
         System.out.println("Number of lookups:" + fstSubstringMatcher.getNumLookups());
-        System.out.println("Sec. per lookup:" + (1.0 * (end - start)) / fstSubstringMatcher.getNumLookups());
+        System.out.println("MilliSec. per lookup:" + (1.0 * (end - start)) / fstSubstringMatcher.getNumLookups());
     }
 
     private InputStream getResource(String s) {
