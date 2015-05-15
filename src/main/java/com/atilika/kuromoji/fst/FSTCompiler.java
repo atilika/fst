@@ -3,12 +3,8 @@ package com.atilika.kuromoji.fst;
 import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class FSTCompiler {
 
@@ -37,7 +33,6 @@ public class FSTCompiler {
         if (b.getDestination().arcs.size() == 0) {
             // an arc which points to dead end accepting state
             b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
-//            return;
         }
         else {
             // whether equivlent destination state is already frozen
@@ -54,7 +49,6 @@ public class FSTCompiler {
                 b.getDestination().setInstructionAddress(newAddress); // the last arc since it is run in reverse order
             }
         }
-
 
         if (isStartState && b.getLabel() < program.cacheFirstAddresses.length) {
             program.cacheFirstAddresses[b.getLabel()] = b.getTargetJumpAddress();
@@ -81,37 +75,10 @@ public class FSTCompiler {
                 newInstructionForArcD =
                         createInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
             }
-//
-//            if (isStartState && d.getLabel() < program.cacheFirstAddresses.length) {
-//                program.cacheFirstAddresses[d.getLabel()] = d.getTargetJumpAddress();
-//                program.cacheFirstAddresses[d.getLabel()] = d.getOutput();
-//                program.cacheFirstIsAccept[d.getLabel()] = d.getDestination().isFinal;
-//            }
 
             program.addInstruction(newInstructionForArcD);
         }
         return newAddress;
-    }
-
-    public void makeInstructionForDeadEndState() {
-        // TODO: this is currently not used. Delete it afterwards.
-        if (program.numInstructions == 0) {
-            char KEY_FOR_DEAD_END = ' ';
-            Instruction instructionAccept = createInstructionAccept(-1);
-            program.addInstruction(instructionAccept);
-//            List<Integer> arcAddresses = new ArrayList<>();
-//            if (arcDestinationAddressHashMap.containsKey(KEY_FOR_DEAD_END)) {
-//                arcAddresses = arcDestinationAddressHashMap.get(KEY_FOR_DEAD_END);
-//            }
-//            int newAddress = program.numInstructions;
-//            arcAddresses.add(newAddress);
-//            arcDestinationAddressHashMap.put(KEY_FOR_DEAD_END, arcAddresses);
-//            addressInstructionHashMap.put(newAddress, instructionAccept);
-        }
-        else {
-            // already exists
-            return;
-        }
     }
 
     public Instruction createInstructionFail() {

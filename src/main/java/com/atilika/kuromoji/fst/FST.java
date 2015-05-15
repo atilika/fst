@@ -167,8 +167,6 @@ public class FST {
 //        compileState(tempStates[0]); // For FST Compiler
         compileStartingState(tempStates[0]); // For FST Compiler, caching
         findEquivalentCollisionHandled(tempStates[0]);
-
-        compileFinalWord(tempStates); // For FST compiler
     }
 
 
@@ -294,25 +292,6 @@ public class FST {
         state.isFinal = false;
     }
 
-    private void compileFinalWord(State[] tempStates) {
-        char transitionDummyChar = 'D';
-        State dummyState = new State();
-        dummyState.setArc(transitionDummyChar, 0, tempStates[0]); // trans. char.: ' ',  output: 0, dest. state: to starting state
-        List<Character> transitionStrings = dummyState.getAllTransitionStrings();
-        if (transitionStrings.size() != 0) {
-            for (int i = 0; i < transitionStrings.size(); i++) {
-                char transitionChar = transitionStrings.get(i);
-                compileArc(transitionChar, dummyState, false);
-            }
-        }
-        else {
-            // This is the case when start state is an accepting state. It will not be used when empty string does not appear in the dictionary
-//            char transitionChar = fstCompiler.KEY_FOR_DEADEND_ARC;
-            dummyState.setArc(' ', 0, dummyState);
-            compileArc(' ', dummyState, false);
-        }
-    }
-
     /**
      * Assign a target jump address to an arc that points to a given state object
      *
@@ -326,10 +305,6 @@ public class FST {
                 compileArc(transitionChar, state, false);
             }
         }
-        else {
-            // Compile dead-end state
-//            fstCompiler.makeInstructionForDeadEndState();
-        }
     }
 
     private void compileStartingState(State state) {
@@ -340,10 +315,6 @@ public class FST {
                 compileArc(transitionChar, state, true);
             }
         }
-//        else {
-//            // Compile dead-end state
-//            fstCompiler.makeInstructionForDeadEndState();
-//        }
     }
 
     private void compileArc(char transitionChar, State state, boolean isStartState) {
