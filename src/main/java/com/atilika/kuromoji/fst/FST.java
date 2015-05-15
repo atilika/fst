@@ -328,7 +328,7 @@ public class FST {
         }
         else {
             // Compile dead-end state
-            fstCompiler.makeInstructionForDeadEndState();
+//            fstCompiler.makeInstructionForDeadEndState();
         }
     }
 
@@ -340,10 +340,10 @@ public class FST {
                 compileArc(transitionChar, state, true);
             }
         }
-        else {
-            // Compile dead-end state
-            fstCompiler.makeInstructionForDeadEndState();
-        }
+//        else {
+//            // Compile dead-end state
+//            fstCompiler.makeInstructionForDeadEndState();
+//        }
     }
 
     private void compileArc(char transitionChar, State state, boolean isStartState) {

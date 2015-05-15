@@ -3,6 +3,9 @@ package com.atilika.kuromoji.fst;
 import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

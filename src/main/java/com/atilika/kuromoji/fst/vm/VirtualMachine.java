@@ -1,10 +1,5 @@
 package com.atilika.kuromoji.fst.vm;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class VirtualMachine {
 
     private int pc;
@@ -50,7 +45,6 @@ public class VirtualMachine {
                 isFirstArc = false;
                 continue;
             }
-            isFirstArc = false;
 
             Instruction i = program.getInstructionAt(pc);
 //            System.out.println(i);

@@ -1,6 +1,10 @@
 package com.atilika.kuromoji.fst.vm;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +17,8 @@ public class Program {
     public final static int BYTES_PER_INSTRUCTIONS = 11;
 
     //        int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
-    int instructionsSize = BYTES_PER_INSTRUCTIONS * 5000000;
+//    int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
+    int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
     ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
 
     int CACHED_CHAR_RANGE = 1 << 16;
@@ -88,4 +93,17 @@ public class Program {
     public int[] getCacheFirstAddresses() {return this.cacheFirstAddresses;}
 
     public int[] getCacheFirstOutputs() {return this.cacheFirstOutputs;}
+
+    public void outputProgramToFile() throws IOException {
+        ByteBuffer bbuf = this.instruction;
+        File file = new File("fstByteBuffer");
+
+        boolean append = false;
+
+        FileChannel wChannel = new FileOutputStream(file, append).getChannel();
+
+        wChannel.write(bbuf);
+
+        wChannel.close();
+    }
 }
