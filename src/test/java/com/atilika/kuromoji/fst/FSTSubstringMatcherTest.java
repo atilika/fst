@@ -1,5 +1,6 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
@@ -65,8 +66,8 @@ public class FSTSubstringMatcherTest {
 //        String resource = "jawikititlesHead1000.txt";
 //        String resource = "ipadic-allwords_uniqHead5000.csv";
 //        String resource = "ipadic-allwords_uniqHead100000.csv";
-        String resource = "ipadic-allwords_uniqHead200000.csv";
-//        String resource = "ipadic-allwords_uniq_sorted.csv";
+//        String resource = "ipadic-allwords_uniqHead200000.csv";
+        String resource = "ipadic-allwords_uniq_sorted.csv";
         testJAWikipediaIncremental(resource);
     }
 
@@ -103,6 +104,7 @@ public class FSTSubstringMatcherTest {
         }
         reader.close();
 
+        List<Instruction> instructions = program.debugInstructions();
         program.outputProgramToFile(); // outputting bytebuffer to a file
 
         List<String> sentences = readInFile();

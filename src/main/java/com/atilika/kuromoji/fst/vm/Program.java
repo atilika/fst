@@ -15,10 +15,10 @@ public class Program {
     public int numInstructions = 0;
 
     public final static int BYTES_PER_INSTRUCTIONS = 11;
+    int numInstructionsAllocated = 100000;
 
-    //        int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
 //    int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
-    int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
+    int instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
     ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
 
     int CACHED_CHAR_RANGE = 1 << 16;
@@ -53,14 +53,18 @@ public class Program {
     }
 
     public void addInstruction(Instruction i) {
-//            int internalIndex = instructionIndex * BYTES_PER_INSTRUCTIONS;
+        // Doubling the size of buffer when the current size is not enough
+        int currentSizePlusOneInstruction = (numInstructions + 1) * BYTES_PER_INSTRUCTIONS;
 
-//            if (internalIndex > instructionsSize ) {
+        if (currentSizePlusOneInstruction > instructionsSize) {
 //                // grow byte array by doubling the size of it.
-//                ByteBuffer newInstructions = ByteBuffer.allocate()
-//
-//            }
-        // write instruction into bytearray as bytes..
+            numInstructionsAllocated *= 2;
+            instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
+            ByteBuffer newInstructions = ByteBuffer.allocate(instructionsSize);
+            instruction.flip(); // limit ← position、 position ← 0
+            newInstructions.put(instruction);
+            instruction = newInstructions;
+        }
 
 //        instruction.putShort(i.opcode);
         instruction.put(i.opcode);
