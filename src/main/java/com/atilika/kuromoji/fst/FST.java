@@ -5,20 +5,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 public class FST {
     // Note that FST only allows the presorted dictionaries as input.
 
 //    private HashMap<String, ArrayList<State>> statesDictionaryHashList;
     private HashMap<Integer, ArrayList<State>> statesDictionaryHashList;
+//    private TreeMap<Integer, ArrayList<State>> statesDictionaryHashList;
     public FSTCompiler fstCompiler = new FSTCompiler();
 
     // TODO: Rewrite this...
     public int MAX_WORD_LENGTH = 100;
 
     public FST() {
-//        this.statesDictionaryHashList = new HashMap<String, ArrayList<State>>();
-        this.statesDictionaryHashList = new HashMap<Integer, ArrayList<State>>();
+        this.statesDictionaryHashList = new HashMap<>();
         ArrayList<State> stateList = new ArrayList<State>();
         stateList.add(new State());
 //        this.statesDictionaryHashList.put("start state", stateList); // setting the start state

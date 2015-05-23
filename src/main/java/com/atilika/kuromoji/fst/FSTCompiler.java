@@ -5,6 +5,7 @@ import com.atilika.kuromoji.fst.vm.Program;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FSTCompiler {
 
@@ -20,8 +21,8 @@ public class FSTCompiler {
      * @param b
      * @return -1 if there is no Arc which input/output corresponds to key. Else return the address that corresponds to that arc.
      */
-    public int referToFrozenArc(Arc b, HashMap<Integer, ArrayList<State>> statesDictionaryHashMap) {
-        return b.getDestination().getInstructionAddress();
+    public int referToFrozenArc(Arc b, Map<Integer, ArrayList<State>> statesDictionaryHashMap) {
+        return b.getTargetJumpAddress();
     }
 
     /**
@@ -29,7 +30,7 @@ public class FSTCompiler {
      *
      * @param b
      */
-    public void assignTargetAddressToArcB(Arc b, HashMap<Integer, ArrayList<State>> statesDictionaryHashList, boolean isStartState) {
+    public void assignTargetAddressToArcB(Arc b, Map<Integer, ArrayList<State>> statesDictionaryHashList, boolean isStartState) {
         if (b.getDestination().arcs.size() == 0) {
             // an arc which points to dead end accepting state
             b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
@@ -40,13 +41,13 @@ public class FSTCompiler {
             int targetAddress = referToFrozenArc(b, statesDictionaryHashList);
             if (targetAddress != -1) {
                 b.setTargetJumpAddress(targetAddress); // equivalent state found
-                b.getDestination().setInstructionAddress(targetAddress);
+//                b.getDestination().setInstructionAddress(targetAddress);
 
             } else {
                 // First arc is regarded as a state
                 int newAddress = makeNewInstructionsForFreezingState(b, isStartState); // TODO: this method is not fully implemented yet
                 b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
-                b.getDestination().setInstructionAddress(newAddress); // the last arc since it is run in reverse order
+//                b.getDestination().setInstructionAddress(newAddress); // the last arc since it is run in reverse order
             }
         }
 

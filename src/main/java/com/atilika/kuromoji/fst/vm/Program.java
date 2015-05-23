@@ -21,7 +21,7 @@ public class Program {
     int instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
     ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
 
-    int CACHED_CHAR_RANGE = 1 << 16;
+    int CACHED_CHAR_RANGE = 1 << 16; // 2bytes, range of whole char type.
     public int[] cacheFirstAddresses;
     public int[] cacheFirstOutputs;
     public boolean[] cacheFirstIsAccept;
