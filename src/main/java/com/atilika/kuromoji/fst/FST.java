@@ -226,16 +226,16 @@ public class FST {
 
 
         if (statesDictionaryHashList.containsKey(key)) {
-            List<State> collidedStates = statesDictionaryHashList.get(key);
+//            List<State> collidedStates = statesDictionaryHashList.get(key);
 
             if (state.arcs.size() == 0) {
                 // the dead end state (which is unique!)
-                return collidedStates.get(0);
+                return statesDictionaryHashList.get(key).get(0);
             }
 
             // Here, there are multiple states that has the same transition arc
             // Linear Probing the collidedStates!
-            for (State collidedState : collidedStates) {
+            for (State collidedState : statesDictionaryHashList.get(key)) {
                 boolean destStateDiff = false;
 
                 for (int i = 0; i < collidedState.arcs.size(); i++) {
@@ -290,28 +290,26 @@ public class FST {
      * @param state
      */
     private void compileState(State state) {
-//        List<Character> transitionStrings = state.getAllTransitionStrings();
         if (state.arcs.size() != 0) {
             for (int i = 0; i < state.arcs.size(); i++) {
-//                char transitionChar = state.arcs.get(i).getLabel();
-//                compileArc(transitionChar, state, false);
                 compileArc(state.arcs.get(i), false);
             }
         }
     }
 
     private void compileStartingState(State state) {
-//        List<Character> transitionStrings = state.getAllTransitionStrings();
         if (state.arcs.size() != 0) {
             for (int i = 0; i < state.arcs.size(); i++) {
-//                char transitionChar = transitionStrings.get(i);
                 compileArc(state.arcs.get(i), true);
             }
         }
     }
 
     private void compileArc(Arc b, boolean isStartState) {
-//        Arc b = state.getNextArc(transitionChar);
         fstCompiler.assignTargetAddressToArcB(b, statesDictionaryHashList, isStartState);
+    }
+
+    public HashMap<Integer, List<State>> getStatesDictionaryHashList() {
+        return this.statesDictionaryHashList;
     }
 }

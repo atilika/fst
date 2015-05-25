@@ -123,6 +123,7 @@ public class State {
     @Override
     public int hashCode() {
         int result = arcs != null ? arcs.hashCode() : 0;
+
         result = 31 * result + (isFinal ? 1 : 0);
         return result;
     }
