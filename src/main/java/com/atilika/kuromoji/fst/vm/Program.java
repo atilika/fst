@@ -17,7 +17,6 @@ public class Program {
     public final static int BYTES_PER_INSTRUCTIONS = 11;
     int numInstructionsAllocated = 100000;
 
-//    int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
     int instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
     ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
 
@@ -43,7 +42,6 @@ public class Program {
         instruction.position(internalIndex);
 
         Instruction i = new Instruction();
-//        i.opcode = instruction.getShort();
         i.opcode = instruction.get();
         i.arg1 = instruction.getChar();
         i.arg2 = instruction.getInt();
@@ -66,7 +64,6 @@ public class Program {
             instruction = newInstructions;
         }
 
-//        instruction.putShort(i.opcode);
         instruction.put(i.opcode);
         instruction.putChar(i.arg1);
         instruction.putInt(i.arg2);

@@ -19,7 +19,7 @@ public class FSTCompiler {
      * @param b
      * @return -1 if there is no Arc which input/output corresponds to key. Else return the address that corresponds to that arc.
      */
-    public int referToFrozenArc(Arc b, Map<Integer, List<State>> statesDictionaryHashMap) {
+    public int referToFrozenArc(Arc b) {
         return b.getTargetJumpAddress();
     }
 
@@ -28,24 +28,21 @@ public class FSTCompiler {
      *
      * @param b
      */
-    public void assignTargetAddressToArcB(Arc b, Map<Integer, List<State>> statesDictionaryHashList, boolean isStartState) {
+    public void assignTargetAddressToArcB(Arc b, boolean isStartState) {
         if (b.getDestination().arcs.size() == 0) {
             // an arc which points to dead end accepting state
             b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
         }
         else {
-            // whether equivlent destination state is already frozen
-
-            int targetAddress = referToFrozenArc(b, statesDictionaryHashList);
+            // check whether equivalent destination state is already frozen
+            int targetAddress = referToFrozenArc(b);
             if (targetAddress != -1) {
                 b.setTargetJumpAddress(targetAddress); // equivalent state found
-//                b.getDestination().setInstructionAddress(targetAddress);
 
             } else {
                 // First arc is regarded as a state
-                int newAddress = makeNewInstructionsForFreezingState(b, isStartState); // TODO: this method is not fully implemented yet
+                int newAddress = makeNewInstructionsForFreezingState(b);
                 b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
-//                b.getDestination().setInstructionAddress(newAddress); // the last arc since it is run in reverse order
             }
         }
 
@@ -56,12 +53,12 @@ public class FSTCompiler {
         }
     }
 
-    public int makeNewInstructionsForFreezingState(Arc b, boolean isStartState){
+    public int makeNewInstructionsForFreezingState(Arc b){
         // No frozen arcs transiting to the same state. Freeze a new arc.
 
         program.addInstruction(createInstructionFail());
         int newAddress = program.numInstructions;
-        Instruction newInstructionForArcD = new Instruction();
+        Instruction newInstructionForArcD;
 
         for (int i = 0; i < b.getDestination().arcs.size(); i++) {
 

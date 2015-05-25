@@ -9,7 +9,6 @@ public class Instruction {
     public static final byte ACCEPT = 5;
     public static final byte ACCEPT_OR_MATCH = 6;
 
-//    public short opcode;
     public byte opcode;
 
     public char arg1;

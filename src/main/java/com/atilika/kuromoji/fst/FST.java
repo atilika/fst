@@ -7,10 +7,7 @@ import java.util.*;
 public class FST {
     // Note that FST only allows the presorted dictionaries as input.
 
-//    private HashMap<String, ArrayList<State>> statesDictionaryHashList;
-//    private HashMap<Integer, ArrayList<State>> statesDictionaryHashList;
     private HashMap<Integer, List<State>> statesDictionaryHashList;
-//    private TreeMap<Integer, ArrayList<State>> statesDictionaryHashList;
     public FSTCompiler fstCompiler = new FSTCompiler();
 
     // TODO: Rewrite this...
@@ -18,9 +15,8 @@ public class FST {
 
     public FST() {
         this.statesDictionaryHashList = new HashMap<>();
-        LinkedList<State> stateList = new LinkedList<State>();
+        ArrayList<State> stateList = new ArrayList<>();
         stateList.add(new State());
-//        this.statesDictionaryHashList.put("start state", stateList); // setting the start state
         this.statesDictionaryHashList.put(0, stateList); // temporary setting the start state
 
     }
@@ -127,7 +123,6 @@ public class FST {
             setTransition(tempStates[i - 1], temp, output, previousWord.charAt(i - 1));
             tempStates[i - 1].arcs.remove(removingArc);
 
-//            compileState(tempStates[i - 1]); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
             compileState(tempStates[i - 1]); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
 
         }
@@ -224,9 +219,7 @@ public class FST {
         // returns a equivalent state which is already in the stateDicitonary. nextState will be used when there is a collision
         Integer key = state.hashCode(); // this is going to be the hashCode.
 
-
         if (statesDictionaryHashList.containsKey(key)) {
-//            List<State> collidedStates = statesDictionaryHashList.get(key);
 
             if (state.arcs.size() == 0) {
                 // the dead end state (which is unique!)
@@ -262,7 +255,7 @@ public class FST {
         }
         // At this point, we know that there is no equivalent compiled (finalized) node
         State newStateToDic = new State(state); // deep copy
-        List<State> stateList = new LinkedList<State>();
+        List<State> stateList = new ArrayList<State>();
         if (statesDictionaryHashList.containsKey(key)) {
             stateList = statesDictionaryHashList.get(key);
             // adding new state to a key
@@ -280,7 +273,7 @@ public class FST {
      */
     private void clearState(State state) {
         // clear all transitions and set it to non-final state
-        state.arcs = new ArrayList<Arc>();
+        state.arcs = new ArrayList<>();
         state.isFinal = false;
     }
 
@@ -306,7 +299,7 @@ public class FST {
     }
 
     private void compileArc(Arc b, boolean isStartState) {
-        fstCompiler.assignTargetAddressToArcB(b, statesDictionaryHashList, isStartState);
+        fstCompiler.assignTargetAddressToArcB(b, isStartState);
     }
 
     public HashMap<Integer, List<State>> getStatesDictionaryHashList() {
