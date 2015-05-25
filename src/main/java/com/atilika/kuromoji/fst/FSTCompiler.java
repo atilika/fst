@@ -3,9 +3,7 @@ package com.atilika.kuromoji.fst;
 import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class FSTCompiler {
 
@@ -21,7 +19,7 @@ public class FSTCompiler {
      * @param b
      * @return -1 if there is no Arc which input/output corresponds to key. Else return the address that corresponds to that arc.
      */
-    public int referToFrozenArc(Arc b, Map<Integer, ArrayList<State>> statesDictionaryHashMap) {
+    public int referToFrozenArc(Arc b, Map<Integer, List<State>> statesDictionaryHashMap) {
         return b.getTargetJumpAddress();
     }
 
@@ -30,7 +28,7 @@ public class FSTCompiler {
      *
      * @param b
      */
-    public void assignTargetAddressToArcB(Arc b, Map<Integer, ArrayList<State>> statesDictionaryHashList, boolean isStartState) {
+    public void assignTargetAddressToArcB(Arc b, Map<Integer, List<State>> statesDictionaryHashList, boolean isStartState) {
         if (b.getDestination().arcs.size() == 0) {
             // an arc which points to dead end accepting state
             b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0

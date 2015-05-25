@@ -11,7 +11,6 @@ public class State {
     ArrayList<Arc> arcs; // possible arcs given a transition string
     boolean isFinal = false;
     boolean visited; //for visualization purpose
-//    int instructionAddress = -1;
 
     public State() {
         this.arcs = new ArrayList<>(1);
@@ -85,30 +84,18 @@ public class State {
         return retList;
     }
 
-//    public List<String> getAllOutputs() {
-//        List<Character> transitionStrings = getAllTransitionStrings();
-//        List<String> retList = new ArrayList<String>();
-//
-//        for (char transitionString : transitionStrings) {
-//            retList.add(linearSearchArc(transitionString).getOutput().toString()); // adding int output
-//        }
-//
-//        Collections.sort(retList);
-//
-//        return retList;
-//    }
-
-//    public boolean hasArc(char transition) {
-//        return linearSearchArc(transition) != null;
-//    }
+    public boolean containsArcLabel(char label) {
+        for (Arc arc : arcs) {
+            if (arc.label == label) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void setFinal() {
         this.isFinal = true;
     }
-
-//    public void setInstructionAddress(int instructionAddress) { this.instructionAddress = instructionAddress;}
-
-//    public int getInstructionAddress() { return this.instructionAddress;}
 
     public Arc linearSearchArc(char transition) {
         for (Arc arc : arcs) {
