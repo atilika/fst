@@ -1,7 +1,7 @@
 package com.atilika.kuromoji.fst;
 
 public class Arc {
-    char label; // for dead end state
+    char label;
     int output = 0;
     State destination;
     int targetJumpAddress;

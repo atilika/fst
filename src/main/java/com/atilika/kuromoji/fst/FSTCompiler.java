@@ -14,16 +14,6 @@ public class FSTCompiler {
     }
 
     /**
-     * Assuming Arc b already holds target jump address. Checks whether Arc b is already frozen.
-     *
-     * @param b
-     * @return -1 if there is no Arc which input/output corresponds to key. Else return the address that corresponds to that arc.
-     */
-    public int referToFrozenArc(Arc b) {
-        return b.getTargetJumpAddress();
-    }
-
-    /**
      * Assigning an target jump address to Arc b.
      *
      * @param b
@@ -35,7 +25,7 @@ public class FSTCompiler {
         }
         else {
             // check whether equivalent destination state is already frozen
-            int targetAddress = referToFrozenArc(b);
+            int targetAddress = b.getTargetJumpAddress();
             if (targetAddress != -1) {
                 b.setTargetJumpAddress(targetAddress); // equivalent state found
 
@@ -53,17 +43,20 @@ public class FSTCompiler {
         }
     }
 
+    /**
+     * Freeze a new arc since no frozen arcs transiting to the same state.
+     *
+     * @param b
+     * @return the address of new instruction
+     */
     public int makeNewInstructionsForFreezingState(Arc b){
-        // No frozen arcs transiting to the same state. Freeze a new arc.
 
         program.addInstruction(createInstructionFail());
         int newAddress = program.numInstructions;
         Instruction newInstructionForArcD;
 
-        for (int i = 0; i < b.getDestination().arcs.size(); i++) {
-
+        for (Arc d : b.getDestination().arcs) {
             newAddress = program.numInstructions;
-            Arc d = b.getDestination().arcs.get(i);
             if (d.getDestination().isFinal) {
                 newInstructionForArcD =
                         createInstructionMatchOrAccept(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());

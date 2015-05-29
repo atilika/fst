@@ -44,7 +44,11 @@ public class FST {
         return output;
     }
 
-
+    /**
+     * Get starting state. Note that only start state uses 0 as the key for states dictionary.
+     *
+     * @return starting state
+     */
     public State getStartState() {
         return this.statesDictionary.get(0).get(0);
     }
@@ -113,7 +117,7 @@ public class FST {
             int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
 //            Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
             tempStates[i - 1].arcs.remove(tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)));
-            setTransition(tempStates[i - 1], findEquivalentCollisionHandled(tempStates[i]), output, previousWord.charAt(i - 1));
+            setTransition(tempStates[i - 1], findEquivalentState(tempStates[i]), output, previousWord.charAt(i - 1));
 
             compileState(tempStates[i - 1]); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
 
@@ -151,13 +155,13 @@ public class FST {
             state.arcs.remove(state.linearSearchArc(c));
             setTransition(
                 state,
-                findEquivalentCollisionHandled(tempStates[i]), output, lastWord.charAt(i - 1)
+                findEquivalentState(tempStates[i]), output, lastWord.charAt(i - 1)
             );
             compileState(state); // For FST Compiler
 
         }
         compileStartingState(tempStates[0]); // For FST Compiler, caching
-        findEquivalentCollisionHandled(tempStates[0]);
+        findEquivalentState(tempStates[0]);
     }
 
 
@@ -210,10 +214,10 @@ public class FST {
      * Find the equivalent state by checking its destination states to when collided.
      *
      * @param state
-     * @return returns an equivalent state which is already in the stateDicitonary. nextState will be used when there is
-     * a collision
+     * @return returns an equivalent state which is already in the stateDicitonary. If there is no equivalent state,
+     * then a new state will created and put into statesDictionary.
      */
-    private State findEquivalentCollisionHandled(State state) {
+    private State findEquivalentState(State state) {
         Integer key = state.hashCode(); // this is going to be the hashCode.
 
         if (statesDictionary.containsKey(key)) {
@@ -223,8 +227,7 @@ public class FST {
                 return statesDictionary.get(key).get(0);
             }
 
-            // Here, there are multiple states that has the same transition arc
-            // Linear Probing the collidedStates!
+            // Here, there are multiple states that has the same hashcode. Linear Probing the collidedStates.
             for (State collidedState : statesDictionary.get(key)) {
                 boolean destStateDiff = false;
 
@@ -266,12 +269,11 @@ public class FST {
     }
 
     /**
-     * Initialize the temp states
+     * Initialize the temp states. It clears all transitions and set it to non-final state
      *
      * @param state
      */
     private void clearState(State state) {
-        // clear all transitions and set it to non-final state
         state.arcs = new ArrayList<>();
         state.isFinal = false;
     }
@@ -283,16 +285,16 @@ public class FST {
      */
     private void compileState(State state) {
         if (state.arcs.size() != 0) {
-            for (int i = 0; i < state.arcs.size(); i++) {
-                compileArc(state.arcs.get(i), false);
+            for (Arc arc : state.arcs) {
+                compileArc(arc, false);
             }
         }
     }
 
     private void compileStartingState(State state) {
         if (state.arcs.size() != 0) {
-            for (int i = 0; i < state.arcs.size(); i++) {
-                compileArc(state.arcs.get(i), true);
+            for (Arc arc : state.arcs) {
+                compileArc(arc, true);
             }
         }
     }

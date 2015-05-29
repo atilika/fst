@@ -8,14 +8,12 @@ public class VirtualMachine {
         pc = 0;
     }
 
-
     public int run(Program program, String input) {
 
 //        pc = 0;
         pc = program.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1; // Compiled in a reverse order
 
         int accumulator = 0; // CPU register
-
         int position = 0; // CPU register
 
         boolean done = false;
@@ -52,7 +50,6 @@ public class VirtualMachine {
 
             switch (opcode) {
 
-
                 case Instruction.MATCH:
 
                     char arg1 = i.arg1;
@@ -70,11 +67,6 @@ public class VirtualMachine {
                     }
 
                     break;
-
-//                case Instruction.ACCUMULATE:
-//                    accumulator += i.arg2;
-//                    break;
-
 
                 case Instruction.HELLO:
                     System.out.println("hello!");
@@ -100,7 +92,6 @@ public class VirtualMachine {
                     else {
                         if (position < input.length() && arg1 == input.charAt(position)) {
 //                        pc += i.arg2 - 1; // pc is always incremented!
-//                        pc = i.arg2 - 1; // JUMP to Address i.arg2
                             pc = i.arg2 + 1; // JUMP to Address i.arg2
                             accumulator += i.arg3;
                             position += 1; // move the input char pointer

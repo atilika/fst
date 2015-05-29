@@ -50,13 +50,17 @@ public class Program {
         return i;
     }
 
+    /**
+     * Add an instruction to Bytebuffer. Doubling the size of buffer when the current size is not enough.
+     *
+     * @param i
+     */
     public void addInstruction(Instruction i) {
-        // Doubling the size of buffer when the current size is not enough
         int currentSizePlusOneInstruction = (numInstructions + 1) * BYTES_PER_INSTRUCTIONS;
 
         if (currentSizePlusOneInstruction > instructionsSize) {
-//                // grow byte array by doubling the size of it.
-            numInstructionsAllocated *= 2;
+            // grow byte array by doubling the size of it.
+            numInstructionsAllocated = numInstructionsAllocated << 1;
             instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
             ByteBuffer newInstructions = ByteBuffer.allocate(instructionsSize);
             instruction.flip(); // limit ← position、 position ← 0
@@ -103,6 +107,7 @@ public class Program {
 
         FileChannel wChannel = new FileOutputStream(file, append).getChannel();
 
+        bbuf.flip();
         wChannel.write(bbuf);
 
         wChannel.close();
