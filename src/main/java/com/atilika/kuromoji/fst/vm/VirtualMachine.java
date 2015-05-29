@@ -12,7 +12,6 @@ public class VirtualMachine {
     public int run(Program program, String input) {
 
 //        pc = 0;
-//        pc = program.instruction.position() / Program.BYTES_PER_INSTRUCTIONS - 1; // Compiled in a reverse order
         pc = program.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1; // Compiled in a reverse order
 
         int accumulator = 0; // CPU register

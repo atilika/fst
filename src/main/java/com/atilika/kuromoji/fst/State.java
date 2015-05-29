@@ -45,31 +45,8 @@ public class State {
         arcs.add(newArc);
     }
 
-    public Arc getTransitionArc(char transition) {
-        if (linearSearchArc(transition) != null) {
-//            return arcs.get(transition).getDestination();
-            return linearSearchArc(transition);
-        }
-        return null;
-    }
-
-
-    public Arc getNextArc(char transitionString) {
-        Arc nextArc = null;
-        if (linearSearchArc(transitionString) != null) {
-            nextArc = linearSearchArc(transitionString);
-        }
-        return nextArc;
-    }
-
-
-    public State getNextState(char transitionString) {
-        State nextState = null;
-        if ((getTransitionArc(transitionString)) != null) {
-            Arc nextArc = linearSearchArc(transitionString);
-            nextState = nextArc.getDestination();
-        }
-        return nextState;
+    public Arc getTransitionArc(char transitionChar) {
+        return linearSearchArc(transitionChar);
     }
 
     public List<Character> getAllTransitionStrings() {

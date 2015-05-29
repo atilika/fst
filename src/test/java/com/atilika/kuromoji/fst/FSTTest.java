@@ -89,7 +89,7 @@ public class FSTTest {
         FSTTestHelper fstTestHelper = new FSTTestHelper();
         FST fst = fstTestHelper.readIncremental(resource);
 
-        for (List<State> listOfStates : fst.getStatesDictionaryHashList().values()) {
+        for (List<State> listOfStates : fst.getStatesDictionary().values()) {
             if (listOfStates.size() == 2) {
                 System.out.println();
             }

@@ -68,6 +68,7 @@ public class FSTSubstringMatcherTest {
 //        String resource = "ipadic-allwords_uniqHead100000.csv";
 //        String resource = "ipadic-allwords_uniqHead200000.csv";
         String resource = "ipadic-allwords_uniq_sorted.csv";
+//        String resource = "jawikititles.txt";
         testJAWikipediaIncremental(resource);
     }
 
@@ -104,7 +105,7 @@ public class FSTSubstringMatcherTest {
         }
         reader.close();
 
-        List<Instruction> instructions = program.debugInstructions();
+//        List<Instruction> instructions = program.debugInstructions();
         program.outputProgramToFile(); // outputting bytebuffer to a file
 
         List<String> sentences = readInFile();

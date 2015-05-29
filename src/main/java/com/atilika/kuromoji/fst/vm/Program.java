@@ -21,9 +21,9 @@ public class Program {
     ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
 
     int CACHED_CHAR_RANGE = 1 << 16; // 2bytes, range of whole char type.
-    public int[] cacheFirstAddresses;
-    public int[] cacheFirstOutputs;
-    public boolean[] cacheFirstIsAccept;
+    public int[] cacheFirstAddresses; // 4 bytes * 66536 = 262,144 = 262KB
+    public int[] cacheFirstOutputs;  // 262KB
+    public boolean[] cacheFirstIsAccept; // 1 bit * 66536 = 66536 bits = 8317 bits = 8KB
 
     public Program() {
         this.cacheFirstAddresses = new int[CACHED_CHAR_RANGE];
