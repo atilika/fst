@@ -26,7 +26,7 @@ public class State {
 
 
     public void setArc(char transition, int output, State toState) {
-        Arc existingArc = linearSearchArc(transition);
+        Arc existingArc = findArc(transition);
         if (existingArc != null) {
             // does override existing arc
             arcs.remove(existingArc);
@@ -36,17 +36,13 @@ public class State {
     }
 
     public void setArc(char transition, State toState) {
-        if (linearSearchArc(transition) != null) {
+        if (findArc(transition) != null) {
 //            does not override existing arc
             return;
         }
         Arc newArc = new Arc(toState);
         newArc.setLabel(transition);
         arcs.add(newArc);
-    }
-
-    public Arc getTransitionArc(char transitionChar) {
-        return linearSearchArc(transitionChar);
     }
 
     public List<Character> getAllTransitionStrings() {
@@ -61,20 +57,12 @@ public class State {
         return retList;
     }
 
-    public boolean containsArcLabel(char label) {
-        for (Arc arc : arcs) {
-            if (arc.label == label) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void setFinal() {
         this.isFinal = true;
     }
 
-    public Arc linearSearchArc(char transition) {
+    public Arc findArc(char transition) {
+        // linear search
         for (Arc arc : arcs) {
             if (arc.getLabel() == transition) {
                 return arc;

@@ -56,7 +56,7 @@ public class FSTFormatter {
                 continue;
             }
             for (char transition : state.getAllTransitionStrings()) {
-                Arc arc = state.linearSearchArc(transition);
+                Arc arc = state.findArc(transition);
                 State toState = arc.getDestination();
                 stateArrayList.add(toState);
 
@@ -66,7 +66,8 @@ public class FSTFormatter {
                 else {
                     sb.append(formatState(toState));
                 }
-                sb.append(formatEdge(state, toState, transition, arc.getOutput().toString(), "fontsize=40"));
+                Integer arcOutput = arc.getOutput();
+                sb.append(formatEdge(state, toState, transition, arcOutput.toString(), "fontsize=40"));
             }
             state.visited = true;
             stateArrayList.remove(0);

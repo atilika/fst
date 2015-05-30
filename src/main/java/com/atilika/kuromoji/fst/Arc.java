@@ -4,7 +4,7 @@ public class Arc {
     char label;
     int output = 0;
     State destination;
-    int targetJumpAddress;
+    private int targetJumpAddress;
 
 
     public Arc(int output, State destination, char label) {
@@ -22,7 +22,7 @@ public class Arc {
         return this.destination;
     }
 
-    public Integer getOutput() {
+    public int getOutput() {
         return this.output;
     }
 
