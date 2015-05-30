@@ -50,7 +50,7 @@ public class VirtualMachine {
 
             switch (opcode) {
 
-                case Instruction.MATCH:
+                case Program.MATCH:
 
                     char arg1 = i.arg1;
 
@@ -68,20 +68,17 @@ public class VirtualMachine {
 
                     break;
 
-                case Instruction.HELLO:
+                case Program.HELLO:
                     System.out.println("hello!");
                     break;
 
-                case Instruction.NOP:
-                    break;
-
-                case Instruction.ACCEPT:
+                case Program.ACCEPT:
                     if (input.length() == position) {
                         done = true;
                     }
                     break;
 
-                case Instruction.ACCEPT_OR_MATCH:
+                case Program.ACCEPT_OR_MATCH:
                     arg1 = i.arg1;
 
                     if (input.length() == position + 1 && arg1 == input.charAt(position)) {
@@ -99,7 +96,7 @@ public class VirtualMachine {
                     }
                     break;
 
-                case Instruction.FAIL:
+                case Program.FAIL:
                     done = true;
                     accumulator = -1;
                     break;

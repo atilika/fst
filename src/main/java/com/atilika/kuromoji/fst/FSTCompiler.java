@@ -51,55 +51,50 @@ public class FSTCompiler {
      */
     public int makeNewInstructionsForFreezingState(Arc b){
 
-        program.addInstruction(createInstructionFail());
+        program.addInstructionFail();
         int newAddress = program.numInstructions;
-        Instruction newInstructionForArcD;
 
         for (Arc d : b.getDestination().arcs) {
             newAddress = program.numInstructions;
             if (d.getDestination().isFinal) {
-                newInstructionForArcD =
-                        createInstructionMatchOrAccept(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
+                program.addInstructionMatchOrAccept(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
             } else {
-                newInstructionForArcD =
-                        createInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
+                program.addInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
             }
-
-            program.addInstruction(newInstructionForArcD);
         }
         return newAddress;
     }
 
     public Instruction createInstructionFail() {
         Instruction instructionFail = new Instruction();
-        instructionFail.opcode = instructionFail.FAIL;
+        instructionFail.opcode = program.FAIL;
         return instructionFail;
     }
 
     public Instruction createInstructionAccept(int jumpAddress) {
         Instruction instructionAccept = new Instruction();
-        instructionAccept.opcode = instructionAccept.ACCEPT;
+        instructionAccept.opcode = program.ACCEPT;
         instructionAccept.arg2 = jumpAddress;
         return instructionAccept;
     }
 
     public Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
         Instruction instructionMatch = new Instruction();
-        instructionMatch.opcode = instructionMatch.MATCH;
+        instructionMatch.opcode = program.MATCH;
         instructionMatch.arg1 = arg1;
         instructionMatch.arg2 = jumpAddress;
         instructionMatch.arg3 = output;
         return instructionMatch;
     }
 
-    private Instruction createInstructionMatchOrAccept(char arg1, int jumpAddress, int output) {
-        Instruction instructionMatch = new Instruction();
-        instructionMatch.opcode = instructionMatch.ACCEPT_OR_MATCH;
-        instructionMatch.arg1 = arg1;
-        instructionMatch.arg2 = jumpAddress;
-        instructionMatch.arg3 = output;
-        return instructionMatch;
-    }
+//    private Instruction createInstructionMatchOrAccept(char arg1, int jumpAddress, int output) {
+//        Instruction instructionMatch = new Instruction();
+//        instructionMatch.opcode = instructionMatch.ACCEPT_OR_MATCH;
+//        instructionMatch.arg1 = arg1;
+//        instructionMatch.arg2 = jumpAddress;
+//        instructionMatch.arg3 = output;
+//        return instructionMatch;
+//    }
 
     public Program getProgram() {
         return this.program;

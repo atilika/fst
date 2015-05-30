@@ -114,12 +114,14 @@ public class FST {
 //        We minimize the states from the suffix of the previous word
 
         for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
-            int output = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)).getOutput();
+            State state = tempStates[i - 1];
+            char previousWordChar = previousWord.charAt(i - 1);
+            int output = state.linearSearchArc(previousWordChar).getOutput();
 //            Arc removingArc = tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1));
-            tempStates[i - 1].arcs.remove(tempStates[i - 1].linearSearchArc(previousWord.charAt(i - 1)));
-            setTransition(tempStates[i - 1], findEquivalentState(tempStates[i]), output, previousWord.charAt(i - 1));
+            state.arcs.remove(state.linearSearchArc(previousWordChar));
+            setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
 
-            compileState(tempStates[i - 1]); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
+            compileState(state); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
 
         }
         for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
@@ -149,10 +151,10 @@ public class FST {
     private void handleLastWord(String previousWord, String lastWord, State[] tempStates) {
         for (int i = lastWord.length(); i > 0; i--) {
             State state = tempStates[i - 1];
-            char c = previousWord.charAt(i - 1);
-            int output = state.linearSearchArc(c).getOutput();
+            char previousWordChar = previousWord.charAt(i - 1);
+            int output = state.linearSearchArc(previousWordChar).getOutput();
 
-            state.arcs.remove(state.linearSearchArc(c));
+            state.arcs.remove(state.linearSearchArc(previousWordChar));
             setTransition(
                 state,
                 findEquivalentState(tempStates[i]), output, lastWord.charAt(i - 1)
