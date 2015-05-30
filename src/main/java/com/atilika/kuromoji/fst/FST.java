@@ -251,6 +251,7 @@ public class FST {
                 }
 
                 if (!destStateDiff) {
+//                    System.out.println("Collided!");
                     // OK, these states point to the same state. Equivalent!
                     return collidedState;
                 }
