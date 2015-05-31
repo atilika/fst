@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -73,6 +74,46 @@ public class FSTTest {
         fst.createDictionary(inputValues, outputValues);
 
         return fst;
+    }
+
+    @Test
+    public void testExtractFromWikipediaArticle() throws Exception {
+        // Read the dictionary from a file
+        // Extract words from dictionaries
+
+        String resource = "ipadic-allwords_uniq_sorted.csv";
+        testJAWikipediaIncremental(resource);
+    }
+
+    private void testJAWikipediaIncremental(String resource) throws Exception {
+        FSTTestHelper fstTestHelper = new FSTTestHelper();
+        FST fst = fstTestHelper.readIncremental(resource);
+
+        for (List<State> listOfStates : fst.getStatesDictionary().values()) {
+            if (listOfStates.size() == 2) {
+                System.out.println();
+            }
+//            assertEquals(1, listOfStates.size());
+        }
+
+        int wordIDExpected = 1;
+
+        // Read all words
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(getResource(resource), "UTF-8"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Remove comments
+            line = line.replaceAll("#.*$", "");
+
+            // Skip empty lines or comment lines
+            if (line.trim().length() == 0) {
+                continue;
+            }
+            assertEquals(wordIDExpected, fst.transduce(line));
+            wordIDExpected++;
+        }
+        reader.close();
     }
 
     private InputStream getResource(String s) {

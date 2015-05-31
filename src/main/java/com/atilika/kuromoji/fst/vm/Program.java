@@ -11,20 +11,25 @@ import java.util.List;
 
 public class Program {
 
+    public static final byte MATCH = 1;
+    public static final byte FAIL = 3;
+    public static final byte HELLO = 4;
+    public static final byte ACCEPT = 5;
+    public static final byte ACCEPT_OR_MATCH = 6;
+
     int endOfTheProgram = 0; // end of the pc;
     public int numInstructions = 0;
 
     public final static int BYTES_PER_INSTRUCTIONS = 11;
     int numInstructionsAllocated = 100000;
 
-//    int instructionsSize = BYTES_PER_INSTRUCTIONS * 1000000;
     int instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
-    ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
+    public ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
 
-    int CACHED_CHAR_RANGE = 1 << 16;
-    public int[] cacheFirstAddresses;
-    public int[] cacheFirstOutputs;
-    public boolean[] cacheFirstIsAccept;
+    int CACHED_CHAR_RANGE = 1 << 16; // 2bytes, range of whole char type.
+    public int[] cacheFirstAddresses; // 4 bytes * 66536 = 262,144 = 262KB
+    public int[] cacheFirstOutputs;  // 262KB
+    public boolean[] cacheFirstIsAccept; // 1 bit * 66536 = 66536 bits = 8317 bits = 8KB
 
     public Program() {
         this.cacheFirstAddresses = new int[CACHED_CHAR_RANGE];
@@ -43,7 +48,6 @@ public class Program {
         instruction.position(internalIndex);
 
         Instruction i = new Instruction();
-//        i.opcode = instruction.getShort();
         i.opcode = instruction.get();
         i.arg1 = instruction.getChar();
         i.arg2 = instruction.getInt();
@@ -52,21 +56,18 @@ public class Program {
         return i;
     }
 
+//    public byte getOpcodeAt(int pc) {
+//        return instruction.get();
+//    }
+
+    /**
+     * Add an instruction to Bytebuffer. Doubling the size of buffer when the current size is not enough.
+     *
+     * @param i
+     */
     public void addInstruction(Instruction i) {
-        // Doubling the size of buffer when the current size is not enough
-        int currentSizePlusOneInstruction = (numInstructions + 1) * BYTES_PER_INSTRUCTIONS;
+        doubleBufferSize();
 
-        if (currentSizePlusOneInstruction > instructionsSize) {
-//                // grow byte array by doubling the size of it.
-            numInstructionsAllocated *= 2;
-            instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
-            ByteBuffer newInstructions = ByteBuffer.allocate(instructionsSize);
-            instruction.flip(); // limit ← position、 position ← 0
-            newInstructions.put(instruction);
-            instruction = newInstructions;
-        }
-
-//        instruction.putShort(i.opcode);
         instruction.put(i.opcode);
         instruction.putChar(i.arg1);
         instruction.putInt(i.arg2);
@@ -74,6 +75,43 @@ public class Program {
 
         endOfTheProgram += BYTES_PER_INSTRUCTIONS;
         numInstructions += 1; // TODO: integrate this variable with the above.
+    }
+
+    public void addInstruction(byte op, char label, int targetAddress, int output) {
+        doubleBufferSize();
+        instruction.put(op);
+        instruction.putChar(label);
+        instruction.putInt(targetAddress);
+        instruction.putInt(output);
+
+        endOfTheProgram += BYTES_PER_INSTRUCTIONS;
+        numInstructions += 1;
+    }
+
+    public void addInstructionFail() {
+        addInstruction(FAIL, ' ', -1, 0); // Ideally, compress this
+    }
+
+    public void addInstructionMatch(char label, int targetAddress, int output) {
+        addInstruction(MATCH, label, targetAddress, output);
+    }
+
+    public void addInstructionMatchOrAccept(char label, int targetAddress, int output) {
+        addInstruction(ACCEPT_OR_MATCH, label, targetAddress, output);
+    }
+
+    private void doubleBufferSize() {
+        int currentSizePlusOneInstruction = (numInstructions + 1) * BYTES_PER_INSTRUCTIONS;
+
+        if (currentSizePlusOneInstruction > instructionsSize) {
+            // grow byte array by doubling the size of it.
+            numInstructionsAllocated = numInstructionsAllocated << 1;
+            instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
+            ByteBuffer newInstructions = ByteBuffer.allocate(instructionsSize);
+            instruction.flip(); // limit ← position、 position ← 0
+            newInstructions.put(instruction);
+            instruction = newInstructions;
+        }
     }
 
     public void addInstructions(List<Instruction> instructions) {
@@ -86,7 +124,9 @@ public class Program {
     public List<Instruction> debugInstructions() {
         List<Instruction> instructions = new ArrayList<>();
         int pc = 0;
-        int end = this.instruction.position() / Program.BYTES_PER_INSTRUCTIONS - 1;
+//        int end = this.instruction.position() / Program.BYTES_PER_INSTRUCTIONS - 1;
+        int end = this.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1;
+//        int end = endOfTheProgram - 1;
         while (pc <= end) {
             instructions.add(this.getInstructionAt(pc));
             pc++;
@@ -100,12 +140,15 @@ public class Program {
 
     public void outputProgramToFile() throws IOException {
         ByteBuffer bbuf = this.instruction;
+        bbuf.rewind();
+        bbuf.limit(endOfTheProgram);
         File file = new File("fstByteBuffer");
 
         boolean append = false;
 
         FileChannel wChannel = new FileOutputStream(file, append).getChannel();
 
+//        bbuf.flip();
         wChannel.write(bbuf);
 
         wChannel.close();

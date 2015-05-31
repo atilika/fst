@@ -11,11 +11,11 @@ public class State {
     ArrayList<Arc> arcs; // possible arcs given a transition string
     boolean isFinal = false;
     boolean visited; //for visualization purpose
-    int instructionAddress = -1;
+    private int targetJumpAddress = -1;
 
     public State() {
-        this.arcs = new ArrayList<Arc>();
-    }
+        this.arcs = new ArrayList<>();
+    } // INITIAL_CAPACITY not set
 
     /**
      * Copy constructor
@@ -25,52 +25,33 @@ public class State {
         this.isFinal = source.isFinal;
     }
 
+    public int getTargetJumpAddress() {
+        return this.targetJumpAddress;
+    }
 
-    public void setArc(char transition, int output, State toState) {
-        Arc existingArc = linearSearchArc(transition);
+    public void setTargetJumpAddress(int targetJumpAddress) {
+        this.targetJumpAddress = targetJumpAddress;
+    }
+
+    public Arc setArc(char transition, int output, State toState) {
+        Arc existingArc = findArc(transition);
         if (existingArc != null) {
             // does override existing arc
             arcs.remove(existingArc);
         }
         Arc newArc = new Arc(output, toState, transition);
         arcs.add(newArc);
+        return newArc;
     }
 
     public void setArc(char transition, State toState) {
-        if (linearSearchArc(transition) != null) {
+        if (findArc(transition) != null) {
 //            does not override existing arc
             return;
         }
         Arc newArc = new Arc(toState);
         newArc.setLabel(transition);
         arcs.add(newArc);
-    }
-
-    public Arc getTransitionArc(char transition) {
-        if (linearSearchArc(transition) != null) {
-//            return arcs.get(transition).getDestination();
-            return linearSearchArc(transition);
-        }
-        return null;
-    }
-
-
-    public Arc getNextArc(char transitionString) {
-        Arc nextArc = null;
-        if (linearSearchArc(transitionString) != null) {
-            nextArc = linearSearchArc(transitionString);
-        }
-        return nextArc;
-    }
-
-
-    public State getNextState(char transitionString) {
-        State nextState = null;
-        if ((getTransitionArc(transitionString)) != null) {
-            Arc nextArc = linearSearchArc(transitionString);
-            nextState = nextArc.getDestination();
-        }
-        return nextState;
     }
 
     public List<Character> getAllTransitionStrings() {
@@ -85,32 +66,12 @@ public class State {
         return retList;
     }
 
-    public List<String> getAllOutputs() {
-        List<Character> transitionStrings = getAllTransitionStrings();
-        List<String> retList = new ArrayList<String>();
-
-        for (char transitionString : transitionStrings) {
-            retList.add(linearSearchArc(transitionString).getOutput().toString()); // adding int output
-        }
-
-        Collections.sort(retList);
-
-        return retList;
-    }
-
-    public boolean hasArc(char transition) {
-        return linearSearchArc(transition) != null;
-    }
-
     public void setFinal() {
         this.isFinal = true;
     }
 
-    public void setInstructionAddress(int instructionAddress) { this.instructionAddress = instructionAddress;}
-
-    public int getInstructionAddress() { return this.instructionAddress;}
-
-    public Arc linearSearchArc(char transition) {
+    public Arc findArc(char transition) {
+        // linear search
         for (Arc arc : arcs) {
             if (arc.getLabel() == transition) {
                 return arc;
@@ -136,6 +97,7 @@ public class State {
     @Override
     public int hashCode() {
         int result = arcs != null ? arcs.hashCode() : 0;
+
         result = 31 * result + (isFinal ? 1 : 0);
         return result;
     }
