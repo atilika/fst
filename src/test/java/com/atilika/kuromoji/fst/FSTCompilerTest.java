@@ -134,6 +134,7 @@ public class FSTCompilerTest {
             assertEquals(outputValues[i], fst.transduce(inputValues[i]));
         }
 
+
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
         Program program = fst.fstCompiler.getProgram();
@@ -143,6 +144,33 @@ public class FSTCompilerTest {
         }
 
         assertEquals(-1, vm.run(program, "thursday"));
+    }
+
+    @Test
+    public void testSuffixStatesMerged() throws Exception {
+        String inputValues[] = {"cat", "cats", "dog", "dogs"};
+        int outputValues[] = {1, 2, 3, 4};
+        FST fst = new FST();
+        fst.createDictionary(inputValues, outputValues);
+
+        Program program = fst.fstCompiler.getProgram();
+        List<Instruction> instructionsForDebug = program.debugInstructions();
+
+//      There should be only one instruction with the label 's' and the output 1
+        List<Instruction> instructionsToSameState = new ArrayList<>();
+
+        int numInstructionWithTransitionCharS = 0;
+        for (Instruction instruction : instructionsForDebug) {
+            if (instruction.arg1 == 's') {
+                numInstructionWithTransitionCharS++;
+            }
+            if (instruction.arg1 == 'g' || instruction.arg1 == 't') {
+                instructionsToSameState.add(instruction);
+            }
+        }
+        assertEquals(1, numInstructionWithTransitionCharS); // 1, since states are equivalent.
+        // pointing to the same Instruction address
+        assertEquals(instructionsToSameState.get(0).arg2, instructionsToSameState.get(1).arg2);
     }
 
     @Test

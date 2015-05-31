@@ -21,23 +21,24 @@ public class FSTCompiler {
     public void assignTargetAddressToArcB(Arc b, boolean isStartState) {
         if (b.getDestination().arcs.size() == 0) {
             // an arc which points to dead end accepting state
-            b.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
+            b.getDestination().setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
         }
         else {
             // check whether equivalent destination state is already frozen
-            int targetAddress = b.getTargetJumpAddress();
-            if (targetAddress != -1) {
-                b.setTargetJumpAddress(targetAddress); // equivalent state found
-
-            } else {
+            if (b.getDestination().getTargetJumpAddress() == -1) {
                 // First arc is regarded as a state
-                int newAddress = makeNewInstructionsForFreezingState(b);
-                b.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
+            int newAddress = makeNewInstructionsForFreezingState(b);
+            b.getDestination().setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
             }
         }
 
         if (isStartState && b.getLabel() < program.cacheFirstAddresses.length) {
-            program.cacheFirstAddresses[b.getLabel()] = b.getTargetJumpAddress();
+            // making states for the arcs outgoing from starting state. Not necessary since cache is enabled.
+            program.addInstructionFail();
+            compileArcToInstruction(b);
+
+            // caching
+            program.cacheFirstAddresses[b.getLabel()] = b.getDestination().getTargetJumpAddress();
             program.cacheFirstOutputs[b.getLabel()] = b.getOutput();
             program.cacheFirstIsAccept[b.getLabel()] = b.getDestination().isFinal;
         }
@@ -56,13 +57,20 @@ public class FSTCompiler {
 
         for (Arc d : b.getDestination().arcs) {
             newAddress = program.numInstructions;
-            if (d.getDestination().isFinal) {
-                program.addInstructionMatchOrAccept(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
-            } else {
-                program.addInstructionMatch(d.getLabel(), d.getTargetJumpAddress(), d.getOutput());
-            }
+            compileArcToInstruction(d);
         }
+
+        b.getDestination().setTargetJumpAddress(newAddress);
+
         return newAddress;
+    }
+
+    private void compileArcToInstruction(Arc d) {
+        if (d.getDestination().isFinal) {
+            program.addInstructionMatchOrAccept(d.getLabel(), d.getDestination().getTargetJumpAddress(), d.getOutput());
+        } else {
+            program.addInstructionMatch(d.getLabel(), d.getDestination().getTargetJumpAddress(), d.getOutput());
+        }
     }
 
     public Instruction createInstructionFail() {

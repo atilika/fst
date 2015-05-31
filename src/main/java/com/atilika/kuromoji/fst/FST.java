@@ -14,7 +14,7 @@ public class FST {
     public int MAX_WORD_LENGTH = 100;
 
     public FST() {
-        List<State> stateList = new ArrayList<>();
+        List<State> stateList = new LinkedList<>();
         stateList.add(new State());
         this.statesDictionary = new HashMap<>();
         this.statesDictionary.put(0, stateList); // temporary setting the start state
@@ -117,11 +117,10 @@ public class FST {
             State state = tempStates[i - 1];
             char previousWordChar = previousWord.charAt(i - 1);
             int output = state.findArc(previousWordChar).getOutput();
-//            Arc removingArc = tempStates[i - 1].findArc(previousWord.charAt(i - 1));
             state.arcs.remove(state.findArc(previousWordChar));
-            setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
+            Arc arcToFrozenArc = setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
 
-            compileState(state); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
+            compileArc(arcToFrozenArc, false); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
 
         }
         for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
@@ -155,15 +154,15 @@ public class FST {
             int output = state.findArc(previousWordChar).getOutput();
 
             state.arcs.remove(state.findArc(previousWordChar));
-            setTransition(
+            Arc arcToFrozenArc = setTransition(
                 state,
                 findEquivalentState(tempStates[i]), output, lastWord.charAt(i - 1)
             );
-            compileState(state); // For FST Compiler
+            compileArc(arcToFrozenArc, false); // For FST Compiler
 
         }
         compileStartingState(tempStates[0]); // For FST Compiler, caching
-//        findEquivalentState(tempStates[0]); // not necessary when compiling is enabled
+        findEquivalentState(tempStates[0]); // not necessary when compiling is enabled
     }
 
 
@@ -204,8 +203,8 @@ public class FST {
         return word - prefix;
     }
 
-    private void setTransition(State from, State to, int output, char transitionStr) {
-        from.setArc(transitionStr, output, to);
+    private Arc setTransition(State from, State to, int output, char transitionStr) {
+        return from.setArc(transitionStr, output, to);
     }
 
     private void setTransition(State from, State to, char transitionStr) {
@@ -233,17 +232,17 @@ public class FST {
             for (State collidedState : statesDictionary.get(key)) {
                 boolean destStateDiff = false;
 
-                for (Arc arc : collidedState.arcs) {
+                for (Arc collidedArc : collidedState.arcs) {
 
                     // we cannot guarantee that the state has a given transition char since the hashCode() may
                     // collide in coincidence.
-                    Arc collidedArc = state.findArc(arc.getLabel());
-                    if (collidedArc == null) {
+                    Arc targetArc = state.findArc(collidedArc.getLabel());
+                    if (targetArc == null) {
                         // this state is not equivalent since a given state does not contain collided state's transition string.
                         destStateDiff = true;
                         break;
                     }
-                    else if (!collidedArc.getDestination().equals(arc.getDestination())) {
+                    else if (!targetArc.getDestination().equals(collidedArc.getDestination())) {
                         // this state is not equivalent since there is a dest. state that is different.
                         destStateDiff = true;
                         break;
@@ -278,17 +277,6 @@ public class FST {
     private void clearState(State state) {
         state.arcs = new ArrayList<>();
         state.isFinal = false;
-    }
-
-    /**
-     * Assign a target jump address to an arc that points to a given state object
-     *
-     * @param state
-     */
-    private void compileState(State state) {
-        for (Arc arc : state.arcs) {
-            compileArc(arc, false);
-        }
     }
 
     private void compileStartingState(State state) {

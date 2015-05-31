@@ -11,6 +11,7 @@ public class State {
     ArrayList<Arc> arcs; // possible arcs given a transition string
     boolean isFinal = false;
     boolean visited; //for visualization purpose
+    private int targetJumpAddress = -1;
 
     public State() {
         this.arcs = new ArrayList<>(1);
@@ -24,8 +25,15 @@ public class State {
         this.isFinal = source.isFinal;
     }
 
+    public int getTargetJumpAddress() {
+        return this.targetJumpAddress;
+    }
 
-    public void setArc(char transition, int output, State toState) {
+    public void setTargetJumpAddress(int targetJumpAddress) {
+        this.targetJumpAddress = targetJumpAddress;
+    }
+
+    public Arc setArc(char transition, int output, State toState) {
         Arc existingArc = findArc(transition);
         if (existingArc != null) {
             // does override existing arc
@@ -33,6 +41,7 @@ public class State {
         }
         Arc newArc = new Arc(output, toState, transition);
         arcs.add(newArc);
+        return newArc;
     }
 
     public void setArc(char transition, State toState) {
