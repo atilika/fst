@@ -24,7 +24,7 @@ public class Program {
     int numInstructionsAllocated = 100000;
 
     int instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
-    ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
+    public ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
 
     int CACHED_CHAR_RANGE = 1 << 16; // 2bytes, range of whole char type.
     public int[] cacheFirstAddresses; // 4 bytes * 66536 = 262,144 = 262KB
@@ -124,7 +124,9 @@ public class Program {
     public List<Instruction> debugInstructions() {
         List<Instruction> instructions = new ArrayList<>();
         int pc = 0;
-        int end = this.instruction.position() / Program.BYTES_PER_INSTRUCTIONS - 1;
+//        int end = this.instruction.position() / Program.BYTES_PER_INSTRUCTIONS - 1;
+        int end = this.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1;
+//        int end = endOfTheProgram - 1;
         while (pc <= end) {
             instructions.add(this.getInstructionAt(pc));
             pc++;
@@ -138,13 +140,15 @@ public class Program {
 
     public void outputProgramToFile() throws IOException {
         ByteBuffer bbuf = this.instruction;
+        bbuf.rewind();
+        bbuf.limit(endOfTheProgram);
         File file = new File("fstByteBuffer");
 
         boolean append = false;
 
         FileChannel wChannel = new FileOutputStream(file, append).getChannel();
 
-        bbuf.flip();
+//        bbuf.flip();
         wChannel.write(bbuf);
 
         wChannel.close();

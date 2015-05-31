@@ -232,20 +232,35 @@ public class FST {
             for (State collidedState : statesDictionary.get(key)) {
                 boolean destStateDiff = false;
 
-                for (Arc collidedArc : collidedState.arcs) {
+                if (collidedState.arcs.size() != state.arcs.size()) {
+                    continue;
+                }
+//                for (Arc collidedArc : collidedState.arcs) {
+                for (int i = 0; i < collidedState.arcs.size(); i++) {
 
                     // we cannot guarantee that the state has a given transition char since the hashCode() may
                     // collide in coincidence.
-                    Arc targetArc = state.findArc(collidedArc.getLabel());
-                    if (targetArc == null) {
-                        // this state is not equivalent since a given state does not contain collided state's transition string.
+                    // TODO: this is linear searching the arc that has the same label. If we can ensure that Arcs are
+                    // TODO: sorted according to its label, then no need to linear search it.
+//                    Arc targetArc = state.findArc(collidedArc.getLabel());
+//                    if (targetArc == null) {
+//                        // this state is not equivalent since a given state does not contain collided state's transition string.
+//                        destStateDiff = true;
+//                        break;
+//                    }
+//                    else if (!targetArc.getDestination().equals(collidedArc.getDestination())) {
+//                        // this state is not equivalent since there is a dest. state that is different.
+//                        destStateDiff = true;
+//                        break;
+//                    }
+                    if (collidedState.arcs.get(i).getLabel() != state.arcs.get(i).getLabel()) {
                         destStateDiff = true;
-                        break;
                     }
-                    else if (!targetArc.getDestination().equals(collidedArc.getDestination())) {
-                        // this state is not equivalent since there is a dest. state that is different.
+                    else if (collidedState.arcs.get(i).getOutput() != state.arcs.get(i).getOutput()) {
                         destStateDiff = true;
-                        break;
+                    }
+                    else if (!collidedState.arcs.get(i).getDestination().equals(state.arcs.get(i).getDestination())) {
+                        destStateDiff = true;
                     }
                 }
 
@@ -258,7 +273,7 @@ public class FST {
         }
         // At this point, we know that there is no equivalent compiled (finalized) node
         State newStateToDic = new State(state); // deep copy
-        List<State> stateList = new ArrayList<>();
+        List<State> stateList = new LinkedList<>();
         if (statesDictionary.containsKey(key)) {
             stateList = statesDictionary.get(key);
             // adding new state to a key
@@ -283,6 +298,7 @@ public class FST {
         for (Arc arc : state.arcs) {
             compileArc(arc, true);
         }
+        fstCompiler.program.instruction.flip();
     }
 
     private void compileArc(Arc b, boolean isStartState) {

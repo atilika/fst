@@ -14,8 +14,8 @@ public class State {
     private int targetJumpAddress = -1;
 
     public State() {
-        this.arcs = new ArrayList<>(1);
-    } // INITIAL_CAPACITY = 1
+        this.arcs = new ArrayList<>();
+    } // INITIAL_CAPACITY not set
 
     /**
      * Copy constructor
