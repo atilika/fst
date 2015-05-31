@@ -97,7 +97,7 @@ public class FSTCompilerTest {
 ////        fstCompiler.instructionList = instructionList;
 //        fstCompiler.program.addInstructions(instructionList);
 //
-//        fstCompiler.assignTargetAddressToArcB(arcB);
+//        fstCompiler.assignTargetAddressToDestinationState(arcB);
 //        // TargetJumpAddress = 0, to the dead-end accepting state
 //        assertEquals(0, arcB.getTargetJumpAddress());
 //
@@ -268,6 +268,7 @@ public class FSTCompilerTest {
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
         Program program = fst.fstCompiler.getProgram();
+        List<Instruction> instructions = program.debugInstructions();
 
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));

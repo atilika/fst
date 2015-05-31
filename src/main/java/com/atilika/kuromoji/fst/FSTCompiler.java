@@ -18,17 +18,18 @@ public class FSTCompiler {
      *
      * @param b
      */
-    public void assignTargetAddressToArcB(Arc b, boolean isStartState) {
-        if (b.getDestination().arcs.size() == 0) {
+    public void assignTargetAddressToDestinationState(Arc b, boolean isStartState) {
+        State state = b.getDestination();
+        if (state.arcs.size() == 0) {
             // an arc which points to dead end accepting state
-            b.getDestination().setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
+            state.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
         }
         else {
             // check whether equivalent destination state is already frozen
-            if (b.getDestination().getTargetJumpAddress() == -1) {
+            if (state.getTargetJumpAddress() == -1) {
                 // First arc is regarded as a state
-            int newAddress = makeNewInstructionsForFreezingState(b);
-            b.getDestination().setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
+                int newAddress = makeNewInstructionsForFreezingState(state);
+                state.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
             }
         }
 
@@ -38,30 +39,27 @@ public class FSTCompiler {
             compileArcToInstruction(b);
 
             // caching
-            program.cacheFirstAddresses[b.getLabel()] = b.getDestination().getTargetJumpAddress();
+            program.cacheFirstAddresses[b.getLabel()] = state.getTargetJumpAddress();
             program.cacheFirstOutputs[b.getLabel()] = b.getOutput();
-            program.cacheFirstIsAccept[b.getLabel()] = b.getDestination().isFinal;
+            program.cacheFirstIsAccept[b.getLabel()] = state.isFinal;
         }
     }
 
     /**
      * Freeze a new arc since no frozen arcs transiting to the same state.
      *
-     * @param b
+     * @param freezingState
      * @return the address of new instruction
      */
-    public int makeNewInstructionsForFreezingState(Arc b){
-
+    public int makeNewInstructionsForFreezingState(State freezingState){
         program.addInstructionFail();
-        int newAddress = program.numInstructions;
 
-        for (Arc d : b.getDestination().arcs) {
-            newAddress = program.numInstructions;
-            compileArcToInstruction(d);
+        for (Arc outgoingArc : freezingState.arcs) {
+            compileArcToInstruction(outgoingArc);
         }
 
-        b.getDestination().setTargetJumpAddress(newAddress);
-
+        int newAddress = program.numInstructions - 1;
+        freezingState.setTargetJumpAddress(newAddress);
         return newAddress;
     }
 

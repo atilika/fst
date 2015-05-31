@@ -286,7 +286,7 @@ public class FST {
     }
 
     private void compileArc(Arc b, boolean isStartState) {
-        fstCompiler.assignTargetAddressToArcB(b, isStartState);
+        fstCompiler.assignTargetAddressToDestinationState(b, isStartState);
     }
 
     public HashMap<Integer, List<State>> getStatesDictionary() {
