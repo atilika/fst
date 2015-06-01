@@ -235,24 +235,10 @@ public class FST {
                 if (collidedState.arcs.size() != state.arcs.size()) {
                     continue;
                 }
-//                for (Arc collidedArc : collidedState.arcs) {
-                for (int i = 0; i < collidedState.arcs.size(); i++) {
 
+                for (int i = 0; i < collidedState.arcs.size(); i++) {
                     // we cannot guarantee that the state has a given transition char since the hashCode() may
                     // collide in coincidence.
-                    // TODO: this is linear searching the arc that has the same label. If we can ensure that Arcs are
-                    // TODO: sorted according to its label, then no need to linear search it.
-//                    Arc targetArc = state.findArc(collidedArc.getLabel());
-//                    if (targetArc == null) {
-//                        // this state is not equivalent since a given state does not contain collided state's transition string.
-//                        destStateDiff = true;
-//                        break;
-//                    }
-//                    else if (!targetArc.getDestination().equals(collidedArc.getDestination())) {
-//                        // this state is not equivalent since there is a dest. state that is different.
-//                        destStateDiff = true;
-//                        break;
-//                    }
                     if (collidedState.arcs.get(i).getLabel() != state.arcs.get(i).getLabel()) {
                         destStateDiff = true;
                     }
