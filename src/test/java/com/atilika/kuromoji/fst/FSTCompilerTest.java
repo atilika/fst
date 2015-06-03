@@ -277,6 +277,12 @@ public class FSTCompilerTest {
 
     }
 
+    @Test
+    public void testReadCompiledFST() throws Exception {
+
+
+    }
+
     //    @Ignore("Enable for testing simple VM-based FST")
     @Test
     public void testJAWikipediaIncremental10Words() throws Exception {

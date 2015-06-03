@@ -230,27 +230,7 @@ public class FST {
 
             // Here, there are multiple states that has the same hashcode. Linear Probing the collidedStates.
             for (State collidedState : statesDictionary.get(key)) {
-                boolean destStateDiff = false;
-
-                if (collidedState.arcs.size() != state.arcs.size()) {
-                    continue;
-                }
-
-                for (int i = 0; i < collidedState.arcs.size(); i++) {
-                    // we cannot guarantee that the state has a given transition char since the hashCode() may
-                    // collide in coincidence.
-                    if (collidedState.arcs.get(i).getLabel() != state.arcs.get(i).getLabel()) {
-                        destStateDiff = true;
-                    }
-                    else if (collidedState.arcs.get(i).getOutput() != state.arcs.get(i).getOutput()) {
-                        destStateDiff = true;
-                    }
-                    else if (!collidedState.arcs.get(i).getDestination().equals(state.arcs.get(i).getDestination())) {
-                        destStateDiff = true;
-                    }
-                }
-
-                if (!destStateDiff) {
+                if (isStateEquivalent(state, collidedState)) {
 //                    System.out.println("Collided!");
                     // OK, these states point to the same state. Equivalent!
                     return collidedState;
@@ -268,6 +248,41 @@ public class FST {
         statesDictionary.put(key, stateList);
 
         return newStateToDic;
+    }
+
+    private boolean isStateEquivalent(State state, State collidedState) {
+
+        if (state.arcs.size() != collidedState.arcs.size()) {
+            return false;
+        }
+
+        boolean isArcEquiv = true;
+
+        for (int i = 0; i < collidedState.arcs.size(); i++) {
+            // we cannot guarantee that the state has a given transition char since the hashCode() may
+            // collide in coincidence.
+            isArcEquiv &= isArcEquvivalent(collidedState.arcs.get(i), state.arcs.get(i));
+        }
+        return isArcEquiv;
+    }
+
+    private boolean isArcEquvivalent(Arc collidedArc, Arc currentArc) {
+
+        //
+        if (collidedArc.getLabel() != currentArc.getLabel()) {
+            return false;
+        }
+
+        //
+        if (collidedArc.getOutput() != currentArc.getOutput()) {
+            return false;
+        }
+
+        if (!collidedArc.getDestination().equals(currentArc.getDestination())) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

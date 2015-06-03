@@ -1,6 +1,7 @@
 package com.atilika.kuromoji.fst.vm;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -123,13 +124,9 @@ public class Program {
 
     public List<Instruction> debugInstructions() {
         List<Instruction> instructions = new ArrayList<>();
-        int pc = 0;
-//        int end = this.instruction.position() / Program.BYTES_PER_INSTRUCTIONS - 1;
         int end = this.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1;
-//        int end = endOfTheProgram - 1;
-        while (pc <= end) {
+        for (int pc = 0; pc < end; pc++) {
             instructions.add(this.getInstructionAt(pc));
-            pc++;
         }
         return instructions;
     }
@@ -152,5 +149,24 @@ public class Program {
         wChannel.write(bbuf);
 
         wChannel.close();
+    }
+
+    public void readProgramFromFile(String filename) throws IOException {
+        ByteBuffer bbuf = this.instruction;
+        bbuf.rewind();
+        bbuf.limit(endOfTheProgram);
+//        File file = new File("fstByteBuffer");
+        File file = new File(filename);
+
+        boolean append = false;
+
+//        FileChannel wChannel = new FileOutputStream(file, append).getChannel();
+        FileChannel rChannel = new FileInputStream(file).getChannel();
+//        rChannel.read();
+
+//        bbuf.flip();
+//        wChannel.write(bbuf);
+
+//        wChannel.close();
     }
 }
