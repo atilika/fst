@@ -89,7 +89,11 @@ public class State {
         State state = (State) o;
 
         if (isFinal != state.isFinal) return false;
-        if (arcs != null ? !arcs.equals(state.arcs) : state.arcs != null) return false;
+        if (arcs != null) {
+            if (!arcs.equals(state.arcs)) return false;
+        } else {
+            if (state.arcs != null) return false;
+        }
 
         return true;
     }

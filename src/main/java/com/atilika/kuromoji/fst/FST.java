@@ -79,9 +79,7 @@ public class FST {
             outputValue++; // allocate the next wordID
         }
 
-        // for last word
-        String lastWord = previousWord;
-        handleLastWord(previousWord, lastWord, tempStates);
+        handleLastWord(previousWord, tempStates);
     }
 
 
@@ -102,9 +100,7 @@ public class FST {
             previousWord = inputWord;
         }
 
-        // for last word
-        String lastWord = previousWord;
-        handleLastWord(previousWord, lastWord, tempStates);
+        handleLastWord(previousWord, tempStates);
     }
 
     private void createDictionaryCommon(String inputWord, String previousWord, State[] tempStates, int currentOutput) {
@@ -119,7 +115,6 @@ public class FST {
             int output = state.findArc(previousWordChar).getOutput();
             state.arcs.remove(state.findArc(previousWordChar));
             Arc arcToFrozenArc = setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
-
             compileArc(arcToFrozenArc, false); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
 
         }
@@ -147,17 +142,20 @@ public class FST {
 
     }
 
-    private void handleLastWord(String previousWord, String lastWord, State[] tempStates) {
-        for (int i = lastWord.length(); i > 0; i--) {
+    /**
+     * Freezing temp states which represent the last word of the input words
+     *
+     * @param previousWord
+     * @param tempStates
+     */
+    private void handleLastWord(String previousWord, State[] tempStates) {
+        for (int i = previousWord.length(); i > 0; i--) {
             State state = tempStates[i - 1];
             char previousWordChar = previousWord.charAt(i - 1);
             int output = state.findArc(previousWordChar).getOutput();
 
             state.arcs.remove(state.findArc(previousWordChar));
-            Arc arcToFrozenArc = setTransition(
-                state,
-                findEquivalentState(tempStates[i]), output, lastWord.charAt(i - 1)
-            );
+            Arc arcToFrozenArc = setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
             compileArc(arcToFrozenArc, false); // For FST Compiler
 
         }
@@ -230,9 +228,7 @@ public class FST {
 
             // Here, there are multiple states that has the same hashcode. Linear Probing the collidedStates.
             for (State collidedState : statesDictionary.get(key)) {
-                if (isStateEquivalent(state, collidedState)) {
-//                    System.out.println("Collided!");
-                    // OK, these states point to the same state. Equivalent!
+                if (state.equals(collidedState)) {
                     return collidedState;
                 }
             }
@@ -248,41 +244,6 @@ public class FST {
         statesDictionary.put(key, stateList);
 
         return newStateToDic;
-    }
-
-    private boolean isStateEquivalent(State state, State collidedState) {
-
-        if (state.arcs.size() != collidedState.arcs.size()) {
-            return false;
-        }
-
-        boolean isArcEquiv = true;
-
-        for (int i = 0; i < collidedState.arcs.size(); i++) {
-            // we cannot guarantee that the state has a given transition char since the hashCode() may
-            // collide in coincidence.
-            isArcEquiv &= isArcEquvivalent(collidedState.arcs.get(i), state.arcs.get(i));
-        }
-        return isArcEquiv;
-    }
-
-    private boolean isArcEquvivalent(Arc collidedArc, Arc currentArc) {
-
-        //
-        if (collidedArc.getLabel() != currentArc.getLabel()) {
-            return false;
-        }
-
-        //
-        if (collidedArc.getOutput() != currentArc.getOutput()) {
-            return false;
-        }
-
-        if (!collidedArc.getDestination().equals(currentArc.getDestination())) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
