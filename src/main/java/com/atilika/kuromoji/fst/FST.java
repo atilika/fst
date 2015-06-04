@@ -110,12 +110,7 @@ public class FST {
 //        We minimize the states from the suffix of the previous word
 
         for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
-            State state = tempStates[i - 1];
-            char previousWordChar = previousWord.charAt(i - 1);
-            int output = state.findArc(previousWordChar).getOutput();
-            state.arcs.remove(state.findArc(previousWordChar));
-            Arc arcToFrozenArc = setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
-            compileArc(arcToFrozenArc, false); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
+            freezeAndPointToNewState(previousWord, tempStates, i);
 
         }
         for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
@@ -142,6 +137,15 @@ public class FST {
 
     }
 
+    private void freezeAndPointToNewState(String previousWord, State[] tempStates, int i) {
+        State state = tempStates[i - 1];
+        char previousWordChar = previousWord.charAt(i - 1);
+        int output = state.findArc(previousWordChar).getOutput();
+        state.arcs.remove(state.findArc(previousWordChar));
+        Arc arcToFrozenArc = setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
+        compileArc(arcToFrozenArc, false); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
+    }
+
     /**
      * Freezing temp states which represent the last word of the input words
      *
@@ -150,13 +154,7 @@ public class FST {
      */
     private void handleLastWord(String previousWord, State[] tempStates) {
         for (int i = previousWord.length(); i > 0; i--) {
-            State state = tempStates[i - 1];
-            char previousWordChar = previousWord.charAt(i - 1);
-            int output = state.findArc(previousWordChar).getOutput();
-
-            state.arcs.remove(state.findArc(previousWordChar));
-            Arc arcToFrozenArc = setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
-            compileArc(arcToFrozenArc, false); // For FST Compiler
+            freezeAndPointToNewState(previousWord, tempStates, i);
 
         }
         compileStartingState(tempStates[0]); // For FST Compiler, caching
