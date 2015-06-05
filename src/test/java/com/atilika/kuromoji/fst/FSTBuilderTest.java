@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class FSTTest {
+public class FSTBuilderTest {
 
     @Test
     public void testCreateDictionary() throws Exception {
@@ -21,11 +21,11 @@ public class FSTTest {
         int outputValues[] = {1, 2, 3, 4, 20, 42, 43};
 
 
-        FST fst = new FST();
-        fst.createDictionary(inputValues, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(inputValues, outputValues);
 
         for (int i = 0; i < inputValues.length; i++) {
-            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+            assertEquals(outputValues[i], fstBuilder.transduce(inputValues[i]));
         }
     }
 
@@ -43,7 +43,7 @@ public class FSTTest {
     }
 
 
-    public static FST read(InputStream is) throws IOException {
+    public static FSTBuilder read(InputStream is) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         String line;
         ArrayList<String> titles = new ArrayList<String>();
@@ -69,11 +69,11 @@ public class FSTTest {
             outputValues[i] = i;
         }
 
-        FST fst = new FST();
-        fst.MAX_WORD_LENGTH = maxWordLength;
-        fst.createDictionary(inputValues, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.MAX_WORD_LENGTH = maxWordLength;
+        fstBuilder.createDictionary(inputValues, outputValues);
 
-        return fst;
+        return fstBuilder;
     }
 
     @Test
@@ -87,9 +87,9 @@ public class FSTTest {
 
     private void testJAWikipediaIncremental(String resource) throws Exception {
         FSTTestHelper fstTestHelper = new FSTTestHelper();
-        FST fst = fstTestHelper.readIncremental(resource);
+        FSTBuilder fstBuilder = fstTestHelper.readIncremental(resource);
 
-        for (List<State> listOfStates : fst.getStatesDictionary().values()) {
+        for (List<State> listOfStates : fstBuilder.getStatesDictionary().values()) {
             if (listOfStates.size() == 2) {
                 System.out.println();
             }
@@ -110,7 +110,7 @@ public class FSTTest {
             if (line.trim().length() == 0) {
                 continue;
             }
-            assertEquals(wordIDExpected, fst.transduce(line));
+            assertEquals(wordIDExpected, fstBuilder.transduce(line));
             wordIDExpected++;
         }
         reader.close();

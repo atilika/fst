@@ -14,11 +14,11 @@ public class FSTCompiler {
     }
 
     /**
-     * Assigning an target jump address to Arc b.
+     * Assigning an target jump address to Arc b and make corresponding Instruction.
      *
      * @param b
      */
-    public void assignTargetAddressToDestinationState(Arc b, boolean isStartState) {
+    public void compileArc(Arc b, boolean isStartState) {
         State state = b.getDestination();
         if (state.arcs.size() == 0) {
             // an arc which points to dead end accepting state
@@ -37,12 +37,19 @@ public class FSTCompiler {
             // making states for the arcs outgoing from starting state. Not necessary since cache is enabled.
             program.addInstructionFail();
             compileArcToInstruction(b);
-
-            // caching
-            program.cacheFirstAddresses[b.getLabel()] = state.getTargetJumpAddress();
-            program.cacheFirstOutputs[b.getLabel()] = b.getOutput();
-            program.cacheFirstIsAccept[b.getLabel()] = state.isFinal;
+            cacheArcs(b, state);
         }
+    }
+
+    /**
+     * Cache the outgoing arcs from the starting state
+     * @param b
+     * @param state
+     */
+    private void cacheArcs(Arc b, State state) {
+        program.cacheFirstAddresses[b.getLabel()] = state.getTargetJumpAddress();
+        program.cacheFirstOutputs[b.getLabel()] = b.getOutput();
+        program.cacheFirstIsAccept[b.getLabel()] = state.getIsFinal();
     }
 
     /**
@@ -58,16 +65,27 @@ public class FSTCompiler {
             compileArcToInstruction(outgoingArc);
         }
 
-        int newAddress = program.numInstructions - 1;
+        int newAddress = program.getNumInstructions() - 1;
         freezingState.setTargetJumpAddress(newAddress);
         return newAddress;
     }
 
     private void compileArcToInstruction(Arc d) {
-        if (d.getDestination().isFinal) {
+        if (d.getDestination().getIsFinal()) {
             program.addInstructionMatchOrAccept(d.getLabel(), d.getDestination().getTargetJumpAddress(), d.getOutput());
         } else {
             program.addInstructionMatch(d.getLabel(), d.getDestination().getTargetJumpAddress(), d.getOutput());
+        }
+    }
+
+    /**
+     * Compile Instructions for starting state
+     *
+     * @param state
+     */
+    public void compileStartingState(State state) {
+        for (Arc arc : state.arcs) {
+            compileArc(arc, true);
         }
     }
 

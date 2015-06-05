@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 
-public class FST {
+public class FSTBuilder {
     // Note that FST only allows the presorted dictionaries as input.
 
     private HashMap<Integer, List<State>> statesDictionary;
@@ -13,7 +13,7 @@ public class FST {
     // TODO: Rewrite this...
     public int MAX_WORD_LENGTH = 100;
 
-    public FST() {
+    public FSTBuilder() {
         List<State> stateList = new LinkedList<>();
         stateList.add(new State());
         this.statesDictionary = new HashMap<>();
@@ -111,14 +111,13 @@ public class FST {
 
         for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
             freezeAndPointToNewState(previousWord, tempStates, i);
-
         }
+
         for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
             clearState(tempStates[i]);
-            setTransition(tempStates[i - 1], tempStates[i], inputWord.charAt(i - 1));
+            tempStates[i - 1].setArc(inputWord.charAt(i - 1), tempStates[i]);
         }
         tempStates[inputWord.length()].setFinal();
-
 
         // dealing with common prefix between previous word and the current word
         // (also note that its output must have common prefix too.)
@@ -126,9 +125,8 @@ public class FST {
 
         for (int i = 0; i < commonPrefixLengthPlusOne - 1; i++) {
             Arc nextArc = currentState.findArc(inputWord.charAt(i));
-            // commonStateOutput = nextArc.output
             currentOutput = excludePrefix(currentOutput, nextArc.getOutput());
-            currentState = currentState.findArc(inputWord.charAt(i)).getDestination();
+            currentState = nextArc.getDestination();
         }
 
         // currentOutput is the difference of outputs
@@ -137,13 +135,20 @@ public class FST {
 
     }
 
+    /**
+     * Freeze a new state if there is no equivalent state in the states dictionary.
+     *
+     * @param previousWord
+     * @param tempStates
+     * @param i
+     */
     private void freezeAndPointToNewState(String previousWord, State[] tempStates, int i) {
         State state = tempStates[i - 1];
         char previousWordChar = previousWord.charAt(i - 1);
         int output = state.findArc(previousWordChar).getOutput();
         state.arcs.remove(state.findArc(previousWordChar));
-        Arc arcToFrozenArc = setTransition(state, findEquivalentState(tempStates[i]), output, previousWordChar);
-        compileArc(arcToFrozenArc, false); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
+        Arc arcToFrozenArc = state.setArc(previousWordChar, output, findEquivalentState(tempStates[i]));
+        fstCompiler.compileArc(arcToFrozenArc, false); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
     }
 
     /**
@@ -155,12 +160,11 @@ public class FST {
     private void handleLastWord(String previousWord, State[] tempStates) {
         for (int i = previousWord.length(); i > 0; i--) {
             freezeAndPointToNewState(previousWord, tempStates, i);
-
         }
-        compileStartingState(tempStates[0]); // For FST Compiler, caching
+        fstCompiler.compileStartingState(tempStates[0]); // For FST Compiler, caching
+        fstCompiler.program.instruction.flip(); // storing limit as the limit of the bytebuffer
         findEquivalentState(tempStates[0]); // not necessary when compiling is enabled
     }
-
 
     /**
      * Allocate State object to each indice
@@ -195,16 +199,15 @@ public class FST {
         return i + 1;
     }
 
+    /**
+     * Exclude output of the common prefix from the current output
+     *
+     * @param word
+     * @param prefix
+     * @return
+     */
     private int excludePrefix(int word, int prefix) {
         return word - prefix;
-    }
-
-    private Arc setTransition(State from, State to, int output, char transitionStr) {
-        return from.setArc(transitionStr, output, to);
-    }
-
-    private void setTransition(State from, State to, char transitionStr) {
-        from.setArc(transitionStr, to);
     }
 
     /**
@@ -251,18 +254,7 @@ public class FST {
      */
     private void clearState(State state) {
         state.arcs = new ArrayList<>();
-        state.isFinal = false;
-    }
-
-    private void compileStartingState(State state) {
-        for (Arc arc : state.arcs) {
-            compileArc(arc, true);
-        }
-        fstCompiler.program.instruction.flip();
-    }
-
-    private void compileArc(Arc b, boolean isStartState) {
-        fstCompiler.assignTargetAddressToDestinationState(b, isStartState);
+        state.initFinal();
     }
 
     public HashMap<Integer, List<State>> getStatesDictionary() {

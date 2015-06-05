@@ -1,6 +1,5 @@
 package com.atilika.kuromoji.fst;
 
-import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
@@ -24,11 +23,11 @@ public class FSTSubstringMatcherTest {
         String[] tokens = {"寿司", "食べ"};
         int[] outputValues = {1, 2};
 
-        FST fst = new FST();
-        fst.createDictionary(tokens, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
+        Program program = fstBuilder.fstCompiler.getProgram();
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
@@ -46,11 +45,11 @@ public class FSTSubstringMatcherTest {
         String[] tokens = {"寿司", "食べ"};
         int[] outputValues = {1, 2};
 
-        FST fst = new FST();
-        fst.createDictionary(tokens, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
+        Program program = fstBuilder.fstCompiler.getProgram();
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
@@ -77,10 +76,10 @@ public class FSTSubstringMatcherTest {
     private void testJAWikipediaIncremental(String resource) throws Exception {
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         FSTTestHelper fstTestHelper = new FSTTestHelper();
-        FST fst = fstTestHelper.readIncremental(resource);
+        FSTBuilder fstBuilder = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
+        Program program = fstBuilder.fstCompiler.getProgram();
 
 //        FSTFormatter fstFormatter = new FSTFormatter();
 //        fstFormatter.format(fst, "ipadic-allwords_uniq_sorted_Head1070_tail65.txt");
@@ -107,7 +106,7 @@ public class FSTSubstringMatcherTest {
         }
         reader.close();
 
-//        List<Instruction> instructions = program.debugInstructions();
+//        List<Instruction> instructions = program.dumpInstructions();
         program.outputProgramToFile(); // outputting bytebuffer to a file
 
         List<String> sentences = readInFile();

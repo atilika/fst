@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class FSTCompilerTest {
@@ -97,7 +96,7 @@ public class FSTCompilerTest {
 ////        fstCompiler.instructionList = instructionList;
 //        fstCompiler.program.addInstructions(instructionList);
 //
-//        fstCompiler.assignTargetAddressToDestinationState(arcB);
+//        fstCompiler.compileArc(arcB);
 //        // TargetJumpAddress = 0, to the dead-end accepting state
 //        assertEquals(0, arcB.getTargetJumpAddress());
 //
@@ -127,18 +126,18 @@ public class FSTCompilerTest {
         int outputValues[] = {1, 2, 3, 4, 20, 42, 43};
 
 
-        FST fst = new FST();
-        fst.createDictionary(inputValues, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(inputValues, outputValues);
 
         for (int i = 0; i < inputValues.length; i++) {
-            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+            assertEquals(outputValues[i], fstBuilder.transduce(inputValues[i]));
         }
 
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
-        List<Instruction> instructionsForDebug = program.debugInstructions();
+        Program program = fstBuilder.fstCompiler.getProgram();
+        List<Instruction> instructionsForDebug = program.dumpInstructions();
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
         }
@@ -150,11 +149,11 @@ public class FSTCompilerTest {
     public void testSuffixStatesMerged() throws Exception {
         String inputValues[] = {"cat", "cats", "dog", "dogs"};
         int outputValues[] = {1, 2, 3, 4};
-        FST fst = new FST();
-        fst.createDictionary(inputValues, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(inputValues, outputValues);
 
-        Program program = fst.fstCompiler.getProgram();
-        List<Instruction> instructionsForDebug = program.debugInstructions();
+        Program program = fstBuilder.fstCompiler.getProgram();
+        List<Instruction> instructionsForDebug = program.dumpInstructions();
 
 //      There should be only one instruction with the label 's' and the output 1
         List<Instruction> instructionsToSameState = new ArrayList<>();
@@ -186,18 +185,18 @@ public class FSTCompilerTest {
             sortedInput[i] = inputs.get(i);
         }
 
-        FST fst = new FST();
+        FSTBuilder fstBuilder = new FSTBuilder();
 
-        fst.createDictionary(sortedInput, outputValues);
+        fstBuilder.createDictionary(sortedInput, outputValues);
 
         for (int i = 0; i < sortedInput.length; i++) {
-            assertEquals(outputValues[i], fst.transduce(sortedInput[i]));
+            assertEquals(outputValues[i], fstBuilder.transduce(sortedInput[i]));
         }
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
-        List<Instruction> instructionsDebug = program.debugInstructions();
+        Program program = fstBuilder.fstCompiler.getProgram();
+        List<Instruction> instructionsDebug = program.dumpInstructions();
         for (int i = 0; i < sortedInput.length; i++) {
             assertEquals(outputValues[i], vm.run(program, sortedInput[i]));
         }
@@ -209,18 +208,18 @@ public class FSTCompilerTest {
         String inputValues[] = {"さかな", "寿", "寿司"};
         int outputValues[] = {0, 1, 2};
 
-        FST fst = new FST();
-        fst.createDictionary(inputValues, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(inputValues, outputValues);
 
         for (int i = 0; i < inputValues.length; i++) {
-            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+            assertEquals(outputValues[i], fstBuilder.transduce(inputValues[i]));
         }
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
+        Program program = fstBuilder.fstCompiler.getProgram();
 
-        List<Instruction> instructionsDebug = program.debugInstructions();
+        List<Instruction> instructionsDebug = program.dumpInstructions();
 
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
@@ -235,16 +234,16 @@ public class FSTCompilerTest {
         String inputValues[] = {"!", "! -attention-"};
         int outputValues[] = {0, 1};
 
-        FST fst = new FST();
-        fst.createDictionary(inputValues, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(inputValues, outputValues);
 
         for (int i = 0; i < inputValues.length; i++) {
-            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+            assertEquals(outputValues[i], fstBuilder.transduce(inputValues[i]));
         }
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
+        Program program = fstBuilder.fstCompiler.getProgram();
 
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
@@ -258,17 +257,17 @@ public class FSTCompilerTest {
         String inputValues[] = {"!", "! -attention-", "!!!", "!!!F You!!!", "!［ai-ou］"};
         int outputValues[] = {0, 1, 2, 3, 4};
 
-        FST fst = new FST();
-        fst.createDictionary(inputValues, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(inputValues, outputValues);
 
         for (int i = 0; i < inputValues.length; i++) {
-            assertEquals(outputValues[i], fst.transduce(inputValues[i]));
+            assertEquals(outputValues[i], fstBuilder.transduce(inputValues[i]));
         }
 
         // Test whether the program is correctly made.
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
-        List<Instruction> instructions = program.debugInstructions();
+        Program program = fstBuilder.fstCompiler.getProgram();
+        List<Instruction> instructions = program.dumpInstructions();
 
         for (int i = 0; i < inputValues.length; i++) {
             assertEquals(outputValues[i], vm.run(program, inputValues[i]));
@@ -299,10 +298,10 @@ public class FSTCompilerTest {
 
     private void testJAWikipediaIncremental(String resource) throws Exception {
         FSTTestHelper fstTestHelper = new FSTTestHelper();
-        FST fst = fstTestHelper.readIncremental(resource);
+        FSTBuilder fstBuilder = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = fst.fstCompiler.getProgram();
+        Program program = fstBuilder.fstCompiler.getProgram();
 
         int wordIDExpected = 1;
 

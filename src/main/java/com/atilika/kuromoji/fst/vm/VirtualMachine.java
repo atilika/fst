@@ -112,5 +112,4 @@ public class VirtualMachine {
         return accumulator;
 
     }
-
 }
