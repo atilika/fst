@@ -5,6 +5,8 @@ import com.atilika.kuromoji.fst.vm.Program;
 
 public class FSTCompiler {
 
+    private static final int ADDRESS_FAIL = 1; // Address 0 stores the information about the buffer size
+
     public Program program;
 
     public FSTCompiler() {
@@ -20,7 +22,7 @@ public class FSTCompiler {
         State state = b.getDestination();
         if (state.arcs.size() == 0) {
             // an arc which points to dead end accepting state
-            state.setTargetJumpAddress(0);// assuming dead-end accepting state is always at the address 0
+            state.setTargetJumpAddress(ADDRESS_FAIL);// assuming dead-end accepting state is always at the address 0
         }
         else {
             // check whether equivalent destination state is already frozen

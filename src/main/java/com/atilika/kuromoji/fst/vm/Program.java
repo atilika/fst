@@ -1,11 +1,10 @@
 package com.atilika.kuromoji.fst.vm;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,8 +18,9 @@ public class Program {
     public static final byte ACCEPT_OR_MATCH = 6;
     public final static int BYTES_PER_INSTRUCTIONS = 11;
 
-    int endOfTheProgram = 0; // place of the end of the byte buffer;
-    int numInstructionsAllocated = 100000;
+    int endOfTheProgram; // place of the end of the byte buffer;
+//    int numInstructionsAllocated = 100000; // counting the first 4 bytes as one psuedo instruction
+    int numInstructionsAllocated = 10; // counting the first 4 bytes as one psuedo instruction
     public ByteBuffer instruction = ByteBuffer.allocate(BYTES_PER_INSTRUCTIONS * numInstructionsAllocated); // init
 
     public static final int CACHED_CHAR_RANGE = 1 << 16; // 2bytes, range of whole char type.
@@ -33,7 +33,15 @@ public class Program {
         Arrays.fill(this.cacheFirstAddresses, -1);
         this.cacheFirstOutputs = new int[CACHED_CHAR_RANGE];
         this.cacheFirstIsAccept = new boolean[CACHED_CHAR_RANGE];
+
+        instruction.putInt(0); // putting the size of bytebuffer in the end.
+        instruction.putInt(0); // putting the size of bytebuffer in the end.
+        instruction.putChar(' ');
+        instruction.put((byte) 0);
+        endOfTheProgram += BYTES_PER_INSTRUCTIONS;
+        // 11 bytes
     }
+
 
     public Instruction getInstructionAt(int pc) {
         int internalIndex = pc * BYTES_PER_INSTRUCTIONS;
@@ -91,7 +99,7 @@ public class Program {
     private void doubleBufferSize() {
         int currentSizePlusOneInstruction = (this.getNumInstructions() + 1) * BYTES_PER_INSTRUCTIONS;
 
-        if (currentSizePlusOneInstruction > BYTES_PER_INSTRUCTIONS * numInstructionsAllocated) {
+        if (currentSizePlusOneInstruction >= BYTES_PER_INSTRUCTIONS * numInstructionsAllocated) {
             // grow byte array by doubling the size of it.
             numInstructionsAllocated = numInstructionsAllocated << 1;
             ByteBuffer newInstructions = ByteBuffer.allocate(BYTES_PER_INSTRUCTIONS * numInstructionsAllocated);
@@ -110,6 +118,7 @@ public class Program {
     public List<Instruction> dumpInstructions() {
         List<Instruction> instructions = new ArrayList<>();
         int numInstructions = this.getNumInstructions();
+//        for (int pc = 0; pc < numInstructions; pc++) {
         for (int pc = 0; pc < numInstructions; pc++) {
             instructions.add(this.getInstructionAt(pc));
         }
@@ -127,10 +136,13 @@ public class Program {
     public void outputProgramToFile() throws IOException {
         ByteBuffer bbuf = this.instruction;
         bbuf.rewind();
-        bbuf.limit(endOfTheProgram);
         File file = new File("fstByteBuffer");
 
         boolean append = false;
+
+        bbuf.putInt(endOfTheProgram); // putting the buffer size
+        bbuf.rewind();
+        bbuf.limit(endOfTheProgram);
 
         FileChannel wChannel = new FileOutputStream(file, append).getChannel();
 
@@ -140,22 +152,36 @@ public class Program {
         wChannel.close();
     }
 
-    public void readProgramFromFile(String filename) throws IOException {
-        ByteBuffer bbuf = this.instruction;
-        bbuf.rewind();
-        bbuf.limit(endOfTheProgram);
-//        File file = new File("fstByteBuffer");
+    public void readProgramFromFile() throws IOException {
+        String filename = "fstbytebuffer";
         File file = new File(filename);
 
-        boolean append = false;
+//        rChannel.read(bbuf); // Reading bytes from one file
 
-//        FileChannel wChannel = new FileOutputStream(file, append).getChannel();
-        FileChannel rChannel = new FileInputStream(file).getChannel();
+        DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        int instructionSize = dis.readInt();    // Read size of baseArr and checkArr
+        dis.readByte(); // moving pos
+        dis.readChar();
+        dis.readInt();
+        ByteBuffer bbuf = ByteBuffer.allocate(instructionSize);
+        // padding because the Instructions are stored under the assumption that the first address is used
+        bbuf.put((byte)0);
+        bbuf.putChar(' ');
+        bbuf.putInt(0);
+        bbuf.putInt(0);
+
+
+        ReadableByteChannel rChannel = Channels.newChannel(dis);
+//        ReadableByteChannel rChannel = new FileInputStream(file).getChannel();
+        rChannel.read(bbuf); // TODO: testing
+        this.instruction = bbuf;
+
+
 //        rChannel.read();
 
 //        bbuf.flip();
 //        wChannel.write(bbuf);
 
-//        wChannel.close();
+        rChannel.close();
     }
 }

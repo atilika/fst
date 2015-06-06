@@ -6,6 +6,7 @@ import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -64,16 +65,19 @@ public class VirtualMachineTest {
 //        program.addInstruction(instructionFail);
 //        program.addInstruction(instructionMatch);
 
-        Instruction storedMatchInstruction = program.getInstructionAt(2);
+        List<Instruction> instructions = program.dumpInstructions();
+
+        Instruction storedMatchInstruction = program.getInstructionAt(3);
+        // +1 because byte size is stored as the first instruction
 
         assertEquals(storedMatchInstruction.arg1, instructionMatch.arg1);
         assertEquals(storedMatchInstruction.arg2, instructionMatch.arg2);
         assertEquals(storedMatchInstruction.arg3, instructionMatch.arg3);
 
-        Instruction storedAcceptInstruction = program.getInstructionAt(0);
+        Instruction storedAcceptInstruction = program.getInstructionAt(1);
         assertEquals(storedAcceptInstruction.toString(), instructionAccept.toString());
 
-        Instruction storedFailInstruction = program.getInstructionAt(1);
+        Instruction storedFailInstruction = program.getInstructionAt(2);
         assertEquals(storedFailInstruction.toString(), instructionFail.toString());
     }
 }

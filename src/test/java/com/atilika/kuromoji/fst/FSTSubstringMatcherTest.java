@@ -1,5 +1,6 @@
 package com.atilika.kuromoji.fst;
 
+import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
@@ -81,6 +82,11 @@ public class FSTSubstringMatcherTest {
         VirtualMachine vm = new VirtualMachine();
         Program program = fstBuilder.fstCompiler.getProgram();
 
+        program.outputProgramToFile(); // outputting bytebuffer to a file
+        program.readProgramFromFile();
+//         List<Instruction> instructions = program.dumpInstructions();
+
+
 //        FSTFormatter fstFormatter = new FSTFormatter();
 //        fstFormatter.format(fst, "ipadic-allwords_uniq_sorted_Head1070_tail65.txt");
 
@@ -106,8 +112,7 @@ public class FSTSubstringMatcherTest {
         }
         reader.close();
 
-//        List<Instruction> instructions = program.dumpInstructions();
-        program.outputProgramToFile(); // outputting bytebuffer to a file
+
 
         List<String> sentences = readInFile();
 
