@@ -14,7 +14,7 @@ public class VirtualMachineTest {
     @Test
     public void testHelloVM()
     {
-        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine vm = new VirtualMachine(false);
         Program program = new Program();
 
         Instruction instruction = new Instruction();
@@ -33,7 +33,7 @@ public class VirtualMachineTest {
     @Test
     public void testMatch() throws Exception {
         // testing the input string "a" being accepted or not
-        VirtualMachine vm = new VirtualMachine();
+        VirtualMachine vm = new VirtualMachine(false);
         Program program = new Program();
         Instruction instructionMatch = new Instruction();
         instructionMatch.opcode = Program.MATCH;
@@ -44,8 +44,6 @@ public class VirtualMachineTest {
         Instruction instructionAccept = new Instruction();
         instructionAccept.opcode = Program.ACCEPT;
 
-//        Instruction[] instructions =
-//                new Instruction[] {instructionMatch, instructionAccept};
         program.addInstructions(
                 Arrays.asList(instructionAccept, instructionMatch)
         );
