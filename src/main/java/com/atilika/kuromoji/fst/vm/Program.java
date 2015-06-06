@@ -1,6 +1,7 @@
 package com.atilika.kuromoji.fst.vm;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,20 +17,16 @@ public class Program {
     public static final byte HELLO = 4;
     public static final byte ACCEPT = 5;
     public static final byte ACCEPT_OR_MATCH = 6;
-
-    int endOfTheProgram = 0; // end of the pc;
-    public int numInstructions = 0;
-
     public final static int BYTES_PER_INSTRUCTIONS = 11;
+
+    int endOfTheProgram = 0; // place of the end of the byte buffer;
     int numInstructionsAllocated = 100000;
+    public ByteBuffer instruction = ByteBuffer.allocate(BYTES_PER_INSTRUCTIONS * numInstructionsAllocated); // init
 
-    int instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
-    public ByteBuffer instruction = ByteBuffer.allocate(instructionsSize); // init
-
-    int CACHED_CHAR_RANGE = 1 << 16; // 2bytes, range of whole char type.
-    public int[] cacheFirstAddresses; // 4 bytes * 66536 = 262,144 = 262KB
+    public static final int CACHED_CHAR_RANGE = 1 << 16; // 2bytes, range of whole char type.
+    public int[] cacheFirstAddresses; // 4 bytes * 66536 = 262,144 ~= 262KB
     public int[] cacheFirstOutputs;  // 262KB
-    public boolean[] cacheFirstIsAccept; // 1 bit * 66536 = 66536 bits = 8317 bits = 8KB
+    public boolean[] cacheFirstIsAccept; // 1 bit * 66536 = 66536 bits = 8317 bits ~= 8KB
 
     public Program() {
         this.cacheFirstAddresses = new int[CACHED_CHAR_RANGE];
@@ -66,15 +63,7 @@ public class Program {
      * @param i
      */
     public void addInstruction(Instruction i) {
-        doubleBufferSize();
-
-        instruction.put(i.opcode);
-        instruction.putChar(i.arg1);
-        instruction.putInt(i.arg2);
-        instruction.putInt(i.arg3);
-
-        endOfTheProgram += BYTES_PER_INSTRUCTIONS;
-        numInstructions += 1; // TODO: integrate this variable with the above.
+        addInstruction(i.opcode, i.arg1, i.arg2, i.arg3);
     }
 
     public void addInstruction(byte op, char label, int targetAddress, int output) {
@@ -85,7 +74,6 @@ public class Program {
         instruction.putInt(output);
 
         endOfTheProgram += BYTES_PER_INSTRUCTIONS;
-        numInstructions += 1;
     }
 
     public void addInstructionFail() {
@@ -101,35 +89,29 @@ public class Program {
     }
 
     private void doubleBufferSize() {
-        int currentSizePlusOneInstruction = (numInstructions + 1) * BYTES_PER_INSTRUCTIONS;
+        int currentSizePlusOneInstruction = (this.getNumInstructions() + 1) * BYTES_PER_INSTRUCTIONS;
 
-        if (currentSizePlusOneInstruction > instructionsSize) {
+        if (currentSizePlusOneInstruction > BYTES_PER_INSTRUCTIONS * numInstructionsAllocated) {
             // grow byte array by doubling the size of it.
             numInstructionsAllocated = numInstructionsAllocated << 1;
-            instructionsSize = BYTES_PER_INSTRUCTIONS * numInstructionsAllocated;
-            ByteBuffer newInstructions = ByteBuffer.allocate(instructionsSize);
-            instruction.flip(); // limit ← position、 position ← 0
+            ByteBuffer newInstructions = ByteBuffer.allocate(BYTES_PER_INSTRUCTIONS * numInstructionsAllocated);
+            instruction.flip(); // limit ← position, position ← 0
             newInstructions.put(instruction);
             instruction = newInstructions;
         }
     }
 
     public void addInstructions(List<Instruction> instructions) {
-
         for (Instruction i : instructions) {
             addInstruction(i);
         }
     }
 
-    public List<Instruction> debugInstructions() {
+    public List<Instruction> dumpInstructions() {
         List<Instruction> instructions = new ArrayList<>();
-        int pc = 0;
-//        int end = this.instruction.position() / Program.BYTES_PER_INSTRUCTIONS - 1;
-        int end = this.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1;
-//        int end = endOfTheProgram - 1;
-        while (pc <= end) {
+        int numInstructions = this.getNumInstructions();
+        for (int pc = 0; pc < numInstructions; pc++) {
             instructions.add(this.getInstructionAt(pc));
-            pc++;
         }
         return instructions;
     }
@@ -137,6 +119,10 @@ public class Program {
     public int[] getCacheFirstAddresses() {return this.cacheFirstAddresses;}
 
     public int[] getCacheFirstOutputs() {return this.cacheFirstOutputs;}
+
+    public int getNumInstructions() {
+        return this.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS;
+    }
 
     public void outputProgramToFile() throws IOException {
         ByteBuffer bbuf = this.instruction;
@@ -152,5 +138,24 @@ public class Program {
         wChannel.write(bbuf);
 
         wChannel.close();
+    }
+
+    public void readProgramFromFile(String filename) throws IOException {
+        ByteBuffer bbuf = this.instruction;
+        bbuf.rewind();
+        bbuf.limit(endOfTheProgram);
+//        File file = new File("fstByteBuffer");
+        File file = new File(filename);
+
+        boolean append = false;
+
+//        FileChannel wChannel = new FileOutputStream(file, append).getChannel();
+        FileChannel rChannel = new FileInputStream(file).getChannel();
+//        rChannel.read();
+
+//        bbuf.flip();
+//        wChannel.write(bbuf);
+
+//        wChannel.close();
     }
 }

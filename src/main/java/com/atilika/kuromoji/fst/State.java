@@ -5,11 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class State {
-    // Two types of strings;
-    // 1. Transition string,
-    // 2. Output string
-    ArrayList<Arc> arcs; // possible arcs given a transition string
-    boolean isFinal = false;
+    ArrayList<Arc> arcs;
+    private boolean isFinal = false;
     boolean visited; //for visualization purpose
     private int targetJumpAddress = -1;
 
@@ -70,6 +67,10 @@ public class State {
         this.isFinal = true;
     }
 
+    public void initFinal() { this.isFinal = false; }
+
+    public boolean getIsFinal() { return this.isFinal; }
+
     public Arc findArc(char transition) {
         // linear search
         for (Arc arc : arcs) {
@@ -89,7 +90,11 @@ public class State {
         State state = (State) o;
 
         if (isFinal != state.isFinal) return false;
-        if (arcs != null ? !arcs.equals(state.arcs) : state.arcs != null) return false;
+        if (arcs != null) {
+            if (!arcs.equals(state.arcs)) return false;
+        } else {
+            if (state.arcs != null) return false;
+        }
 
         return true;
     }

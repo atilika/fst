@@ -43,7 +43,11 @@ public class Arc {
 
         if (label != arc.label) return false;
         if (output != arc.output) return false;
-        if (destination != null ? !destination.equals(arc.destination) : arc.destination != null) return false;
+        if (destination != null) {
+            if (!destination.equals(arc.destination)) return false;
+        } else {
+            if (arc.destination != null) return false;
+        }
 
         return true;
     }

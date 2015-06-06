@@ -11,10 +11,10 @@ public class FSTFormatterTest {
 //        String inputValues[] = {"さかな", "寿", "寿司"};
 //        int outputValues[] = {0, 1, 2};
 
-        FST fst = new FST();
-        fst.createDictionary(inputValues, outputValues);
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(inputValues, outputValues);
 
         FSTFormatter fstFormatter = new FSTFormatter();
-        fstFormatter.format(fst, "LinearSearchFiniteStateTransducerOutput.txt");
+        fstFormatter.format(fstBuilder, "LinearSearchFiniteStateTransducerOutput.txt");
     }
 }

@@ -3,9 +3,14 @@ package com.atilika.kuromoji.fst.vm;
 public class VirtualMachine {
 
     private int pc;
+    private boolean useCache;
 
     public VirtualMachine() {
-        pc = 0;
+        this.useCache = true;
+    }
+
+    public VirtualMachine(boolean useCache) {
+        this.useCache = useCache;
     }
 
     public int run(Program program, String input) {
@@ -22,7 +27,7 @@ public class VirtualMachine {
         while (!done) {
 
             // Referring to the cache
-            if (isFirstArc && input.charAt(position) < program.getCacheFirstAddresses().length) {
+            if (useCache && isFirstArc && input.charAt(position) < program.getCacheFirstAddresses().length) {
 
                 if (program.getCacheFirstAddresses()[input.charAt(position)] == -1) {
                     accumulator = -1;
@@ -112,5 +117,4 @@ public class VirtualMachine {
         return accumulator;
 
     }
-
 }

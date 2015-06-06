@@ -7,10 +7,10 @@ import java.util.ArrayList;
 public class FSTFormatter {
     private final static String FONT_NAME = "Helvetica";
 
-    public String format(FST fst, String outFileName) {
+    public String format(FSTBuilder fstBuilder, String outFileName) {
         StringBuilder sb = new StringBuilder();
         sb.append(formatHeader());
-        sb.append(formatHashedNodes(fst));
+        sb.append(formatHashedNodes(fstBuilder));
         sb.append(formatTrailer());
 
         try {
@@ -42,12 +42,12 @@ public class FSTFormatter {
         return "}";
     }
 
-    private String formatHashedNodes(FST fst) {
+    private String formatHashedNodes(FSTBuilder fstBuilder) {
         StringBuilder sb = new StringBuilder();
-        sb.append(formatState(fst.getStartState())); // format the start state
+        sb.append(formatState(fstBuilder.getStartState())); // format the start state
 
         ArrayList<State> stateArrayList = new ArrayList<State>();
-        stateArrayList.add(fst.getStartState());
+        stateArrayList.add(fstBuilder.getStartState());
 
         while (!stateArrayList.isEmpty()) {
             State state = stateArrayList.get(0);
@@ -60,7 +60,7 @@ public class FSTFormatter {
                 State toState = arc.getDestination();
                 stateArrayList.add(toState);
 
-                if (toState.isFinal) {
+                if (toState.getIsFinal()) {
                     sb.append(formatFinalState(toState));
                 }
                 else {

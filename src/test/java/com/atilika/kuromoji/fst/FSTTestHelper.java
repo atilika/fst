@@ -27,15 +27,15 @@ public class FSTTestHelper {
     }
 
 
-    public FST readIncremental(String resource) throws IOException {
+    public FSTBuilder readIncremental(String resource) throws IOException {
         InputStream is = getResource(resource);
-        FST fst = new FST();
+        FSTBuilder fstBuilder = new FSTBuilder();
         FSTTestHelper fstTestHelper = new FSTTestHelper();
-        fst.MAX_WORD_LENGTH = fstTestHelper.getMaxWordLength(getResource(resource));
+        fstBuilder.MAX_WORD_LENGTH = fstTestHelper.getMaxWordLength(getResource(resource));
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        fst.createDictionaryIncremental(reader);
+        fstBuilder.createDictionaryIncremental(reader);
 
-        return fst;
+        return fstBuilder;
     }
 
     private InputStream getResource(String s) {
