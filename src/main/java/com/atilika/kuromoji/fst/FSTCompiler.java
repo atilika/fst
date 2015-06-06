@@ -3,8 +3,6 @@ package com.atilika.kuromoji.fst;
 import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 
-import java.util.*;
-
 public class FSTCompiler {
 
     public Program program;
@@ -49,7 +47,7 @@ public class FSTCompiler {
     private void cacheArcs(Arc b, State state) {
         program.cacheFirstAddresses[b.getLabel()] = state.getTargetJumpAddress();
         program.cacheFirstOutputs[b.getLabel()] = b.getOutput();
-        program.cacheFirstIsAccept[b.getLabel()] = state.getIsFinal();
+        program.cacheFirstIsAccept[b.getLabel()] = state.isFinal();
     }
 
     /**
@@ -71,7 +69,7 @@ public class FSTCompiler {
     }
 
     private void compileArcToInstruction(Arc d) {
-        if (d.getDestination().getIsFinal()) {
+        if (d.getDestination().isFinal()) {
             program.addInstructionMatchOrAccept(d.getLabel(), d.getDestination().getTargetJumpAddress(), d.getOutput());
         } else {
             program.addInstructionMatch(d.getLabel(), d.getDestination().getTargetJumpAddress(), d.getOutput());

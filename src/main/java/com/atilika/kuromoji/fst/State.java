@@ -69,7 +69,7 @@ public class State {
 
     public void initFinal() { this.isFinal = false; }
 
-    public boolean getIsFinal() { return this.isFinal; }
+    public boolean isFinal() { return this.isFinal; }
 
     public Arc findArc(char transition) {
         // linear search

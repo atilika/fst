@@ -60,7 +60,7 @@ public class FSTFormatter {
                 State toState = arc.getDestination();
                 stateArrayList.add(toState);
 
-                if (toState.getIsFinal()) {
+                if (toState.isFinal()) {
                     sb.append(formatFinalState(toState));
                 }
                 else {
