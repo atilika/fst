@@ -67,17 +67,16 @@ public class VirtualMachineTest {
 
         List<Instruction> instructions = program.dumpInstructions();
 
-        Instruction storedMatchInstruction = program.getInstructionAt(3);
-        // +1 because byte size is stored as the first instruction
+        Instruction storedMatchInstruction = program.getInstructionAt(2);
 
         assertEquals(storedMatchInstruction.arg1, instructionMatch.arg1);
         assertEquals(storedMatchInstruction.arg2, instructionMatch.arg2);
         assertEquals(storedMatchInstruction.arg3, instructionMatch.arg3);
 
-        Instruction storedAcceptInstruction = program.getInstructionAt(1);
+        Instruction storedAcceptInstruction = program.getInstructionAt(0);
         assertEquals(storedAcceptInstruction.toString(), instructionAccept.toString());
 
-        Instruction storedFailInstruction = program.getInstructionAt(2);
+        Instruction storedFailInstruction = program.getInstructionAt(1);
         assertEquals(storedFailInstruction.toString(), instructionFail.toString());
     }
 }
