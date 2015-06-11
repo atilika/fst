@@ -303,28 +303,6 @@ public class FSTCompilerTest {
         VirtualMachine vm = new VirtualMachine();
         Program program = fstBuilder.fstCompiler.getProgram();
 
-        int wordIDExpected = 1;
-
-        // Read all words
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(getResource(resource), "UTF-8"));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // Remove comments
-            line = line.replaceAll("#.*$", "");
-
-            // Skip empty lines or comment lines
-            if (line.trim().length() == 0) {
-                continue;
-            }
-            int wordID = vm.run(program, line);
-            assertEquals(wordIDExpected, wordID);
-            wordIDExpected++;
-        }
-        reader.close();
-    }
-
-    private InputStream getResource(String s) {
-        return this.getClass().getClassLoader().getResourceAsStream(s);
+        fstTestHelper.checkOutputWordByWord(resource, program, vm);
     }
 }

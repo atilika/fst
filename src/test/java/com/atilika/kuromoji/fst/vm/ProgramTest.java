@@ -5,6 +5,7 @@ import com.atilika.kuromoji.fst.FSTTestHelper;
 import org.junit.Test;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -27,28 +28,6 @@ public class ProgramTest {
 
         VirtualMachine vm = new VirtualMachine(false);
 
-        int wordIDExpected = 1;
-
-        // TODO: Make this a method in FSTTestHelper
-        BufferedReader reader = new BufferedReader(
-            new InputStreamReader(getResource(resource), "UTF-8"));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // Remove comments
-            line = line.replaceAll("#.*$", "");
-
-            // Skip empty lines or comment lines
-            if (line.trim().length() == 0) {
-                continue;
-            }
-            int wordID = vm.run(program, line);
-            assertEquals(wordIDExpected, wordID);
-            wordIDExpected++;
-        }
-        reader.close();
-    }
-
-    private InputStream getResource(String s) {
-        return this.getClass().getClassLoader().getResourceAsStream(s);
+        fstTestHelper.checkOutputWordByWord(resource, program, vm);
     }
 }
