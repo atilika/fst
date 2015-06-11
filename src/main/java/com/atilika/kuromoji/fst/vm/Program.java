@@ -2,9 +2,7 @@ package com.atilika.kuromoji.fst.vm;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,8 +17,7 @@ public class Program {
     public final static int BYTES_PER_INSTRUCTIONS = 11;
 
     int endOfTheProgram; // place of the end of the byte buffer;
-//    int numInstructionsAllocated = 100000; // counting the first 4 bytes as one psuedo instruction
-    int numInstructionsAllocated = 10; // counting the first 4 bytes as one psuedo instruction
+    int numInstructionsAllocated = 100000; // counting the first 4 bytes as one psuedo instruction
     public ByteBuffer instruction = ByteBuffer.allocate(BYTES_PER_INSTRUCTIONS * numInstructionsAllocated); // init
 
     public static final int CACHED_CHAR_RANGE = 1 << 16; // 2bytes, range of whole char type.
@@ -33,13 +30,6 @@ public class Program {
         Arrays.fill(this.cacheFirstAddresses, -1);
         this.cacheFirstOutputs = new int[CACHED_CHAR_RANGE];
         this.cacheFirstIsAccept = new boolean[CACHED_CHAR_RANGE];
-
-        instruction.putInt(0); // putting the size of bytebuffer in the end.
-        instruction.putInt(0); // putting the size of bytebuffer in the end.
-        instruction.putChar(' ');
-        instruction.put((byte) 0);
-        endOfTheProgram += BYTES_PER_INSTRUCTIONS;
-        // 11 bytes
     }
 
 
@@ -118,7 +108,6 @@ public class Program {
     public List<Instruction> dumpInstructions() {
         List<Instruction> instructions = new ArrayList<>();
         int numInstructions = this.getNumInstructions();
-//        for (int pc = 0; pc < numInstructions; pc++) {
         for (int pc = 0; pc < numInstructions; pc++) {
             instructions.add(this.getInstructionAt(pc));
         }
@@ -138,17 +127,15 @@ public class Program {
         bbuf.rewind();
         File file = new File("fstByteBuffer");
 
-        boolean append = false;
-
-        bbuf.putInt(endOfTheProgram); // putting the buffer size
         bbuf.rewind();
         bbuf.limit(endOfTheProgram);
 
-        FileChannel wChannel = new FileOutputStream(file, append).getChannel();
+        DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+        dos.writeInt(endOfTheProgram);
 
-//        bbuf.flip();
+        // Appeding the whole bytebuffer to the end of the file
+        WritableByteChannel wChannel = Channels.newChannel(dos);
         wChannel.write(bbuf);
-
         wChannel.close();
     }
 
@@ -156,31 +143,14 @@ public class Program {
         String filename = "fstbytebuffer";
         File file = new File(filename);
 
-//        rChannel.read(bbuf); // Reading bytes from one file
-
-        DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        DataInputStream dis = new DataInputStream(new FileInputStream(file));
         int instructionSize = dis.readInt();    // Read size of baseArr and checkArr
-        dis.readByte(); // moving pos
-        dis.readChar();
-        dis.readInt();
         ByteBuffer bbuf = ByteBuffer.allocate(instructionSize);
-        // padding because the Instructions are stored under the assumption that the first address is used
-        bbuf.put((byte)0);
-        bbuf.putChar(' ');
-        bbuf.putInt(0);
-        bbuf.putInt(0);
 
-
+        // Reading the rest of the bytes
         ReadableByteChannel rChannel = Channels.newChannel(dis);
-//        ReadableByteChannel rChannel = new FileInputStream(file).getChannel();
         rChannel.read(bbuf); // TODO: testing
         this.instruction = bbuf;
-
-
-//        rChannel.read();
-
-//        bbuf.flip();
-//        wChannel.write(bbuf);
 
         rChannel.close();
     }

@@ -5,7 +5,7 @@ import com.atilika.kuromoji.fst.vm.Program;
 
 public class FSTCompiler {
 
-    private static final int ADDRESS_FAIL = 1; // Address 0 stores the information about the buffer size
+    private static final int ADDRESS_FAIL = 0; // Address 0 stores the information about the buffer size
 
     public Program program;
 
@@ -35,7 +35,7 @@ public class FSTCompiler {
 
         if (isStartState && b.getLabel() < program.cacheFirstAddresses.length) {
             // making states for the arcs outgoing from starting state. Not necessary since cache is enabled.
-            program.addInstructionFail();
+//            program.addInstructionFail();
             compileArcToInstruction(b);
             cacheArcs(b, state);
         }
@@ -84,6 +84,8 @@ public class FSTCompiler {
      * @param state
      */
     public void compileStartingState(State state) {
+        program.addInstructionFail();
+        // TODO: Probably better to create a separate method for compiling arcs outgoing from starting state.
         for (Arc arc : state.arcs) {
             compileArc(arc, true);
         }

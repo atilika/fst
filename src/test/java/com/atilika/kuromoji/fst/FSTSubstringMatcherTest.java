@@ -67,8 +67,8 @@ public class FSTSubstringMatcherTest {
 //        String resource = "ipadic-allwords_uniqHead5000.csv";
 //        String resource = "ipadic-allwords_uniqHead100000.csv";
 //        String resource = "ipadic-allwords_uniqHead200000.csv";
-//        String resource = "ipadic-allwords_uniq_sorted.csv";
-        String resource = "jawikititles.txt";
+        String resource = "ipadic-allwords_uniq_sorted.csv";
+//        String resource = "jawikititles.txt";
 //        String resource = "jawikititlesHead1000000.txt";
 
         testJAWikipediaIncremental(resource);
@@ -79,12 +79,13 @@ public class FSTSubstringMatcherTest {
         FSTTestHelper fstTestHelper = new FSTTestHelper();
         FSTBuilder fstBuilder = fstTestHelper.readIncremental(resource);
 
+//        VirtualMachine vm = new VirtualMachine(false);
         VirtualMachine vm = new VirtualMachine();
         Program program = fstBuilder.fstCompiler.getProgram();
 
-        program.outputProgramToFile(); // outputting bytebuffer to a file
-        program.readProgramFromFile();
-//         List<Instruction> instructions = program.dumpInstructions();
+//        program.outputProgramToFile(); // outputting bytebuffer to a file
+//        program.readProgramFromFile();
+//        List<Instruction> instructions = program.dumpInstructions();
 
 
 //        FSTFormatter fstFormatter = new FSTFormatter();
@@ -131,6 +132,7 @@ public class FSTSubstringMatcherTest {
     private InputStream getResource(String s) {
         return this.getClass().getClassLoader().getResourceAsStream(s);
     }
+
 
     private List<String> readInFile() throws IOException {
 
