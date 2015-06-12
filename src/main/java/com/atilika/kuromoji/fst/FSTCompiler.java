@@ -5,7 +5,7 @@ import com.atilika.kuromoji.fst.vm.Program;
 
 public class FSTCompiler {
 
-    private static final int ADDRESS_FAIL = 0; // Address 0 stores the information about the buffer size
+    private static final int ADDRESS_FAIL = 0;
 
     public Program program;
 
@@ -16,10 +16,9 @@ public class FSTCompiler {
     /**
      * Assigning an target jump address to Arc b and make corresponding Instruction.
      *
-     * @param b
+     * @param state
      */
-    public void compileArc(Arc b, boolean isStartState) {
-        State state = b.getDestination();
+    public void compileState(State state) {
         if (state.arcs.size() == 0) {
             // an arc which points to dead end accepting state
             state.setTargetJumpAddress(ADDRESS_FAIL);// assuming dead-end accepting state is always at the address 0
@@ -32,12 +31,17 @@ public class FSTCompiler {
                 state.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
             }
         }
+    }
 
-        if (isStartState && b.getLabel() < program.cacheFirstAddresses.length) {
-            // making states for the arcs outgoing from starting state. Not necessary since cache is enabled.
-//            program.addInstructionFail();
+    /**
+     * Make an instruction for an arc and cache it
+     *
+     * @param b
+     */
+    public void compileArcsFromStartingState(Arc b) {
+        if (b.getLabel() < program.cacheFirstAddresses.length) {
             compileArcToInstruction(b);
-            cacheArcs(b, state);
+            cacheArcs(b, b.getDestination());
         }
     }
 
@@ -85,9 +89,8 @@ public class FSTCompiler {
      */
     public void compileStartingState(State state) {
         program.addInstructionFail();
-        // TODO: Probably better to create a separate method for compiling arcs outgoing from starting state.
         for (Arc arc : state.arcs) {
-            compileArc(arc, true);
+            compileArcsFromStartingState(arc);
         }
     }
 
