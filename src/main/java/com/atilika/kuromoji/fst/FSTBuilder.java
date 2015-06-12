@@ -147,8 +147,8 @@ public class FSTBuilder {
         char previousWordChar = previousWord.charAt(i - 1);
         int output = state.findArc(previousWordChar).getOutput();
         state.arcs.remove(state.findArc(previousWordChar));
-        Arc arcToFrozenArc = state.setArc(previousWordChar, output, findEquivalentState(tempStates[i]));
-        fstCompiler.compileArc(arcToFrozenArc, false); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
+        Arc arcToFrozenState = state.setArc(previousWordChar, output, findEquivalentState(tempStates[i]));
+        fstCompiler.compileState(arcToFrozenState.getDestination()); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
     }
 
     /**
@@ -255,9 +255,5 @@ public class FSTBuilder {
     private void clearState(State state) {
         state.arcs = new ArrayList<>();
         state.initFinal();
-    }
-
-    public HashMap<Integer, List<State>> getStatesDictionary() {
-        return this.statesDictionary;
     }
 }

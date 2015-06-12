@@ -6,6 +6,7 @@ import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -63,6 +64,8 @@ public class VirtualMachineTest {
 //        program.addInstruction(instructionAccept);
 //        program.addInstruction(instructionFail);
 //        program.addInstruction(instructionMatch);
+
+        List<Instruction> instructions = program.dumpInstructions();
 
         Instruction storedMatchInstruction = program.getInstructionAt(2);
 

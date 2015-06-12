@@ -89,13 +89,6 @@ public class FSTBuilderTest {
         FSTTestHelper fstTestHelper = new FSTTestHelper();
         FSTBuilder fstBuilder = fstTestHelper.readIncremental(resource);
 
-        for (List<State> listOfStates : fstBuilder.getStatesDictionary().values()) {
-            if (listOfStates.size() == 2) {
-                System.out.println();
-            }
-//            assertEquals(1, listOfStates.size());
-        }
-
         int wordIDExpected = 1;
 
         // Read all words

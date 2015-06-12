@@ -66,8 +66,8 @@ public class FSTSubstringMatcherTest {
 //        String resource = "ipadic-allwords_uniqHead5000.csv";
 //        String resource = "ipadic-allwords_uniqHead100000.csv";
 //        String resource = "ipadic-allwords_uniqHead200000.csv";
-//        String resource = "ipadic-allwords_uniq_sorted.csv";
-        String resource = "jawikititles.txt";
+        String resource = "ipadic-allwords_uniq_sorted.csv";
+//        String resource = "jawikititles.txt";
 //        String resource = "jawikititlesHead1000000.txt";
 
         testJAWikipediaIncremental(resource);
@@ -78,38 +78,21 @@ public class FSTSubstringMatcherTest {
         FSTTestHelper fstTestHelper = new FSTTestHelper();
         FSTBuilder fstBuilder = fstTestHelper.readIncremental(resource);
 
+//        VirtualMachine vm = new VirtualMachine(false);
         VirtualMachine vm = new VirtualMachine();
         Program program = fstBuilder.fstCompiler.getProgram();
+
+//        program.outputProgramToFile(); // outputting bytebuffer to a file
+//        program.readProgramFromFile();
+//        List<Instruction> instructions = program.dumpInstructions();
+
 
 //        FSTFormatter fstFormatter = new FSTFormatter();
 //        fstFormatter.format(fst, "ipadic-allwords_uniq_sorted_Head1070_tail65.txt");
 
-        int wordIDExpected = 1;
+        fstTestHelper.checkOutputWordByWord(resource, program, vm);
 
-        // Read all words
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(getResource(resource), "UTF-8"));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // Remove comments
-            line = line.replaceAll("#.*$", "");
-
-            // Skip empty lines or comment lines
-            if (line.trim().length() == 0) {
-                continue;
-            }
-//            assertEquals(wordIDExpected, fst.transduce(line));
-
-            int wordID = vm.run(program, line);
-            assertEquals(wordIDExpected, wordID);
-            wordIDExpected++;
-        }
-        reader.close();
-
-//        List<Instruction> instructions = program.dumpInstructions();
-        program.outputProgramToFile(); // outputting bytebuffer to a file
-
-        List<String> sentences = readInFile();
+        List<String> sentences = readSampleWikipediaArticle();
 
         long start = System.currentTimeMillis();
 
@@ -127,7 +110,8 @@ public class FSTSubstringMatcherTest {
         return this.getClass().getClassLoader().getResourceAsStream(s);
     }
 
-    private List<String> readInFile() throws IOException {
+
+    private List<String> readSampleWikipediaArticle() throws IOException {
 
         List<String> sentences = new ArrayList<>();
 
