@@ -51,10 +51,6 @@ public class Program {
         return i;
     }
 
-//    public byte getOpcodeAt(int pc) {
-//        return instruction.get();
-//    }
-
     /**
      * Add an instruction to Bytebuffer. Doubling the size of buffer when the current size is not enough.
      *
@@ -122,10 +118,16 @@ public class Program {
         return this.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS;
     }
 
-    public void outputProgramToFile() throws IOException {
+    /**
+     * Output the stored bytebuffer FST as a file
+     *
+     * @param fileName
+     * @throws IOException
+     */
+    public void outputProgramToFile(String fileName) throws IOException {
         ByteBuffer bbuf = this.instruction;
         bbuf.rewind();
-        File file = new File("fstByteBuffer");
+        File file = new File(fileName);
 
         bbuf.rewind();
         bbuf.limit(endOfTheProgram);
@@ -139,19 +141,45 @@ public class Program {
         wChannel.close();
     }
 
-    public void readProgramFromFile() throws IOException {
-        String filename = "fstbytebuffer";
+    /**
+     * Read saved FST from a file
+     *
+     * @param filename
+     * @throws IOException
+     */
+    public void readProgramFromFile(String filename) throws IOException {
         File file = new File(filename);
 
         DataInputStream dis = new DataInputStream(new FileInputStream(file));
-        int instructionSize = dis.readInt();    // Read size of baseArr and checkArr
+        int instructionSize = dis.readInt();    // Read size of bytebuffer
         ByteBuffer bbuf = ByteBuffer.allocate(instructionSize);
 
         // Reading the rest of the bytes
         ReadableByteChannel rChannel = Channels.newChannel(dis);
-        rChannel.read(bbuf); // TODO: testing
+        rChannel.read(bbuf);
         this.instruction = bbuf;
+        this.endOfTheProgram = instructionSize;
 
         rChannel.close();
+
+        storeCache();
+    }
+
+    /**
+     * Cache outgoing arcs from the starting state
+     */
+    private void storeCache() {
+        int pc = this.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1;
+        Instruction i = new Instruction();
+
+        // Retrieving through the arcs from the starting state
+        while (i.opcode != Program.FAIL) {
+            i = this.getInstructionAt(pc);
+            int indice = i.arg1;
+            this.cacheFirstAddresses[indice] = i.arg2;
+            this.cacheFirstOutputs[indice] = i.arg3;
+            this.cacheFirstIsAccept[indice] = i.opcode == Program.ACCEPT_OR_MATCH;
+            pc--;
+        }
     }
 }
