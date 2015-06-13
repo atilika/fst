@@ -41,19 +41,7 @@ public class FSTCompiler {
     public void compileArcsFromStartingState(Arc b) {
         if (b.getLabel() < program.cacheFirstAddresses.length) {
             compileArcToInstruction(b);
-            cacheArcs(b, b.getDestination());
         }
-    }
-
-    /**
-     * Cache the outgoing arcs from the starting state
-     * @param b
-     * @param state
-     */
-    private void cacheArcs(Arc b, State state) {
-        program.cacheFirstAddresses[b.getLabel()] = state.getTargetJumpAddress();
-        program.cacheFirstOutputs[b.getLabel()] = b.getOutput();
-        program.cacheFirstIsAccept[b.getLabel()] = state.isFinal();
     }
 
     /**

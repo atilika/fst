@@ -163,6 +163,7 @@ public class FSTBuilder {
         }
         fstCompiler.compileStartingState(tempStates[0]); // For FST Compiler, caching
         fstCompiler.program.instruction.flip(); // storing limit as the limit of the bytebuffer
+        fstCompiler.program.storeCache(); // Should come after the filp. Else the limit will be the end of first arcs.
         findEquivalentState(tempStates[0]); // not necessary when compiling is enabled
     }
 

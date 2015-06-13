@@ -168,7 +168,7 @@ public class Program {
     /**
      * Cache outgoing arcs from the starting state
      */
-    private void storeCache() {
+    public void storeCache() {
         int pc = this.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1;
         Instruction i = new Instruction();
 
