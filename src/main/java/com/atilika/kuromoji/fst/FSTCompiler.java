@@ -26,9 +26,9 @@ public class FSTCompiler {
         else {
             // check whether equivalent destination state is already frozen
             if (state.getTargetJumpAddress() == -1) {
-                // First arc is regarded as a state
+                // The last arc is regarded as a state because currently, VM is running the program backwards.
                 int newAddress = makeNewInstructionsForFreezingState(state);
-                state.setTargetJumpAddress(newAddress); // the last arc since it is run in reverse order
+                state.setTargetJumpAddress(newAddress);
             }
         }
     }

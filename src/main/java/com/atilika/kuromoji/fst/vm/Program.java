@@ -61,7 +61,11 @@ public class Program {
     }
 
     public void addInstruction(byte op, char label, int targetAddress, int output) {
-        doubleBufferSize();
+        int currentSizePlusOneInstruction = (this.getNumInstructions() + 1) * BYTES_PER_INSTRUCTIONS;
+        if (currentSizePlusOneInstruction >= BYTES_PER_INSTRUCTIONS * numInstructionsAllocated) {
+            doubleBufferSize();
+        }
+
         instruction.put(op);
         instruction.putChar(label);
         instruction.putInt(targetAddress);
@@ -83,16 +87,12 @@ public class Program {
     }
 
     private void doubleBufferSize() {
-        int currentSizePlusOneInstruction = (this.getNumInstructions() + 1) * BYTES_PER_INSTRUCTIONS;
-
-        if (currentSizePlusOneInstruction >= BYTES_PER_INSTRUCTIONS * numInstructionsAllocated) {
-            // grow byte array by doubling the size of it.
-            numInstructionsAllocated = numInstructionsAllocated << 1;
-            ByteBuffer newInstructions = ByteBuffer.allocate(BYTES_PER_INSTRUCTIONS * numInstructionsAllocated);
-            instruction.flip(); // limit ← position, position ← 0
-            newInstructions.put(instruction);
-            instruction = newInstructions;
-        }
+        // grow byte array by doubling the size of it.
+        numInstructionsAllocated = numInstructionsAllocated << 1;
+        ByteBuffer newInstructions = ByteBuffer.allocate(BYTES_PER_INSTRUCTIONS * numInstructionsAllocated);
+        instruction.flip(); // limit ← position, position ← 0
+        newInstructions.put(instruction);
+        instruction = newInstructions;
     }
 
     public void addInstructions(List<Instruction> instructions) {
