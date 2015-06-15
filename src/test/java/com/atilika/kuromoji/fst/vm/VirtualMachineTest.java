@@ -1,5 +1,6 @@
-package com.atilika.kuromoji.fst;
+package com.atilika.kuromoji.fst.vm;
 
+import com.atilika.kuromoji.fst.FSTCompiler;
 import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 import com.atilika.kuromoji.fst.vm.VirtualMachine;
@@ -61,9 +62,6 @@ public class VirtualMachineTest {
 
         Program program = new Program();
         program.addInstructions(Arrays.asList(instructionAccept, instructionFail, instructionMatch));
-//        program.addInstruction(instructionAccept);
-//        program.addInstruction(instructionFail);
-//        program.addInstruction(instructionMatch);
 
         List<Instruction> instructions = program.dumpInstructions();
 
