@@ -10,8 +10,7 @@ public class FSTBuilder {
     private HashMap<Integer, List<State>> statesDictionary;
     public FSTCompiler fstCompiler = new FSTCompiler();
 
-    // TODO: Rewrite this...
-    public int MAX_WORD_LENGTH = 100;
+    public int MAX_WORD_LENGTH;
 
     public FSTBuilder() {
         List<State> stateList = new LinkedList<>();
@@ -91,6 +90,7 @@ public class FSTBuilder {
      */
     public void createDictionary(String[] inputWords, int[] outputValues) {
         String previousWord = "";
+        this.MAX_WORD_LENGTH = getMaxWordLength(inputWords);
         State[] tempStates = initializeState(MAX_WORD_LENGTH + 1);
         tempStates[0] = this.getStartState(); // initial state
 
@@ -101,6 +101,14 @@ public class FSTBuilder {
         }
 
         handleLastWord(previousWord, tempStates);
+    }
+
+    private int getMaxWordLength(String[] inputWords) {
+        int maxWordLength = 0;
+        for (int i = 0; i < inputWords.length; i++) {
+            maxWordLength = Math.max(maxWordLength, inputWords[i].length());
+        }
+        return maxWordLength;
     }
 
     private void createDictionaryCommon(String inputWord, String previousWord, State[] tempStates, int currentOutput) {
