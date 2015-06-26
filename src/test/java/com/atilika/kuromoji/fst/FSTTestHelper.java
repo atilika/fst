@@ -31,6 +31,17 @@ public class FSTTestHelper {
         return maxWordLength;
     }
 
+    public Program getProgram(String[] inputValues, int[] outputValues) {
+        FSTBuilder fstBuilder = new FSTBuilder();
+        fstBuilder.createDictionary(inputValues, outputValues);
+
+        for (int i = 0; i < inputValues.length; i++) {
+            assertEquals(outputValues[i], fstBuilder.transduce(inputValues[i]));
+        }
+
+        // Test whether the program is correctly made.
+        return fstBuilder.fstCompiler.getProgram();
+    }
 
     public FSTBuilder readIncremental(String resource) throws IOException {
         InputStream is = getResource(resource);

@@ -2,7 +2,6 @@ package com.atilika.kuromoji.fst.vm;
 
 public class VirtualMachine {
 
-    private int pc;
     private boolean useCache;
 
     public VirtualMachine() {
@@ -14,6 +13,7 @@ public class VirtualMachine {
     }
 
     public int run(Program program, String input) {
+        int pc; // Thread-safe
 
 //        pc = 0;
         pc = program.endOfTheProgram / Program.BYTES_PER_INSTRUCTIONS - 1; // Compiled in a reverse order

@@ -16,5 +16,6 @@ public class FSTFormatterTest {
 
         FSTFormatter fstFormatter = new FSTFormatter();
         fstFormatter.format(fstBuilder, "LinearSearchFiniteStateTransducerOutput.txt");
+//        fstFormatter.format(fstBuilder, "FSTsimpleDescendingOutput.txt");
     }
 }
