@@ -2,6 +2,7 @@ package com.atilika.kuromoji.fst;
 
 import com.atilika.kuromoji.fst.vm.Program;
 import com.atilika.kuromoji.fst.vm.VirtualMachine;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -57,6 +58,7 @@ public class FSTSubstringMatcherTest {
         assertEquals(Arrays.asList(expectedTokens), extractedTokens);
     }
 
+    @Ignore("Enable by providing external dictionary file")
     @Test
     public void testExtractFromWikipediaArticle() throws Exception {
         // Read the dictionary from a file

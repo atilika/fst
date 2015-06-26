@@ -3,6 +3,7 @@ package com.atilika.kuromoji.fst;
 import com.atilika.kuromoji.fst.vm.Instruction;
 import com.atilika.kuromoji.fst.vm.Program;
 import com.atilika.kuromoji.fst.vm.VirtualMachine;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -149,14 +150,14 @@ public class FSTCompilerTest {
 
     }
 
-    //    @Ignore("Enable for testing simple VM-based FST")
+    @Ignore("Enable for testing simple VM-based FST")
     @Test
     public void testJAWikipediaIncremental10Words() throws Exception {
         String resource = "jawikititlesHead10.txt";
         testJAWikipediaIncremental(resource);
     }
 
-    //    @Ignore("Enable for testing simple VM-based FST")
+    @Ignore("Enable for testing simple VM-based FST")
     @Test
     public void testJAWikipediaIncremental100Words() throws Exception {
         String resource = "jawikititlesHead100.txt";

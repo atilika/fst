@@ -2,6 +2,7 @@ package com.atilika.kuromoji.fst.vm;
 
 import com.atilika.kuromoji.fst.FSTBuilder;
 import com.atilika.kuromoji.fst.FSTTestHelper;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -13,6 +14,7 @@ import static org.junit.Assert.*;
 
 public class ProgramTest {
 
+    @Ignore("Enable by providing external dictionary file")
     @Test
     public void testReadProgramFromFile() throws Exception {
 

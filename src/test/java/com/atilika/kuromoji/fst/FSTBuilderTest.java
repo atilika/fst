@@ -76,6 +76,7 @@ public class FSTBuilderTest {
         return fstBuilder;
     }
 
+    @Ignore("Enable for testing simple VM-based FST")
     @Test
     public void testExtractFromWikipediaArticle() throws Exception {
         // Read the dictionary from a file
