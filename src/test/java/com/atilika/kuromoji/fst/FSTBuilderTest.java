@@ -21,7 +21,7 @@ public class FSTBuilderTest {
         int outputValues[] = {1, 2, 3, 4, 20, 42, 43};
 
 
-        FSTBuilder fstBuilder = new FSTBuilder();
+        FSTBuilder fstBuilder = new FSTBuilder("pydata".length());
         fstBuilder.createDictionary(inputValues, outputValues);
 
         for (int i = 0; i < inputValues.length; i++) {
@@ -54,7 +54,7 @@ public class FSTBuilderTest {
             line = line.replaceAll("#.*$", "");
 
             // Skip empty lines or comment lines
-            if (line.trim().length() == 0) {
+            if (line.trim().isEmpty()) {
                 continue;
             }
             titles.add(line.trim());
@@ -69,8 +69,7 @@ public class FSTBuilderTest {
             outputValues[i] = i;
         }
 
-        FSTBuilder fstBuilder = new FSTBuilder();
-        fstBuilder.MAX_WORD_LENGTH = maxWordLength;
+        FSTBuilder fstBuilder = new FSTBuilder(maxWordLength);
         fstBuilder.createDictionary(inputValues, outputValues);
 
         return fstBuilder;

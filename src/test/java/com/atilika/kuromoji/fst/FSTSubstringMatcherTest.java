@@ -28,7 +28,7 @@ public class FSTSubstringMatcherTest {
         fstBuilder.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = fstBuilder.fstCompiler.getProgram();
+        Program program = fstBuilder.getFstCompiler().getProgram();
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
@@ -50,7 +50,7 @@ public class FSTSubstringMatcherTest {
         fstBuilder.createDictionary(tokens, outputValues);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = fstBuilder.fstCompiler.getProgram();
+        Program program = fstBuilder.getFstCompiler().getProgram();
 
         FSTSubstringMatcher fstSubstringMatcher = new FSTSubstringMatcher();
         List extractedTokens = fstSubstringMatcher.matchAllSubstrings(sampleSentence, vm, program);
@@ -82,7 +82,7 @@ public class FSTSubstringMatcherTest {
 
 //        VirtualMachine vm = new VirtualMachine(false);
         VirtualMachine vm = new VirtualMachine();
-        Program program = fstBuilder.fstCompiler.getProgram();
+        Program program = fstBuilder.getFstCompiler().getProgram();
 
 //        program.outputProgramToFile(); // outputting bytebuffer to a file
 //        program.readProgramFromFile();

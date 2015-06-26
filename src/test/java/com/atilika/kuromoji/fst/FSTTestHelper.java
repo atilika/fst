@@ -40,17 +40,23 @@ public class FSTTestHelper {
         }
 
         // Test whether the program is correctly made.
-        return fstBuilder.fstCompiler.getProgram();
+        return fstBuilder.getFstCompiler().getProgram();
     }
 
     public FSTBuilder readIncremental(String resource) throws IOException {
+
+//        return new FSTBuilder(resource);
+
         InputStream is = getResource(resource);
-        FSTBuilder fstBuilder = new FSTBuilder();
+
         FSTTestHelper fstTestHelper = new FSTTestHelper();
-        fstBuilder.MAX_WORD_LENGTH = fstTestHelper.getMaxWordLength(getResource(resource));
+        int maxWordLength = fstTestHelper.getMaxWordLength(getResource(resource));
+
+        FSTBuilder fstBuilder = new FSTBuilder(maxWordLength);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         fstBuilder.createDictionaryIncremental(reader);
 
+//        fstBuilder = new FSTBuilder(reader);
         return fstBuilder;
     }
 

@@ -1,18 +1,29 @@
 package com.atilika.kuromoji.fst;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.*;
+import java.io.LineNumberReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class FSTBuilder {
     // Note that FST only allows the presorted dictionaries as input.
 
-    private HashMap<Integer, List<State>> statesDictionary;
-    public FSTCompiler fstCompiler = new FSTCompiler();
+    private Map<Integer, List<State>> statesDictionary;
 
-    public int MAX_WORD_LENGTH;
+    private FSTCompiler fstCompiler = new FSTCompiler();
+
+    private int maxWordLength;
 
     public FSTBuilder() {
+        this(0);
+    }
+
+    public FSTBuilder(int maxWordLength) {
+        this.maxWordLength = maxWordLength;
         List<State> stateList = new LinkedList<>();
         stateList.add(new State());
         this.statesDictionary = new HashMap<>();
@@ -58,15 +69,16 @@ public class FSTBuilder {
      * @param reader
      * @throws IOException
      */
-    public void createDictionaryIncremental(BufferedReader reader) throws IOException {
+    public void createDictionaryIncremental(Reader reader) throws IOException {
+        LineNumberReader lineNumberReader = new LineNumberReader(reader);
         String previousWord = "";
-        State[] tempStates = initializeState(MAX_WORD_LENGTH + 1);
+        State[] tempStates = initializeState(maxWordLength + 1);
         tempStates[0] = this.getStartState(); // initial state
 
         int outputValue = 1; // Initialize output value
 
         String line;
-        while ((line = reader.readLine()) != null) {
+        while ((line = lineNumberReader.readLine()) != null) {
             line = line.replaceAll("#.*$", "");
 
             if (line.trim().isEmpty()) {
@@ -90,8 +102,8 @@ public class FSTBuilder {
      */
     public void createDictionary(String[] inputWords, int[] outputValues) {
         String previousWord = "";
-        this.MAX_WORD_LENGTH = getMaxWordLength(inputWords);
-        State[] tempStates = initializeState(MAX_WORD_LENGTH + 1);
+        this.maxWordLength = getMaxWordLength(inputWords);
+        State[] tempStates = initializeState(maxWordLength + 1);
         tempStates[0] = this.getStartState(); // initial state
 
         for (int inputWordIdx = 0; inputWordIdx < inputWords.length; inputWordIdx++) {
@@ -198,7 +210,7 @@ public class FSTBuilder {
      */
     private int commonPrefixIndice(String prevWord, String currentWord) {
         int i = 0;
-//        System.out.println(prevWord);
+
         while (i < prevWord.length() && i < currentWord.length()) {
             if (prevWord.charAt(i) != currentWord.charAt(i)) {
                 break;
@@ -264,5 +276,9 @@ public class FSTBuilder {
     private void clearState(State state) {
         state.arcs = new ArrayList<>();
         state.initFinal();
+    }
+
+    public FSTCompiler getFstCompiler() {
+        return fstCompiler;
     }
 }

@@ -5,13 +5,6 @@ import com.atilika.kuromoji.fst.FSTTestHelper;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import static org.junit.Assert.*;
-
 public class ProgramTest {
 
     @Ignore("Enable by providing external dictionary file")
@@ -24,7 +17,7 @@ public class ProgramTest {
         FSTTestHelper fstTestHelper = new FSTTestHelper();
         FSTBuilder fstBuilder = fstTestHelper.readIncremental(resource);
 
-        Program program = fstBuilder.fstCompiler.getProgram();
+        Program program = fstBuilder.getFstCompiler().getProgram();
         program.outputProgramToFile("fstbytebuffer");
 
 

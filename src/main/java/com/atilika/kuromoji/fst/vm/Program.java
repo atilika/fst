@@ -121,18 +121,21 @@ public class Program {
     /**
      * Output the stored bytebuffer FST as a file
      *
-     * @param fileName
+     * @param filename
      * @throws IOException
      */
-    public void outputProgramToFile(String fileName) throws IOException {
+    public void outputProgramToFile(String filename) throws IOException {
+        outputProgramToStream(new FileOutputStream(filename));
+    }
+
+    public void outputProgramToStream(OutputStream output) throws IOException {
         ByteBuffer bbuf = this.instruction;
         bbuf.rewind();
-        File file = new File(fileName);
 
         bbuf.rewind();
         bbuf.limit(endOfTheProgram);
 
-        DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+        DataOutputStream dos = new DataOutputStream(output);
         dos.writeInt(endOfTheProgram);
 
         // Appeding the whole bytebuffer to the end of the file
@@ -148,9 +151,12 @@ public class Program {
      * @throws IOException
      */
     public void readProgramFromFile(String filename) throws IOException {
-        File file = new File(filename);
+        readProgramFromFile(new FileInputStream(filename));
+    }
 
-        DataInputStream dis = new DataInputStream(new FileInputStream(file));
+    public void readProgramFromFile(InputStream input) throws IOException {
+
+        DataInputStream dis = new DataInputStream(input);
         int instructionSize = dis.readInt();    // Read size of bytebuffer
         ByteBuffer bbuf = ByteBuffer.allocate(instructionSize);
 

@@ -6,10 +6,10 @@ import com.atilika.kuromoji.fst.vm.VirtualMachine;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,7 +39,7 @@ public class FSTCompilerTest {
         FSTBuilder fstBuilder = new FSTBuilder();
         fstBuilder.createDictionary(inputValues, outputValues);
 
-        Program program = fstBuilder.fstCompiler.getProgram();
+        Program program = fstBuilder.getFstCompiler().getProgram();
         List<Instruction> instructionsForDebug = program.dumpInstructions();
 
 //      There should be only one instruction with the label 's' and the output 1
@@ -169,7 +169,7 @@ public class FSTCompilerTest {
         FSTBuilder fstBuilder = fstTestHelper.readIncremental(resource);
 
         VirtualMachine vm = new VirtualMachine();
-        Program program = fstBuilder.fstCompiler.getProgram();
+        Program program = fstBuilder.getFstCompiler().getProgram();
 
         fstTestHelper.checkOutputWordByWord(resource, program, vm);
     }

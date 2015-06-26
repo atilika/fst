@@ -1,8 +1,11 @@
 package com.atilika.kuromoji.fst;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class FSTFormatterTest {
+
+    @Ignore
     @Test
     public void testFormat() throws Exception {
         String inputValues[] = {"cat", "cats", "dog", "dogs", "friday", "friend", "padata"};
