@@ -58,7 +58,7 @@ public class FSTSubstringMatcherTest {
         assertEquals(Arrays.asList(expectedTokens), extractedTokens);
     }
 
-//    @Ignore("Enable by providing external dictionary file")
+    @Ignore("Enable by providing external dictionary file")
     @Test
     public void testExtractFromWikipediaArticle() throws Exception {
         // Read the dictionary from a file
@@ -68,8 +68,8 @@ public class FSTSubstringMatcherTest {
 //        String resource = "ipadic-allwords_uniqHead5000.csv";
 //        String resource = "ipadic-allwords_uniqHead100000.csv";
 //        String resource = "ipadic-allwords_uniqHead200000.csv";
-        String resource = "ipadic-allwords_uniq_sorted.csv";
-//        String resource = "jawikititles.txt";
+//        String resource = "ipadic-allwords_uniq_sorted.csv";
+        String resource = "jawikititles.txt";
 //        String resource = "jawikititlesHead1000000.txt";
 
         testJAWikipediaIncremental(resource);

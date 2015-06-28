@@ -119,6 +119,7 @@ public class FSTBuilder {
             for (int j = tempStates.size(); j <= inputWord.length(); j++) {
                 tempStates.add(new State());
             }
+//            System.out.println("tempStates size is now: " + tempStates.size());
         }
 
         for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
@@ -126,7 +127,7 @@ public class FSTBuilder {
         }
 
         for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
-            clearState(tempStates.get(i));
+            tempStates.set(i, new State()); // clearing and assigning new state
             tempStates.get(i - 1).setArc(inputWord.charAt(i - 1), tempStates.get(i));
         }
         tempStates.get(inputWord.length()).setFinal();
@@ -240,16 +241,6 @@ public class FSTBuilder {
         statesDictionary.put(key, stateList);
 
         return newStateToDic;
-    }
-
-    /**
-     * Initialize the temp states. It clears all transitions and set it to non-final state
-     *
-     * @param state
-     */
-    private void clearState(State state) {
-        state.arcs = new ArrayList<>();
-        state.initFinal();
     }
 
     public FSTCompiler getFstCompiler() {

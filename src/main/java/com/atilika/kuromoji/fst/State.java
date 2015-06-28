@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class State {
-    ArrayList<Arc> arcs;
+    List<Arc> arcs;
     private boolean isFinal = false;
     boolean visited; //for visualization purpose
     private int targetJumpAddress = -1;
@@ -18,7 +18,7 @@ public class State {
      * Copy constructor
      */
     public State(State source) {
-        arcs = source.arcs;
+        this.arcs = source.arcs;
         this.isFinal = source.isFinal;
     }
 
@@ -66,8 +66,6 @@ public class State {
     public void setFinal() {
         this.isFinal = true;
     }
-
-    public void initFinal() { this.isFinal = false; }
 
     public boolean isFinal() { return this.isFinal; }
 
