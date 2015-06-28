@@ -80,12 +80,12 @@ public class FSTBuilder {
                 continue;
             }
             String inputWord = line;
-            createDictionaryCommon(inputWord, previousWord, tempStates, outputValue);
+            createDictionaryCommon(inputWord, previousWord, outputValue);
             previousWord = inputWord;
             outputValue++; // allocate the next wordID
         }
 
-        handleLastWord(previousWord, tempStates);
+        handleLastWord(previousWord);
     }
 
 
@@ -97,20 +97,18 @@ public class FSTBuilder {
      */
     public void createDictionary(String[] inputWords, int[] outputValues) {
         String previousWord = "";
-//        this.maxWordLength = getMaxWordLength(inputWords);
         tempStates.add(this.getStartState()); // initial state
 
         for (int inputWordIdx = 0; inputWordIdx < inputWords.length; inputWordIdx++) {
             String inputWord = inputWords[inputWordIdx];
-            createDictionaryCommon(inputWord, previousWord, tempStates, outputValues[inputWordIdx]);
+            createDictionaryCommon(inputWord, previousWord, outputValues[inputWordIdx]);
             previousWord = inputWord;
         }
 
-        handleLastWord(previousWord, tempStates);
+        handleLastWord(previousWord);
     }
 
-    private void createDictionaryCommon(String inputWord, String previousWord, List<State> tempStates, int currentOutput) {
-        // TODO: Remove tempstates as input of this method and instead use the field of this class
+    private void createDictionaryCommon(String inputWord, String previousWord, int currentOutput) {
 
         int commonPrefixLengthPlusOne = commonPrefixIndice(previousWord, inputWord);
 //        System.out.println(currentOutput);
@@ -124,7 +122,7 @@ public class FSTBuilder {
         }
 
         for (int i = previousWord.length(); i >= commonPrefixLengthPlusOne; i--) {
-            freezeAndPointToNewState(previousWord, tempStates, i);
+            freezeAndPointToNewState(previousWord, i);
         }
 
         for (int i = commonPrefixLengthPlusOne; i <= inputWord.length(); i++) {
@@ -152,10 +150,9 @@ public class FSTBuilder {
     /**
      * Freeze a new state if there is no equivalent state in the states dictionary.
      *  @param previousWord
-     * @param tempStates
      * @param i
      */
-    private void freezeAndPointToNewState(String previousWord, List<State> tempStates, int i) {
+    private void freezeAndPointToNewState(String previousWord, int i) {
         State state = tempStates.get(i - 1);
         char previousWordChar = previousWord.charAt(i - 1);
         int output = state.findArc(previousWordChar).getOutput();
@@ -167,11 +164,10 @@ public class FSTBuilder {
     /**
      * Freezing temp states which represent the last word of the input words
      *  @param previousWord
-     * @param tempStates
      */
-    private void handleLastWord(String previousWord, List<State> tempStates) {
+    private void handleLastWord(String previousWord) {
         for (int i = previousWord.length(); i > 0; i--) {
-            freezeAndPointToNewState(previousWord, tempStates, i);
+            freezeAndPointToNewState(previousWord, i);
         }
         fstCompiler.compileStartingState(tempStates.get(0)); // For FST Compiler, caching
         fstCompiler.program.instruction.flip(); // storing limit as the limit of the bytebuffer
