@@ -22,7 +22,7 @@ public class FSTTest {
         String[] keys = new String[]{"cat", "cats", "dog"};
         int[] values = new int[]{1, 2, 4};
 
-        FSTBuilder builder = new FSTBuilder(4);
+        FSTBuilder builder = new FSTBuilder();
 
         builder.createDictionary(keys, values);
         builder.getFstCompiler().getProgram().outputProgramToStream(

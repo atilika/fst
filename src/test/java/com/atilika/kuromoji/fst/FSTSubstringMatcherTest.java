@@ -58,7 +58,7 @@ public class FSTSubstringMatcherTest {
         assertEquals(Arrays.asList(expectedTokens), extractedTokens);
     }
 
-    @Ignore("Enable by providing external dictionary file")
+//    @Ignore("Enable by providing external dictionary file")
     @Test
     public void testExtractFromWikipediaArticle() throws Exception {
         // Read the dictionary from a file

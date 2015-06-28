@@ -12,25 +12,6 @@ import static org.junit.Assert.assertEquals;
 
 public class FSTTestHelper {
 
-    // The following methods should ideally be included in FST or FSTCompiler class
-    public int getMaxWordLength (InputStream is) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        int maxWordLength = 0;
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // Remove comments
-            line = line.replaceAll("#.*$", "");
-
-            // Skip empty lines or comment lines
-            if (line.trim().length() == 0) {
-                continue;
-            }
-            maxWordLength = Math.max(maxWordLength, line.trim().length());
-        }
-        reader.close();
-        return maxWordLength;
-    }
-
     public Program getProgram(String[] inputValues, int[] outputValues) {
         FSTBuilder fstBuilder = new FSTBuilder();
         fstBuilder.createDictionary(inputValues, outputValues);
@@ -45,18 +26,12 @@ public class FSTTestHelper {
 
     public FSTBuilder readIncremental(String resource) throws IOException {
 
-//        return new FSTBuilder(resource);
-
         InputStream is = getResource(resource);
 
-        FSTTestHelper fstTestHelper = new FSTTestHelper();
-        int maxWordLength = fstTestHelper.getMaxWordLength(getResource(resource));
-
-        FSTBuilder fstBuilder = new FSTBuilder(maxWordLength);
+        FSTBuilder fstBuilder = new FSTBuilder();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         fstBuilder.createDictionaryIncremental(reader);
 
-//        fstBuilder = new FSTBuilder(reader);
         return fstBuilder;
     }
 
