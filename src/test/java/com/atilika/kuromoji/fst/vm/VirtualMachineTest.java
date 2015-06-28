@@ -52,29 +52,4 @@ public class VirtualMachineTest {
 
         assertEquals(1, vm.run(program, "a"));
     }
-
-    @Test
-    public void testAddInstructions() throws Exception {
-        FSTCompiler fstCompiler = new FSTCompiler();
-        Instruction instructionAccept = fstCompiler.createInstructionAccept(0);
-        Instruction instructionFail = fstCompiler.createInstructionFail();
-        Instruction instructionMatch = fstCompiler.createInstructionMatch('a', 1, 1);
-
-        Program program = new Program();
-        program.addInstructions(Arrays.asList(instructionAccept, instructionFail, instructionMatch));
-
-        List<Instruction> instructions = program.dumpInstructions();
-
-        Instruction storedMatchInstruction = program.getInstructionAt(2);
-
-        assertEquals(storedMatchInstruction.arg1, instructionMatch.arg1);
-        assertEquals(storedMatchInstruction.arg2, instructionMatch.arg2);
-        assertEquals(storedMatchInstruction.arg3, instructionMatch.arg3);
-
-        Instruction storedAcceptInstruction = program.getInstructionAt(0);
-        assertEquals(storedAcceptInstruction.toString(), instructionAccept.toString());
-
-        Instruction storedFailInstruction = program.getInstructionAt(1);
-        assertEquals(storedFailInstruction.toString(), instructionFail.toString());
-    }
 }

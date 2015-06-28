@@ -82,37 +82,6 @@ public class FSTCompiler {
         }
     }
 
-    public Instruction createInstructionFail() {
-        Instruction instructionFail = new Instruction();
-        instructionFail.opcode = program.FAIL;
-        return instructionFail;
-    }
-
-    public Instruction createInstructionAccept(int jumpAddress) {
-        Instruction instructionAccept = new Instruction();
-        instructionAccept.opcode = program.ACCEPT;
-        instructionAccept.arg2 = jumpAddress;
-        return instructionAccept;
-    }
-
-    public Instruction createInstructionMatch(char arg1, int jumpAddress, int output) {
-        Instruction instructionMatch = new Instruction();
-        instructionMatch.opcode = program.MATCH;
-        instructionMatch.arg1 = arg1;
-        instructionMatch.arg2 = jumpAddress;
-        instructionMatch.arg3 = output;
-        return instructionMatch;
-    }
-
-//    private Instruction createInstructionMatchOrAccept(char arg1, int jumpAddress, int output) {
-//        Instruction instructionMatch = new Instruction();
-//        instructionMatch.opcode = instructionMatch.ACCEPT_OR_MATCH;
-//        instructionMatch.arg1 = arg1;
-//        instructionMatch.arg2 = jumpAddress;
-//        instructionMatch.arg3 = output;
-//        return instructionMatch;
-//    }
-
     public Program getProgram() {
         return this.program;
     }
