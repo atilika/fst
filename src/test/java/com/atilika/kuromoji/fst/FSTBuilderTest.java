@@ -21,7 +21,7 @@ public class FSTBuilderTest {
         int outputValues[] = {1, 2, 3, 4, 20, 42, 43};
 
 
-        FSTBuilder fstBuilder = new FSTBuilder("pydata".length());
+        FSTBuilder fstBuilder = new FSTBuilder();
         fstBuilder.createDictionary(inputValues, outputValues);
 
         for (int i = 0; i < inputValues.length; i++) {
@@ -69,7 +69,7 @@ public class FSTBuilderTest {
             outputValues[i] = i;
         }
 
-        FSTBuilder fstBuilder = new FSTBuilder(maxWordLength);
+        FSTBuilder fstBuilder = new FSTBuilder();
         fstBuilder.createDictionary(inputValues, outputValues);
 
         return fstBuilder;
