@@ -19,11 +19,13 @@ public class FSTBuilder {
     private List<State> tempStates;
 
     public FSTBuilder() {
-        tempStates = new ArrayList<>();
         List<State> stateList = new LinkedList<>();
         stateList.add(new State());
         this.statesDictionary = new HashMap<>();
         this.statesDictionary.put(0, stateList); // temporary setting the start state
+
+        tempStates = new ArrayList<>();
+        tempStates.add(this.getStartState()); // initial state
     }
 
     /**
@@ -68,7 +70,6 @@ public class FSTBuilder {
     public void createDictionaryIncremental(Reader reader) throws IOException {
         LineNumberReader lineNumberReader = new LineNumberReader(reader);
         String previousWord = "";
-        tempStates.add(this.getStartState()); // initial state
 
         int outputValue = 1; // Initialize output value
 
@@ -97,7 +98,6 @@ public class FSTBuilder {
      */
     public void createDictionary(String[] inputWords, int[] outputValues) {
         String previousWord = "";
-        tempStates.add(this.getStartState()); // initial state
 
         for (int inputWordIdx = 0; inputWordIdx < inputWords.length; inputWordIdx++) {
             String inputWord = inputWords[inputWordIdx];
@@ -173,20 +173,6 @@ public class FSTBuilder {
         fstCompiler.program.instruction.flip(); // storing limit as the limit of the bytebuffer
         fstCompiler.program.storeCache(); // Should come after the filp. Else the limit will be the end of first arcs.
         findEquivalentState(tempStates.get(0)); // not necessary when compiling is enabled
-    }
-
-    /**
-     * Allocate State object to each indice
-     *
-     * @param numStates
-     * @return
-     */
-    private State[] initializeState(int numStates) {
-        State[] retStates = new State[numStates];
-        for (int i = 0; i < numStates; i++) {
-            retStates[i] = new State();
-        }
-        return retStates;
     }
 
     /**
