@@ -110,7 +110,7 @@ public class FSTBuilder {
 
     private void createDictionaryCommon(String inputWord, String previousWord, int currentOutput) {
 
-        int commonPrefixLengthPlusOne = commonPrefixIndice(previousWord, inputWord);
+        int commonPrefixLengthPlusOne = commonPrefixIndice(previousWord, inputWord) + 1;
 //        System.out.println(currentOutput);
 //        We minimize the states from the suffix of the previous word
 
@@ -183,7 +183,8 @@ public class FSTBuilder {
      * @param currentWord
      * @return
      */
-    private int commonPrefixIndice(String prevWord, String currentWord) {
+//    private int commonPrefixIndice(String prevWord, String currentWord) {
+    public int commonPrefixIndice(String prevWord, String currentWord) {
         int i = 0;
 
         while (i < prevWord.length() && i < currentWord.length()) {
@@ -192,7 +193,7 @@ public class FSTBuilder {
             }
             i += 1;
         }
-        return i + 1;
+        return i;
     }
 
     /**
