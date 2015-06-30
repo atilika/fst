@@ -183,8 +183,7 @@ public class FSTBuilder {
      * @param currentWord
      * @return
      */
-//    private int commonPrefixIndice(String prevWord, String currentWord) {
-    public int commonPrefixIndice(String prevWord, String currentWord) {
+    private int commonPrefixIndice(String prevWord, String currentWord) {
         int i = 0;
 
         while (i < prevWord.length() && i < currentWord.length()) {

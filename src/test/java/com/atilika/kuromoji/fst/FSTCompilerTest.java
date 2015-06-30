@@ -47,16 +47,16 @@ public class FSTCompilerTest {
 
         int numInstructionWithTransitionCharS = 0;
         for (Instruction instruction : instructionsForDebug) {
-            if (instruction.arg1 == 's') {
+            if (instruction.getArg1() == 's') {
                 numInstructionWithTransitionCharS++;
             }
-            if (instruction.arg1 == 'g' || instruction.arg1 == 't') {
+            if (instruction.getArg1() == 'g' || instruction.getArg1() == 't') {
                 instructionsToSameState.add(instruction);
             }
         }
         assertEquals(1, numInstructionWithTransitionCharS); // 1, since states are equivalent.
         // pointing to the same Instruction address
-        assertEquals(instructionsToSameState.get(0).arg2, instructionsToSameState.get(1).arg2);
+        assertEquals(instructionsToSameState.get(0).getArg2(), instructionsToSameState.get(1).getArg2());
     }
 
     @Test

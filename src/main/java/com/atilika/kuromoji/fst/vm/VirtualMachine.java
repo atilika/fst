@@ -51,13 +51,13 @@ public class VirtualMachine {
             Instruction i = program.getInstructionAt(pc);
 //            System.out.println(i);
 
-            short opcode = i.opcode;
+            short opcode = i.getOpcode();
 
             switch (opcode) {
 
                 case Program.MATCH:
 
-                    char arg1 = i.arg1;
+                    char arg1 = i.getArg1();
 
                     if (position >= input.length()) {
                         break;
@@ -66,8 +66,8 @@ public class VirtualMachine {
                     if (arg1 == input.charAt(position)) {
 //                        pc += i.arg2 - 1; // pc is always incremented!
 //                        pc = i.arg2 - 1; // JUMP to Address i.arg2
-                        pc = i.arg2 + 1; // JUMP to Address i.arg2
-                        accumulator += i.arg3;
+                        pc = i.getArg2() + 1; // JUMP to Address i.arg2
+                        accumulator += i.getArg3();
                         position += 1; // move the input char pointer
                     }
 
@@ -84,18 +84,18 @@ public class VirtualMachine {
                     break;
 
                 case Program.ACCEPT_OR_MATCH:
-                    arg1 = i.arg1;
+                    arg1 = i.getArg1();
 
                     if (input.length() == position + 1 && arg1 == input.charAt(position)) {
                         // last character
-                        accumulator += i.arg3;
+                        accumulator += i.getArg3();
                         done = true;
                     }
                     else {
                         if (position < input.length() && arg1 == input.charAt(position)) {
 //                        pc += i.arg2 - 1; // pc is always incremented!
-                            pc = i.arg2 + 1; // JUMP to Address i.arg2
-                            accumulator += i.arg3;
+                            pc = i.getArg2() + 1; // JUMP to Address i.arg2
+                            accumulator += i.getArg3();
                             position += 1; // move the input char pointer
                         }
                     }

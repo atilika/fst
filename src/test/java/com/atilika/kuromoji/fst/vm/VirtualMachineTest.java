@@ -20,10 +20,10 @@ public class VirtualMachineTest {
         Program program = new Program();
 
         Instruction instruction = new Instruction();
-        instruction.opcode = Program.HELLO;
+        instruction.setOpcode(Program.HELLO);
 
         Instruction instructionFail = new Instruction();
-        instructionFail.opcode = Program.FAIL;
+        instructionFail.setOpcode(Program.FAIL);
 
         program.addInstruction(instruction);
         program.addInstruction(instructionFail);
@@ -38,13 +38,13 @@ public class VirtualMachineTest {
         VirtualMachine vm = new VirtualMachine(false);
         Program program = new Program();
         Instruction instructionMatch = new Instruction();
-        instructionMatch.opcode = Program.MATCH;
-        instructionMatch.arg1 = 'a'; // transition string
-        instructionMatch.arg2 = 1;  // target address, delta coded
-        instructionMatch.arg3 = 1; // output, value to be accumulated;
+        instructionMatch.setOpcode(Program.MATCH);
+        instructionMatch.setArg1('a'); // transition string
+        instructionMatch.setArg2(1);  // target address, delta coded
+        instructionMatch.setArg3(1); // output, value to be accumulated;
 
         Instruction instructionAccept = new Instruction();
-        instructionAccept.opcode = Program.ACCEPT;
+        instructionAccept.setOpcode(Program.ACCEPT);
 
         program.addInstructions(
                 Arrays.asList(instructionAccept, instructionMatch)
