@@ -31,21 +31,23 @@ public class State {
     }
 
     public Arc setArc(char transition, int output, State toState) {
-        Arc existingArc = findArc(transition);
-        if (existingArc != null) {
-            // does override existing arc
-            arcs.remove(existingArc);
-        }
+//        Arc existingArc = findArc(transition);
+//        if (existingArc != null) {
+//            // does override existing arc
+//            arcs.remove(existingArc);
+//        }
+        // Assuming no duplicate transition character
         Arc newArc = new Arc(output, toState, transition);
         arcs.add(newArc);
         return newArc;
     }
 
     public void setArc(char transition, State toState) {
-        if (findArc(transition) != null) {
-//            does not override existing arc
-            return;
-        }
+//        if (findArc(transition) != null) {
+////            does not override existing arc
+//            return;
+//        }
+        // Assuming no duplicate transition character
         Arc newArc = new Arc(toState);
         newArc.setLabel(transition);
         arcs.add(newArc);
@@ -75,6 +77,32 @@ public class State {
             if (arc.getLabel() == transition) {
                 return arc;
             }
+        }
+
+        return null;
+    }
+
+//    public Arc findArc(char transition) {
+//        return binarySearchArc(transition, 0, this.arcs.size());
+//    }
+//
+    public Arc binarySearchArc(char transition, int beginIndice, int endIndice) {
+        if (beginIndice >= endIndice) {
+            return null;
+        }
+
+        int indice = beginIndice + (endIndice - beginIndice) / 2; // round down
+
+        if (arcs.get(indice).getLabel() == transition) {
+            return arcs.get(indice);
+        }
+        else if (arcs.get(indice).getLabel() > transition) {
+            // transition char is placed at the left part of the array
+            return binarySearchArc(transition, beginIndice, indice);
+        }
+        else if (arcs.get(indice).getLabel() < transition) {
+            // transition char is placed at the right part of the array
+            return binarySearchArc(transition, indice + 1, endIndice);
         }
 
         return null;

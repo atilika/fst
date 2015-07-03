@@ -92,7 +92,8 @@ public class FSTSubstringMatcherTest {
 //        FSTFormatter fstFormatter = new FSTFormatter();
 //        fstFormatter.format(fst, "ipadic-allwords_uniq_sorted_Head1070_tail65.txt");
 
-        fstTestHelper.checkOutputWordByWord(resource, program, vm);
+        // Enable when you want to confirm that the built (compiled) FST is correct
+//        fstTestHelper.checkOutputWordByWord(resource, program, vm);
 
         List<String> sentences = readSampleWikipediaArticle();
 

@@ -43,10 +43,10 @@ public class Program {
         instruction.position(internalIndex);
 
         Instruction i = new Instruction();
-        i.opcode = instruction.get();
-        i.arg1 = instruction.getChar();
-        i.arg2 = instruction.getInt();
-        i.arg3 = instruction.getInt();
+        i.setOpcode(instruction.get());
+        i.setArg1(instruction.getChar());
+        i.setArg2(instruction.getInt());
+        i.setArg3(instruction.getInt());
 
         return i;
     }
@@ -57,7 +57,7 @@ public class Program {
      * @param i
      */
     public void addInstruction(Instruction i) {
-        addInstruction(i.opcode, i.arg1, i.arg2, i.arg3);
+        addInstruction(i.getOpcode(), i.getArg1(), i.getArg2(), i.getArg3());
     }
 
     public void addInstruction(byte op, char label, int targetAddress, int output) {
@@ -179,12 +179,12 @@ public class Program {
         Instruction i = new Instruction();
 
         // Retrieving through the arcs from the starting state
-        while (i.opcode != Program.FAIL) {
+        while (i.getOpcode() != Program.FAIL) {
             i = this.getInstructionAt(pc);
-            int indice = i.arg1;
-            this.cacheFirstAddresses[indice] = i.arg2;
-            this.cacheFirstOutputs[indice] = i.arg3;
-            this.cacheFirstIsAccept[indice] = i.opcode == Program.ACCEPT_OR_MATCH;
+            int indice = i.getArg1();
+            this.cacheFirstAddresses[indice] = i.getArg2();
+            this.cacheFirstOutputs[indice] = i.getArg3();
+            this.cacheFirstIsAccept[indice] = i.getOpcode() == Program.ACCEPT_OR_MATCH;
             pc--;
         }
     }
