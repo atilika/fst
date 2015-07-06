@@ -24,15 +24,17 @@ public class FSTTestHelper {
         return fstBuilder.getFstCompiler().getProgram();
     }
 
-    public FSTBuilder readIncremental(String resource) throws IOException {
-
-        InputStream is = getResource(resource);
+    public FSTBuilder readIncremental(InputStream is) throws IOException {
 
         FSTBuilder fstBuilder = new FSTBuilder();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         fstBuilder.createDictionaryIncremental(reader);
 
         return fstBuilder;
+    }
+
+    public FSTBuilder readIncremental(String resource) throws IOException {
+        return readIncremental(getResource(resource));
     }
 
     public void checkOutputWordByWord(String resource, Program program, VirtualMachine vm) throws IOException {
