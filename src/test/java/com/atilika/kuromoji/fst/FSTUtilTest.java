@@ -1,5 +1,6 @@
 package com.atilika.kuromoji.fst;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -39,5 +40,18 @@ public class FSTUtilTest {
         assertEquals(surrogateOne, bufferedReader.readLine().trim()); // because higher surrogate < U+FF93
         assertEquals(mo, bufferedReader.readLine().trim());
 
+    }
+
+    @Ignore("Enable when jawikititles.txt is provided")
+    @Test
+    public void testJAWikipedia() throws Exception {
+        FSTUtil fstUtil = new FSTUtil();
+        fstUtil.sortInput(getResource("jawikititles.txt")); // sort ja wikipedia entries
+        File sortedOutput = new File("jawikititles_sorted.txt");
+        fstUtil.writeSortedInput(sortedOutput.getAbsolutePath());
+    }
+
+    private InputStream getResource(String s) {
+        return this.getClass().getClassLoader().getResourceAsStream(s);
     }
 }

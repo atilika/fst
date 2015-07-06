@@ -69,7 +69,8 @@ public class FSTSubstringMatcherTest {
 //        String resource = "ipadic-allwords_uniqHead100000.csv";
 //        String resource = "ipadic-allwords_uniqHead200000.csv";
 //        String resource = "ipadic-allwords_uniq_sorted.csv";
-        String resource = "jawikititles.txt";
+//        String resource = "jawikititles.txt";
+        String resource = "jawikititles_sorted.txt";
 //        String resource = "jawikititlesHead1000000.txt";
 
         testJAWikipediaIncremental(resource);
@@ -93,7 +94,7 @@ public class FSTSubstringMatcherTest {
 //        fstFormatter.format(fst, "ipadic-allwords_uniq_sorted_Head1070_tail65.txt");
 
         // Enable when you want to confirm that the built (compiled) FST is correct
-//        fstTestHelper.checkOutputWordByWord(resource, program, vm);
+        fstTestHelper.checkOutputWordByWord(resource, program, vm);
 
         List<String> sentences = readSampleWikipediaArticle();
 

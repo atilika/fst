@@ -71,21 +71,21 @@ public class State {
 
     public boolean isFinal() { return this.isFinal; }
 
-    public Arc findArc(char transition) {
-        // linear search
-        for (Arc arc : arcs) {
-            if (arc.getLabel() == transition) {
-                return arc;
-            }
-        }
+//    public Arc findArc(char transition) {
+//        // linear search
+//        for (Arc arc : arcs) {
+//            if (arc.getLabel() == transition) {
+//                return arc;
+//            }
+//        }
+//
+//        return null;
+//    }
 
-        return null;
+    public Arc findArc(char transition) {
+        return binarySearchArc(transition, 0, this.arcs.size());
     }
 
-//    public Arc findArc(char transition) {
-//        return binarySearchArc(transition, 0, this.arcs.size());
-//    }
-//
     public Arc binarySearchArc(char transition, int beginIndice, int endIndice) {
         if (beginIndice >= endIndice) {
             return null;
