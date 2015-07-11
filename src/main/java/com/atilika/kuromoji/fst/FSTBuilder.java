@@ -170,10 +170,17 @@ public class FSTBuilder {
         for (int i = previousWord.length(); i > 0; i--) {
             freezeAndPointToNewState(previousWord, i);
         }
+        compileStartingState();
+        findEquivalentState(tempStates.get(0)); // not necessary when compiling is enabled
+    }
+
+    /**
+     * Compiles and caches the outgoing arcs from the starting state
+     */
+    private void compileStartingState() {
         fstCompiler.compileStartingState(tempStates.get(0)); // For FST Compiler, caching
         fstCompiler.program.instruction.flip(); // storing limit as the limit of the bytebuffer
         fstCompiler.program.storeCache(); // Should come after the filp. Else the limit will be the end of first arcs.
-        findEquivalentState(tempStates.get(0)); // not necessary when compiling is enabled
     }
 
     /**

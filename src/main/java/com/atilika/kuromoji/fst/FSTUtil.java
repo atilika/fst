@@ -9,6 +9,12 @@ public class FSTUtil {
 
     List<String> inputStrings = new ArrayList<>();
 
+    /**
+     * Sort the input into Java-lexical order
+     *
+     * @param inputStream
+     * @throws IOException
+     */
     public void sortInput(InputStream inputStream) throws IOException {
 
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -32,6 +38,12 @@ public class FSTUtil {
         sortInput(new FileInputStream(filename));
     }
 
+    /**
+     * Writing input that is sorted in Java-lexical order
+     *
+     * @param output
+     * @throws IOException
+     */
     private void writeSortedInput(OutputStream output) throws IOException {
 
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(output);
