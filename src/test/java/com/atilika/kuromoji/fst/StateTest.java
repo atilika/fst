@@ -45,7 +45,7 @@ public class StateTest {
         Arc ArcB = state.setArc('b', 1, destState);
         Arc ArcC = state.setArc('c', 1, destState);
 
-        String surrogateOne = "𥝱"; // U+2040A
+        String surrogateOne = "𥝱"; // U+25771
         Arc ArcD = state.setArc((surrogateOne.charAt(0)), 1, destState); // surrogate pair
         Arc ArcE = state.setArc(surrogateOne.charAt(1), 1, destState); // surrogate pair
 
