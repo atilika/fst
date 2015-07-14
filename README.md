@@ -1,6 +1,8 @@
 # README
 This package is a prototype of Finite State Transducer for Kuromoji.
 
+High-level explanation of the building algorithm implemented in this package is available [here](http://www.slideshare.net/yoshinarifujinuma/kuromoji-fst)
+
 ## References
 ### In English
 [Direct Construction of Minimal Acyclic Subsequential Transducers](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.24.3698)
