@@ -151,7 +151,8 @@ public class FSTFormatter {
     }
 
     private String getNodeId(State node) {
-        return String.valueOf(node.hashCode());
+//        return String.valueOf(node.hashCode());
+        return String.valueOf(node.getTargetJumpAddress());
     }
 
 }

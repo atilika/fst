@@ -52,10 +52,27 @@ public class Arc {
         return true;
     }
 
+    public boolean equalsExceptOutput(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Arc arc = (Arc) o;
+
+        if (label != arc.label) return false;
+//        if (output != arc.output) return false;
+        if (destination != null) {
+            if (!destination.equals(arc.destination)) return false;
+        } else {
+            if (arc.destination != null) return false;
+        }
+
+        return true;
+    }
+
     @Override
     public int hashCode() {
         int result = (int) label;
-        result = 31 * result + output;
+//        result = 31 * result + output;
         result = 31 * result + (destination != null ? destination.hashCode() : 0);
         return result;
     }

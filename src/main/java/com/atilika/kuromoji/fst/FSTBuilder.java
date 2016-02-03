@@ -156,9 +156,38 @@ public class FSTBuilder {
     private void freezeAndPointToNewState(String previousWord, int i) {
         State state = tempStates.get(i - 1);
         char previousWordChar = previousWord.charAt(i - 1);
+
         int output = state.findArc(previousWordChar).getOutput();
+        State equivalentState = findEquivalentState(tempStates.get(i));
+
+        // if the number of outgoing arcs are 1 for multiple states
+        // TODO: Find the target arc even the outgoings are more than one
+        if (i >= 2 &&
+            tempStates.get(i - 2).arcs.size() == 1 &&
+            tempStates.get(i - 1).arcs.size() == 1 &&
+            tempStates.get(i).arcs.size() == 1
+            ) {
+            // check if the output is pushable
+            State candidateEquivalentState = findEquivalentStateExeptOutput(tempStates.get(i));
+
+            if (candidateEquivalentState != null) {
+
+                int tempOutput = tempStates.get(i).findArc(previousWord.charAt(i)).getOutput();
+                int tempEquivalentOutput = candidateEquivalentState.arcs.get(0).getOutput(); // assuming only one arc for now
+                if (tempOutput - tempEquivalentOutput != 0) {
+                    output = tempOutput - tempEquivalentOutput;
+                    // WE need to update the ouput
+                    tempStates.get(i - 2).findArc(previousWord.charAt(i - 2)).setOutput(-1 * output); // pushing the diff to state before that
+                    state.arcs.remove(state.findArc(previousWordChar));
+                    Arc arcToFrozenState = state.setArc(previousWordChar, output, candidateEquivalentState);
+                    fstCompiler.compileState(arcToFrozenState.getDestination()); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
+                    return; // new state is now frozen!
+                }
+            }
+        }
+
         state.arcs.remove(state.findArc(previousWordChar));
-        Arc arcToFrozenState = state.setArc(previousWordChar, output, findEquivalentState(tempStates.get(i)));
+        Arc arcToFrozenState = state.setArc(previousWordChar, output, equivalentState);
         fstCompiler.compileState(arcToFrozenState.getDestination()); // For FST Compiler, be sure to have it *AFTER* the setTransitionFunction
     }
 
@@ -248,6 +277,21 @@ public class FSTBuilder {
         statesDictionary.put(key, stateList);
 
         return newStateToDic;
+    }
+
+    private State findEquivalentStateExeptOutput(State state) {
+        Integer key = state.hashCode(); // this is going to be the hashCode.
+
+        if (statesDictionary.containsKey(key)) {
+
+            // Here, there are multiple states that has the same hashcode. Linear Probing the collidedStates.
+            for (State collidedStateExceptOutput : statesDictionary.get(key)) {
+                if (state.equalsExceptOutput(collidedStateExceptOutput)) {
+                    return collidedStateExceptOutput;
+                }
+            }
+        }
+        return null;
     }
 
     public FSTCompiler getFstCompiler() {

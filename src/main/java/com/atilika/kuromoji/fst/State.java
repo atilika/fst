@@ -117,7 +117,28 @@ public class State {
 
         if (isFinal != state.isFinal) return false;
         if (arcs != null) {
+//            for (int i = 0; i < arcs.size(); i++) {
+//                if (!arcs.get(i).equals(state.arcs.get(i))) return false;
+//            }
             if (!arcs.equals(state.arcs)) return false;
+        } else {
+            if (state.arcs != null) return false;
+        }
+
+        return true;
+    }
+
+    public boolean equalsExceptOutput(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        State state = (State) o;
+
+        if (isFinal != state.isFinal) return false;
+        if (arcs != null) {
+            for (int i = 0; i < arcs.size(); i++) {
+                if (!arcs.get(i).equalsExceptOutput(state.arcs.get(i))) return false;
+            }
         } else {
             if (state.arcs != null) return false;
         }
